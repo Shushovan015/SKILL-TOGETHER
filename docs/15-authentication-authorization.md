@@ -9,6 +9,13 @@
 - Create a User, UserProfile, default LEARNER role, and server-side session in one transaction.
 - Return a secure HTTP-only cookie.
 
+Phase 2 implementation parameters:
+
+- Email normalization trims leading/trailing whitespace and lowercases before validation and lookup.
+- Password policy requires at least 12 characters and at least one uppercase letter, lowercase letter, number, and symbol.
+- Password hashes use Argon2id through `@node-rs/argon2` with memory cost 19,456 KiB, time cost 3, parallelism 1, and 32-byte output.
+- Duplicate registration emails return `VALIDATION_FAILED` with `field: "email"`.
+
 ## Login
 
 - Use normalized email lookup.
@@ -16,6 +23,8 @@
 - Return a generic error for invalid credentials.
 - Rate-limit by IP and normalized email.
 - Rotate session on successful login.
+
+Phase 2 rate limiting is process-local for the MVP: 5 failed login attempts per 15 minutes per IP and normalized email. A successful login resets the bucket.
 
 ## Logout
 
@@ -31,17 +40,23 @@
 - Set explicit expiration; MVP default is 14 days.
 - Revoke sessions on logout and administrative disablement.
 
+Phase 2 stores the raw opaque token only in the `skilltogether.sid` HTTP-only cookie. The database stores an HMAC-SHA-256 hash of that token using `SESSION_SECRET`.
+
 ## CSRF
 
 - State-changing GraphQL operations require CSRF protection.
 - Use SameSite cookies plus a CSRF token or double-submit strategy.
 - Reject missing or invalid CSRF token with `CSRF_INVALID`.
 
+Phase 2 exposes anonymous `csrfToken`, which sets `skilltogether.csrf` as a non-HTTP-only signed double-submit cookie. Mutations must echo the token in the `x-csrf-token` header. CSRF tokens are not authentication tokens.
+
 ## CORS
 
 - Allow only configured frontend origins.
 - Include credentials only for allowed origins.
 - Do not use wildcard CORS with credentials.
+
+Runtime configuration is controlled by `WEB_ORIGIN` and comma-separated `CORS_ALLOWED_ORIGINS`. Wildcard origins are not used with credentials.
 
 ## Password Reset
 

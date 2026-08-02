@@ -23,59 +23,59 @@ Protects learner data and enables private Study Plans, tasks, assessments, and p
 
 ## Implementation Tasks
 
-- [ ] Implement registration flow.
-- [ ] Implement login flow.
-- [ ] Implement logout flow.
-- [ ] Implement current-user query.
-- [ ] Add session middleware or guard.
-- [ ] Add CSRF protection for mutations.
+- [x] Implement registration flow.
+- [x] Implement login flow.
+- [x] Implement logout flow.
+- [x] Implement current-user query.
+- [x] Add session middleware or guard.
+- [x] Add CSRF protection for mutations.
 
 ## Database Tasks
 
-- [ ] Create users table.
-- [ ] Create user_profiles table.
-- [ ] Create user_roles table.
-- [ ] Create sessions table.
-- [ ] Add indexes and uniqueness constraints.
+- [x] Create users table.
+- [x] Create user_profiles table.
+- [x] Create user_roles table.
+- [x] Create sessions table.
+- [x] Add indexes and uniqueness constraints.
 
 ## Backend Tasks
 
-- [ ] Add AuthModule.
-- [ ] Add password hashing service.
-- [ ] Add session service.
-- [ ] Add GraphQL auth resolvers.
-- [ ] Add role and ownership guard foundation.
-- [ ] Map auth errors to stable codes.
+- [x] Add AuthModule.
+- [x] Add password hashing service.
+- [x] Add session service.
+- [x] Add GraphQL auth resolvers.
+- [x] Add role and ownership guard foundation.
+- [x] Map auth errors to stable codes.
 
 ## Frontend Tasks
 
-- [ ] Build registration page.
-- [ ] Build login page.
-- [ ] Add logout action.
-- [ ] Add authenticated route guard.
-- [ ] Handle session expiration.
+- [x] Build registration page.
+- [x] Build login page.
+- [x] Add logout action.
+- [x] Add authenticated route guard.
+- [x] Handle session expiration.
 
 ## Test Tasks
 
-- [ ] Unit test email normalization.
-- [ ] Integration test password hashing and session creation.
-- [ ] GraphQL test register, login, logout, me.
-- [ ] Component test auth forms.
-- [ ] E2E test registration and login.
+- [x] Unit test email normalization.
+- [x] Integration test password hashing and session creation.
+- [x] GraphQL test register, login, logout, me.
+- [x] Component test auth forms.
+- [x] E2E test registration and login.
 
 ## Documentation Tasks
 
-- [ ] Update auth docs with implementation parameters.
-- [ ] Update API docs if schema changes.
-- [ ] Update error catalogue for new auth errors.
+- [x] Update auth docs with implementation parameters.
+- [x] Update API docs if schema changes.
+- [x] Update error catalogue for new auth errors.
 
 ## Security Checks
 
-- [ ] Passwords are never logged.
-- [ ] Cookies are HTTP-only and secure in production.
-- [ ] CSRF is enforced for mutations.
-- [ ] Invalid credentials return generic message.
-- [ ] Rate limits are applied to auth endpoints.
+- [x] Passwords are never logged.
+- [x] Cookies are HTTP-only and secure in production.
+- [x] CSRF is enforced for mutations.
+- [x] Invalid credentials return generic message.
+- [x] Rate limits are applied to auth endpoints.
 
 ## Acceptance Criteria
 
@@ -107,8 +107,9 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
-- [ ] Tests complete.
-- [ ] Security checks complete.
-- [ ] Documentation updated.
-- [ ] Validation commands passed.
+- [x] Implementation complete.
+- [x] Tests complete.
+- [x] Security checks complete.
+- [x] Documentation updated.
+- [x] Validation commands passed.
+- [x] Principal/security review corrections verified.

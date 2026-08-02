@@ -92,3 +92,38 @@ This document records initial architecture decision records. Status values: Prop
 - Context: The core product promise is today's lesson, not calendar management.
 - Decision: The dashboard prioritizes today's tasks, progress, missed sessions, assessment, and partner summary; the long roadmap lives separately.
 - Consequences: UX must avoid overwhelming five-month calendar views on the dashboard.
+
+## ADR-014: Phase 2 CSRF Bootstrap
+
+- Status: Accepted
+- Context: Authentication mutations are anonymous but still state-changing, and the GraphQL contract required CSRF without defining a browser bootstrap path.
+- Decision: Add an anonymous `csrfToken` GraphQL query that sets a non-HTTP-only CSRF cookie. Mutations must send the same value in the configured CSRF header. Session identifiers remain HTTP-only.
+- Consequences: Frontend auth forms can obtain CSRF before registration, login, and logout. The CSRF token is not an authentication token and must not grant access by itself.
+
+## ADR-015: Authenticated Current User Query
+
+- Status: Accepted
+- Context: The initial GraphQL sketch defined `me: User`, but FR-AUTH-004 and AC-AUTH-004 require missing, expired, or revoked sessions to return `AUTH_REQUIRED`.
+- Decision: Implement and document `me: User!` as an authenticated query. Anonymous screens should use auth form state or handle `AUTH_REQUIRED` rather than relying on nullable `me`.
+- Consequences: Auth checks are explicit and testable. Public routes remain available through `csrfToken`, `register`, and `login`.
+
+## ADR-016: Use `@node-rs/argon2` for Argon2id
+
+- Status: Accepted
+- Context: The native `argon2` package failed to build in the Windows development environment because node-gyp required local compiler/Python setup.
+- Decision: Use `@node-rs/argon2`, configured for Argon2id with memory cost 19,456 KiB, time cost 3, parallelism 1, and 32-byte output.
+- Consequences: Password storage keeps the documented Argon2id algorithm while avoiding fragile local native builds.
+
+## ADR-017: Use Prisma 7 Config and PostgreSQL Adapter
+
+- Status: Accepted
+- Context: The installed Prisma 7 CLI no longer accepts datasource URLs inside `schema.prisma` and requires a driver adapter for direct database connections.
+- Decision: Keep the Prisma schema provider-only, define datasource and migration paths in `prisma.config.ts`, generate the client to `apps/api/src/generated/prisma`, and construct `PrismaClient` with `@prisma/adapter-pg`.
+- Consequences: Validation scripts run Prisma generation before typecheck, tests, E2E, and build. Generated Prisma files are ignored and regenerated locally/CI.
+
+## ADR-018: Use Test-Only In-Memory Auth Persistence
+
+- Status: Accepted
+- Context: Docker/PostgreSQL may be unavailable in local sandboxed test runs, but Phase 2 still needs GraphQL and browser auth-flow coverage.
+- Decision: Add `AUTH_PERSISTENCE=memory` for tests and E2E only. Normal runtime defaults to Prisma/PostgreSQL.
+- Consequences: Auth service and resolver tests can validate session, CSRF, and error behavior without a database process. Repository and migration SQL remain the production persistence path.

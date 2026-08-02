@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+
+  @@map("user_status")
+}
+
+enum UserRole {
+  LEARNER
+  CONTENT_ADMIN
+  SYSTEM_ADMIN
+
+  @@map("user_role")
+}
+
+model User {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String               @unique
+  passwordHash String               @map("password_hash")
+  status       UserStatus           @default(ACTIVE)
+  createdAt    DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  profile      UserProfile?
+  roles        UserRoleAssignment[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  userId               String    @id @map("user_id") @db.Uuid
+  displayName          String    @map("display_name")
+  timeZone             String    @map("time_zone")
+  preferredSessionTime DateTime? @map("preferred_session_time") @db.Time(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UserRoleAssignment {
+  userId String   @map("user_id") @db.Uuid
+  role   UserRole
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, role])
+  @@map("user_roles")
+}
+
+model Session {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  sessionHash String    @unique @map("session_hash")
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz(6)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt], map: "sessions_user_id_expires_at_idx")
+  @@map("sessions")
+}

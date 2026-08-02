@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
+    { "path": "./tsconfig.scripts.json" },
     { "path": "./packages/shared" },
     { "path": "./apps/api" },
     { "path": "./apps/web" }

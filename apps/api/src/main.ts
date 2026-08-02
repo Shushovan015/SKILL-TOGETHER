@@ -1,23 +1,18 @@
 import "reflect-metadata";
 
 import { NestFactory } from "@nestjs/core";
+import { config as loadEnvironment } from "dotenv";
 
 import { AppModule } from "./app.module.js";
+import { ApiConfigService } from "./common/config/api-config.service.js";
+import { configureApplication } from "./configure-app.js";
 
-function resolvePort(value: string | undefined): number {
-  const parsed = Number.parseInt(value ?? "4000", 10);
-
-  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65_535) {
-    throw new Error("API_PORT must be an integer between 1 and 65535");
-  }
-
-  return parsed;
-}
+loadEnvironment();
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
-  app.enableShutdownHooks();
-  await app.listen(resolvePort(process.env["API_PORT"]));
+  configureApplication(app);
+  await app.listen(app.get(ApiConfigService).value.apiPort);
 }
 
 void bootstrap();

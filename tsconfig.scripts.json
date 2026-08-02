@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["ES2023", "DOM"],
+    "rootDir": ".",
+    "tsBuildInfoFile": "node_modules/.tmp/tsconfig.scripts.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["prisma.config.ts", "scripts/**/*.ts", "apps/web/playwright.config.ts"]
+}

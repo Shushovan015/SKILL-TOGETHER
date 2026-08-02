@@ -4,6 +4,9 @@ coverage/
 .turbo/
 .vite/
 .pnpm-store/
+apps/api/src/generated/
+apps/web/playwright-report/
+apps/web/test-results/
 *.tsbuildinfo
 
 .env

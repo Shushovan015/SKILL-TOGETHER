@@ -2,6 +2,12 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@apollo/protobufjs': true
+  '@prisma/engines': true
   esbuild: true
+  prisma: true
 onlyBuiltDependencies:
   - esbuild
+peerDependencyRules:
+  allowedVersions:
+    '@apollo/server': '^4.0.0 || ^5.0.0'

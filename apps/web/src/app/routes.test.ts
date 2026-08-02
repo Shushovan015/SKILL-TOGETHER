@@ -9,6 +9,6 @@ describe("route shell", () => {
       "authenticated",
       "admin"
     ]);
-    expect(appRoutes.map((route) => route.path)).toEqual(["/", "/today", "/admin/content"]);
+    expect(appRoutes.map((route) => route.path)).toEqual(["/", "/register", "/login", "/today"]);
   });
 });

@@ -33,13 +33,18 @@ export const appRoutes = [
     scope: "public"
   },
   {
+    path: "/register",
+    label: "Register",
+    scope: "public"
+  },
+  {
+    path: "/login",
+    label: "Login",
+    scope: "public"
+  },
+  {
     path: "/today",
     label: "Today",
     scope: "authenticated"
-  },
-  {
-    path: "/admin/content",
-    label: "Content",
-    scope: "admin"
   }
 ] as const satisfies readonly AppRouteDefinition[];

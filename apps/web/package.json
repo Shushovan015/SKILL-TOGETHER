@@ -5,12 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "start:e2e": "vite --host 127.0.0.1 --port 5174 --strictPort",
     "build": "tsc --noEmit -p tsconfig.json && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^4.2.9",
+    "@hookform/resolvers": "^5.6.0",
+    "graphql": "^16.14.2",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.84.0",
+    "react-router-dom": "^7.18.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

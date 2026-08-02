@@ -74,15 +74,17 @@ type Mutation {
 }
 
 type Query {
-  me: User
+  csrfToken: String!
+  me: User!
 }
 ```
 
 Authentication requirements:
 
-- `register`, `login`, and public track preview are anonymous.
+- `csrfToken`, `register`, `login`, and public track preview are anonymous.
+- `me` requires a valid authenticated session and returns `AUTH_REQUIRED` when no valid session exists.
 - All other user data operations require an authenticated session.
-- Mutations require CSRF protection.
+- Mutations require CSRF protection using a double-submit token: the server issues a non-HTTP-only CSRF cookie through `csrfToken`, and the client sends the same value in the configured CSRF header.
 
 ## Learning Tracks and Enrollment
 

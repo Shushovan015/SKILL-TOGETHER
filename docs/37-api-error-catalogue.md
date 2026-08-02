@@ -21,6 +21,14 @@ Each API error must include a stable code, safe user message, internal detail, G
 | CSRF_INVALID | CSRF token missing or invalid. | Refresh the page and try again. | Token mismatch. | Reject mutation. | Yes | warn |
 | AUTH_RATE_LIMITED | Too many auth attempts. | Too many attempts. Try again later. | Rate limit exceeded. | GraphQL user error with retry-after. | Yes | warn |
 
+Phase 2 auth mapping:
+
+- Duplicate registration email uses `VALIDATION_FAILED` with `field: "email"`.
+- Missing, expired, revoked, or disabled-user sessions use `AUTH_REQUIRED`.
+- Missing or mismatched CSRF cookie/header pairs use `CSRF_INVALID`.
+- Login with a missing user, disabled user, or bad password uses the generic `AUTH_INVALID_CREDENTIALS`.
+- Exceeded process-local login throttles use `AUTH_RATE_LIMITED`.
+
 ## Planning and Lessons
 
 | Code | Meaning | Safe User Message | Internal Detail | Handling | Retryable | Log Level |

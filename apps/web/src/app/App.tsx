@@ -1,23 +1,35 @@
-import { appRoutes, layoutShells } from "./routes.js";
+import { ApolloProvider } from "@apollo/client/react";
+import { useMemo } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import { HomePage } from "../features/auth/HomePage.js";
+import { LoginPage } from "../features/auth/LoginPage.js";
+import { ProtectedRoute } from "../features/auth/ProtectedRoute.js";
+import { RegisterPage } from "../features/auth/RegisterPage.js";
+import { TodayPage } from "../features/auth/TodayPage.js";
+import { createApolloClient } from "./apollo-client.js";
 
 export function App(): React.JSX.Element {
+  const apolloClient = useMemo(() => createApolloClient(), []);
+
   return (
-    <main className="app-shell" aria-labelledby="app-shell-title">
-      <section className="app-shell__panel">
-        <p className="app-shell__eyebrow">Foundation</p>
-        <h1 id="app-shell-title">SkillTogether</h1>
-        <p>Workspace shell ready.</p>
-        <dl className="app-shell__grid" aria-label="Configured workspace shells">
-          <div>
-            <dt>Layouts</dt>
-            <dd>{layoutShells.length} configured</dd>
-          </div>
-          <div>
-            <dt>Routes</dt>
-            <dd>{appRoutes.length} configured</dd>
-          </div>
-        </dl>
-      </section>
-    </main>
+    <ApolloProvider client={apolloClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/today"
+            element={
+              <ProtectedRoute>
+                <TodayPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </BrowserRouter>
+    </ApolloProvider>
   );
 }

@@ -28,6 +28,8 @@ SkillTogether stores personal profiles, learning progress, private reflections, 
 - Validate allowed origins.
 - Do not enable wildcard CORS with credentials.
 
+Phase 2 stores only opaque session cookies in the browser, hashes session identifiers with HMAC-SHA-256 before persistence, and uses a signed double-submit CSRF cookie/header pair for GraphQL mutations.
+
 ## XSS
 
 - Escape user-generated content by default.
@@ -56,6 +58,8 @@ SkillTogether stores personal profiles, learning progress, private reflections, 
 - Reject common weak passwords if a local list is available.
 - Never log passwords.
 - Never email passwords.
+
+Phase 2 implementation uses Argon2id with memory cost 19,456 KiB, time cost 3, parallelism 1, and 32-byte output. The implemented password policy requires uppercase, lowercase, number, and symbol characters. No local common-password list is bundled yet.
 
 ## Secrets
 

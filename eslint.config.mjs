@@ -11,6 +11,7 @@ export default tseslint.config(
       "dist/**",
       "node_modules/**",
       ".pnpm-store/**",
+      "apps/api/src/generated/**",
       "apps/*/dist/**",
       "packages/*/dist/**"
     ]
@@ -55,7 +56,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ["apps/api/**/*.ts", "vitest.config.mts"],
+    files: ["apps/api/**/*.ts", "scripts/**/*.ts", "vitest.config.mts"],
     languageOptions: {
       globals: globals.node
     }
