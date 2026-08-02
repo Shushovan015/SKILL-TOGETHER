@@ -1,0 +1,186 @@
+# Scheduling Engine
+
+## Purpose
+
+The scheduling engine creates and adjusts Daily Tasks for a learner's Study Plan. It is deterministic for the MVP and must not depend on AI.
+
+## Inputs
+
+- Programme start date.
+- Preferred study days.
+- Available minutes per study day.
+- Preferred session time.
+- Learning Track.
+- Current experience level.
+- Target outcome.
+- Assessment day.
+- Recovery day.
+- Pause periods.
+- Ordered Lessons with prerequisites, duration, required flag, and approved version.
+- Existing Daily Tasks and Task Attempts.
+
+## Constraints
+
+- Required prerequisites must be completed before dependent required lessons.
+- Completed tasks must never be automatically rescheduled.
+- Daily planned minutes must not exceed configured availability.
+- Optional content is moved, shortened, or skipped before required content is delayed.
+- A single missed session should not destroy the weekly schedule.
+- Automatic decisions must be explainable.
+- Important rescheduling changes must be reviewable by the learner.
+- Dates are evaluated in the learner's configured time zone.
+
+## Initial Planning Algorithm
+
+```text
+function createStudyPlan(enrollment, lessons, preferences):
+  approvedLessons = lessons.filter(status == APPROVED)
+  ordered = topologicalSortByPrerequisitesThenSequence(approvedLessons)
+  weeks = createStudyWeeks(enrollment.startDate, preferences.studyDays)
+  for lesson in ordered:
+    slot = firstAvailableSlot(weeks, lesson.duration, preferences, lesson.prerequisites)
+    if slot is missing:
+      recordPlanningConflict(lesson, "NO_CAPACITY")
+      continue
+    createDailyTask(slot.date, lesson.versionId, lesson.duration, lesson.required)
+  scheduleWeeklyAssessments(weeks, preferences.assessmentDay)
+  return plan
+```
+
+## Missed-Task Detection
+
+A task becomes MISSED when:
+
+- scheduled date is before today's local date;
+- status is PLANNED or IN_PROGRESS;
+- no completed Task Attempt exists.
+
+Completed, SKIPPED, CANCELLED, and RESCHEDULED tasks are not marked MISSED.
+
+## Recovery Options
+
+Ranked order:
+
+1. Move missed required lesson to configured recovery day if capacity exists.
+2. Move missed required lesson to next available study day if capacity exists.
+3. Move optional tasks from a future day to create capacity.
+4. Shorten or skip optional content.
+5. Delay dependent required lessons.
+6. Create a short recovery session if configured capacity allows.
+7. Ask learner to review conflict manually.
+
+## Recovery Algorithm
+
+```text
+function proposeRecovery(missedTask, plan):
+  assert missedTask.status == MISSED
+  if missedTask.isCompleted:
+    return noChange("COMPLETED_TASK")
+
+  candidates = recoveryDates(plan, missedTask)
+  for date in candidates:
+    if hasCapacity(date, missedTask.duration):
+      return proposal("MOVE_TO_DATE", date)
+
+  optionalMove = findOptionalTaskToMove(plan, missedTask.duration)
+  if optionalMove:
+    return proposal("MOVE_OPTIONAL_AND_INSERT_REQUIRED", optionalMove)
+
+  optionalSkip = findOptionalTaskToSkip(plan, missedTask.duration)
+  if optionalSkip:
+    return proposal("SKIP_OPTIONAL_AND_INSERT_REQUIRED", optionalSkip)
+
+  dependentDelay = findDependentRequiredTasks(plan, missedTask)
+  if dependentDelay.canDelayWithinCapacity:
+    return proposal("DELAY_DEPENDENTS", dependentDelay)
+
+  return conflict("NO_VALID_RECOVERY_SLOT")
+```
+
+## Conflict Resolution
+
+Conflict results must include:
+
+- task ID;
+- reason code;
+- impacted lessons;
+- capacity calculation;
+- prerequisite impact;
+- suggested learner choices.
+
+The learner can choose to:
+
+- accept the proposal;
+- select another valid date;
+- intentionally skip optional lesson;
+- pause programme;
+- leave task missed for now.
+
+## Pause and Resume
+
+Pause:
+
+- Enrollment becomes PAUSED.
+- No new tasks become due during pause.
+- Existing completed attempts remain unchanged.
+
+Resume:
+
+- Enrollment returns to ACTIVE.
+- Future uncompleted tasks shift after pause range.
+- Completed tasks remain on their historical dates.
+- Assessment windows are recalculated for future weeks only.
+
+## Time Zones and DST
+
+- Store user time zone on UserProfile.
+- Calculate local due dates in that time zone.
+- Store planned dates as `date`, not midnight timestamps.
+- Preferred session time can move through daylight-saving transitions according to local civil time.
+- Audit timestamp still uses `timestamptz`.
+
+## Idempotency
+
+- Running missed detection twice must not create duplicate changes.
+- Recovery proposal generation is read-only.
+- Applying a proposal uses an idempotency key and verifies the task status has not changed.
+- Background jobs can safely retry.
+
+## Audit History
+
+Record:
+
+- task marked MISSED;
+- recovery proposal accepted;
+- task rescheduled;
+- optional task skipped;
+- dependent task delayed;
+- pause and resume.
+
+Audit metadata must be safe and not include private notes or assessment answers.
+
+## Acceptance Examples
+
+### Single Missed Required Lesson
+
+Given Monday's required lesson is missed and Friday is the configured recovery day with enough capacity, the engine proposes moving the missed lesson to Friday and leaves completed tasks unchanged.
+
+### Optional Content Conflict
+
+Given a missed required lesson and the next available day has one optional lesson, the engine proposes moving or skipping the optional lesson before delaying required content.
+
+### Prerequisite Conflict
+
+Given Lesson B requires Lesson A and Lesson A is missed, Lesson B is delayed until after Lesson A is completed or rescheduled earlier.
+
+### Pause Period
+
+Given a learner pauses for one week, future incomplete tasks shift after the pause and completed tasks keep their original dates.
+
+## Edge Cases
+
+- No approved lesson version exists: create planning conflict for admin review.
+- Study day capacity is zero: reject onboarding preference.
+- Assessment day is not a study day: allowed, but assessment duration must fit configured availability or separate assessment capacity.
+- Multiple tracks: main track and German track are scheduled independently, then combined dashboard capacity is checked.
+- User changes time zone: future date calculations use new time zone; historical snapshots remain unchanged.
