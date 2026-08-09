@@ -125,7 +125,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
 
     const lessons = await this.approvedLessonsForTrack(input, track.type);
 
-    if (lessons.length === 0 && track.type !== PrismaTrackType.GERMAN) {
+    if (lessons.length === 0) {
       throw notFoundError();
     }
 
