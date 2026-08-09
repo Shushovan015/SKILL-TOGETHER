@@ -25,35 +25,35 @@ Gives learners approved curriculum content and gives administrators a safe way t
 
 ## Implementation Tasks
 
-- [ ] Implement Learning Track browsing.
-- [ ] Implement Module and Lesson summary queries.
-- [ ] Implement Lesson Version status transitions.
-- [ ] Implement basic admin content list.
-- [ ] Implement admin Lesson Version editor.
-- [ ] Seed first four weeks of approved content.
+- [x] Implement Learning Track browsing.
+- [x] Implement Module and Lesson summary queries.
+- [x] Implement Lesson Version status transitions.
+- [x] Implement basic admin content list.
+- [x] Implement admin Lesson Version editor.
+- [x] Seed first four weeks of approved content.
 
 ## Database Tasks
 
-- [ ] Create learning_tracks, modules, lessons, lesson_versions tables.
-- [ ] Create resources, exercises, knowledge_checks tables.
-- [ ] Add content status enum and indexes.
-- [ ] Add content audit events.
+- [x] Create learning_tracks, modules, lessons, lesson_versions tables.
+- [x] Create resources, exercises, knowledge_checks tables.
+- [x] Add content status enum and indexes.
+- [x] Add content audit events.
 
 ## Backend Tasks
 
-- [ ] Add ContentModule.
-- [ ] Add repositories for tracks and lesson versions.
-- [ ] Add admin content service.
-- [ ] Add approval validation.
-- [ ] Exclude unapproved content from learner queries.
+- [x] Add ContentModule.
+- [x] Add repositories for tracks and lesson versions.
+- [x] Add admin content service.
+- [x] Add approval validation.
+- [x] Exclude unapproved content from learner queries.
 
 ## Frontend Tasks
 
-- [ ] Build track browse view.
-- [ ] Build roadmap module list.
-- [ ] Build admin content list.
-- [ ] Build admin lesson editor form.
-- [ ] Show loading, empty, error, and permission states.
+- [x] Build track browse view.
+- [x] Build roadmap module list.
+- [x] Build admin content list.
+- [x] Build admin lesson editor form.
+- [x] Show loading, empty, error, and permission states.
 
 ## Test Tasks
 
@@ -67,14 +67,14 @@ Gives learners approved curriculum content and gives administrators a safe way t
 
 - [ ] Update seed-data doc with actual seed IDs.
 - [ ] Update content model if implementation fields differ.
-- [ ] Record decisions for content tooling changes.
+- [x] Record decisions for content tooling changes.
 
 ## Security Checks
 
-- [ ] Learners cannot approve content.
-- [ ] Admin operations are role-gated.
+- [x] Learners cannot approve content.
+- [x] Admin operations are role-gated.
 - [ ] Rendered Markdown is sanitized.
-- [ ] External resource URLs are validated.
+- [x] External resource URLs are validated.
 
 ## Acceptance Criteria
 
@@ -105,7 +105,7 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
+- [x] Implementation complete.
 - [ ] Tests complete.
 - [ ] Documentation updated.
 - [ ] Validation commands passed.

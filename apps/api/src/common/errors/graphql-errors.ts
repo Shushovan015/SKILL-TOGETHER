@@ -6,8 +6,17 @@ export type ApiErrorCode =
   | "AUTH_RATE_LIMITED"
   | "AUTH_REQUIRED"
   | "CONFLICT"
+  | "CONTENT_APPROVAL_FAILED"
+  | "CONTENT_INVALID_STATUS"
+  | "CONTENT_NOT_FOUND"
+  | "CONTENT_VERSION_CONFLICT"
   | "CSRF_INVALID"
   | "INTERNAL_ERROR"
+  | "LESSON_EVIDENCE_REQUIRED"
+  | "NOT_FOUND"
+  | "PLAN_CAPACITY_EXCEEDED"
+  | "RECOVERY_NOT_AVAILABLE"
+  | "TASK_ALREADY_COMPLETED"
   | "VALIDATION_FAILED";
 
 export interface ApiGraphqlErrorOptions {
@@ -23,8 +32,17 @@ export const apiErrorMessages = {
   AUTH_RATE_LIMITED: "Too many attempts. Try again later.",
   AUTH_REQUIRED: "Please log in to continue.",
   CONFLICT: "Refresh and try again.",
+  CONTENT_APPROVAL_FAILED: "Complete required content fields before approval.",
+  CONTENT_INVALID_STATUS: "This content cannot move to that status.",
+  CONTENT_NOT_FOUND: "This content is not available.",
+  CONTENT_VERSION_CONFLICT: "Refresh and review the latest version.",
   CSRF_INVALID: "Refresh the page and try again.",
   INTERNAL_ERROR: "Something went wrong. Try again later.",
+  LESSON_EVIDENCE_REQUIRED: "Add the required completion evidence.",
+  NOT_FOUND: "This item is not available.",
+  PLAN_CAPACITY_EXCEEDED: "Your schedule does not have enough available time.",
+  RECOVERY_NOT_AVAILABLE: "No valid recovery slot is available yet.",
+  TASK_ALREADY_COMPLETED: "This task is already completed.",
   VALIDATION_FAILED: "Check the highlighted fields and try again."
 } as const satisfies Record<ApiErrorCode, string>;
 

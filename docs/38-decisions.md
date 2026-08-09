@@ -127,3 +127,24 @@ This document records initial architecture decision records. Status values: Prop
 - Context: Docker/PostgreSQL may be unavailable in local sandboxed test runs, but Phase 2 still needs GraphQL and browser auth-flow coverage.
 - Decision: Add `AUTH_PERSISTENCE=memory` for tests and E2E only. Normal runtime defaults to Prisma/PostgreSQL.
 - Consequences: Auth service and resolver tests can validate session, CSRF, and error behavior without a database process. Repository and migration SQL remain the production persistence path.
+
+## ADR-019: Split Phase 3 Track Selection from Phase 4 Scheduling
+
+- Status: Accepted
+- Context: The GraphQL sketch originally modeled `completeOnboarding` as creating Enrollment, Study Plan, Study Weeks, and Daily Tasks together, while Phase 3 is limited to Learning Tracks, content metadata, minimal Enrollment state, and track selection.
+- Decision: Implement Phase 3 `selectLearningTrack` as an authenticated mutation that creates or updates a DRAFT Enrollment with Learning Track, start date, experience level, and target outcome only. Defer Study Plan, Study Week, Daily Task creation, capacity validation, and activation to Phase 4 `completeOnboarding`.
+- Consequences: Learners can choose and browse a track in Phase 3 without creating scheduling records. Phase 4 must convert draft enrollment preferences into an ACTIVE scheduled Study Plan.
+
+## ADR-020: Store Lesson Prerequisites Explicitly
+
+- Status: Accepted
+- Context: The domain model and GraphQL API expose Lesson prerequisites, but the planned database schema did not include a relationship for reusable Lesson prerequisite metadata.
+- Decision: Add `lesson_prerequisites` as a self-referential join table on `lessons`.
+- Consequences: Track and roadmap queries can return stable prerequisite Lesson IDs without introducing Daily Tasks or scheduling records.
+
+## ADR-021: Use Test-Only In-Memory Content Persistence
+
+- Status: Accepted
+- Context: Phase 3 GraphQL and browser tests need seeded Learning Track content without requiring a local PostgreSQL process in sandboxed runs.
+- Decision: Add `CONTENT_PERSISTENCE=memory` for tests and E2E only. Normal runtime defaults to Prisma/PostgreSQL and uses the idempotent seed script for development data.
+- Consequences: Content tests can validate authorization, ordering, status filtering, and enrollment behavior without a database process. Production remains backed by PostgreSQL migrations and Prisma repositories.

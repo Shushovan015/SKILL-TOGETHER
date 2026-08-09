@@ -46,5 +46,45 @@ export const appRoutes = [
     path: "/today",
     label: "Today",
     scope: "authenticated"
+  },
+  {
+    path: "/onboarding",
+    label: "Onboarding",
+    scope: "authenticated"
+  },
+  {
+    path: "/plan/week/:weekNumber",
+    label: "Weekly plan",
+    scope: "authenticated"
+  },
+  {
+    path: "/lessons/:dailyTaskId",
+    label: "Lesson",
+    scope: "authenticated"
+  },
+  {
+    path: "/lessons/:dailyTaskId/exercise",
+    label: "Exercise",
+    scope: "authenticated"
+  },
+  {
+    path: "/tracks",
+    label: "Tracks",
+    scope: "authenticated"
+  },
+  {
+    path: "/tracks/:slug",
+    label: "Track roadmap",
+    scope: "authenticated"
+  },
+  {
+    path: "/admin/content",
+    label: "Content admin",
+    scope: "admin"
+  },
+  {
+    path: "/admin/content/:versionId",
+    label: "Lesson editor",
+    scope: "admin"
   }
 ] as const satisfies readonly AppRouteDefinition[];

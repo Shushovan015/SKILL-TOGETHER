@@ -4,12 +4,14 @@ import { type EnvSource, validateEnvironment } from "@skilltogether/shared";
 export type NodeEnvironment = "development" | "test" | "production";
 export type SessionSameSite = "lax" | "strict" | "none";
 export type AuthPersistence = "prisma" | "memory";
+export type ContentPersistence = "prisma" | "memory";
 
 export interface ApiConfig {
   readonly nodeEnv: NodeEnvironment;
   readonly apiPort: number;
   readonly databaseUrl: string | undefined;
   readonly authPersistence: AuthPersistence;
+  readonly contentPersistence: ContentPersistence;
   readonly sessionCookieName: string;
   readonly sessionSecret: string;
   readonly sessionTtlMs: number;
@@ -97,11 +99,17 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     source["AUTH_PERSISTENCE"],
     "prisma"
   );
+  const contentPersistence = readOptionalEnum(
+    "CONTENT_PERSISTENCE",
+    persistenceModes,
+    source["CONTENT_PERSISTENCE"],
+    "prisma"
+  );
 
   const validation = validateEnvironment(source, [
     {
       name: "DATABASE_URL",
-      required: authPersistence === "prisma"
+      required: authPersistence === "prisma" || contentPersistence === "prisma"
     },
     {
       name: "SESSION_SECRET",
@@ -199,6 +207,10 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     throw new Error("AUTH_PERSISTENCE must be prisma in production");
   }
 
+  if (nodeEnv === "production" && contentPersistence !== "prisma") {
+    throw new Error("CONTENT_PERSISTENCE must be prisma in production");
+  }
+
   if (corsAllowedOrigins.includes("*")) {
     throw new Error("CORS_ALLOWED_ORIGINS must not include * when credentials are enabled");
   }
@@ -208,6 +220,7 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     apiPort: parseInteger("API_PORT", validation.values["API_PORT"] ?? "4000", 1, 65_535),
     databaseUrl: validation.values["DATABASE_URL"],
     authPersistence,
+    contentPersistence,
     sessionCookieName: validation.values["SESSION_COOKIE_NAME"] ?? "skilltogether.sid",
     sessionSecret,
     sessionTtlMs:

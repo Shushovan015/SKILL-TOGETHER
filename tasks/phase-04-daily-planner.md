@@ -23,36 +23,36 @@ Delivers the core promise: the learner knows what to do today and can recover fr
 
 ## Implementation Tasks
 
-- [ ] Build onboarding workflow.
-- [ ] Create Enrollment and Study Plan from preferences.
-- [ ] Generate Study Weeks and Daily Tasks.
-- [ ] Implement Today dashboard query.
-- [ ] Implement Weekly Plan query.
-- [ ] Implement missed-task detection.
-- [ ] Implement recovery proposal and apply flow.
-- [ ] Implement pause and resume basics.
+- [x] Build onboarding workflow.
+- [x] Create Enrollment and Study Plan from preferences.
+- [x] Generate Study Weeks and Daily Tasks.
+- [x] Implement Today dashboard query.
+- [x] Implement Weekly Plan query.
+- [x] Implement missed-task detection.
+- [x] Implement recovery proposal and apply flow.
+- [x] Implement pause and resume basics.
 
 ## Database Tasks
 
-- [ ] Create enrollments, study_plans, pause_periods, study_weeks, daily_tasks tables.
-- [ ] Add task and enrollment status enums.
-- [ ] Add indexes for user plan and scheduled dates.
-- [ ] Add audit events for schedule changes.
+- [x] Create enrollments, study_plans, pause_periods, study_weeks, daily_tasks tables.
+- [x] Add task and enrollment status enums.
+- [x] Add indexes for user plan and scheduled dates.
+- [x] Add audit events for schedule changes.
 
 ## Backend Tasks
 
-- [ ] Add PlanningModule.
-- [ ] Add deterministic scheduling domain service.
-- [ ] Add capacity validation.
-- [ ] Add recovery service.
-- [ ] Add GraphQL operations for onboarding, dashboard, weekly plan, recovery.
+- [x] Add PlanningModule.
+- [x] Add deterministic scheduling domain service.
+- [x] Add capacity validation.
+- [x] Add recovery service.
+- [x] Add GraphQL operations for onboarding, dashboard, weekly plan, recovery.
 
 ## Frontend Tasks
 
-- [ ] Build onboarding schedule form.
-- [ ] Build Today dashboard.
-- [ ] Build Weekly Plan page.
-- [ ] Build recovery proposal review UI.
+- [x] Build onboarding schedule form.
+- [x] Build Today dashboard.
+- [x] Build Weekly Plan page.
+- [x] Build recovery proposal review UI.
 - [ ] Build pause/resume settings UI if included in phase slice.
 
 ## Test Tasks
@@ -67,13 +67,13 @@ Delivers the core promise: the learner knows what to do today and can recover fr
 
 - [ ] Update scheduling doc with implemented edge cases.
 - [ ] Update page specs for any UI changes.
-- [ ] Update API docs if operation names change.
+- [x] Update API docs if operation names change.
 
 ## Security Checks
 
-- [ ] Learners can access only their own plans and tasks.
-- [ ] Recovery changes are audited.
-- [ ] Schedule preferences are validated server-side.
+- [x] Learners can access only their own plans and tasks.
+- [x] Recovery changes are audited.
+- [x] Schedule preferences are validated server-side.
 
 ## Acceptance Criteria
 
@@ -109,7 +109,7 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
+- [x] Implementation complete.
 - [ ] Tests complete.
 - [ ] Security checks complete.
 - [ ] Documentation updated.

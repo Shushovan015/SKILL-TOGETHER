@@ -41,12 +41,15 @@ button:disabled {
 
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
+input:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-input {
+input,
+textarea,
+select {
   width: 100%;
   border: 1px solid var(--color-border);
   border-radius: 0.375rem;
@@ -56,7 +59,13 @@ input {
   padding: 0.72rem 0.85rem;
 }
 
-input[aria-invalid="true"] {
+textarea {
+  resize: vertical;
+}
+
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
   border-color: #b42318;
 }
 
@@ -118,6 +127,13 @@ input[aria-invalid="true"] {
   min-height: 100vh;
   padding: var(--space-6);
   place-items: center;
+}
+
+.workspace-page--wide {
+  align-content: start;
+  gap: var(--space-6);
+  justify-items: center;
+  place-items: initial;
 }
 
 .auth-panel,
@@ -190,4 +206,308 @@ input[aria-invalid="true"] {
 
 .logout-action {
   align-items: center;
+}
+
+.content-header {
+  align-items: center;
+  display: flex;
+  gap: var(--space-6);
+  justify-content: space-between;
+}
+
+.track-grid,
+.content-layout,
+.admin-list,
+.admin-toolbar,
+.editor-form,
+.content-empty {
+  width: min(100%, 72rem);
+}
+
+.track-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.track-card,
+.module-panel,
+.admin-row,
+.content-form,
+.editor-form {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-panel);
+  padding: var(--space-6);
+}
+
+.track-card {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.track-card h2,
+.module-panel h2,
+.admin-row h2,
+.content-form h2,
+.editor-form h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.track-card p,
+.module-panel p,
+.admin-row p {
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.track-card__type {
+  color: var(--color-action) !important;
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+
+.track-card__meta {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+}
+
+.track-card__meta dt {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.track-card__meta dd {
+  font-weight: 700;
+  margin: var(--space-1) 0 0;
+}
+
+.content-layout {
+  align-items: start;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(18rem, 24rem) 1fr;
+}
+
+.content-form,
+.editor-form fieldset {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.content-form label,
+.editor-form label {
+  display: grid;
+  font-weight: 700;
+  gap: var(--space-1);
+}
+
+.roadmap {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.module-panel ol {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding-left: 1.4rem;
+}
+
+.module-panel li {
+  padding-left: var(--space-2);
+}
+
+.module-panel small {
+  color: var(--color-text-secondary);
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.content-empty {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  color: var(--color-text-secondary);
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.form-success {
+  color: var(--color-action);
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.admin-toolbar button,
+.admin-row__actions button,
+.admin-row__actions .button-link {
+  min-height: 2.35rem;
+  padding: 0.48rem 0.75rem;
+}
+
+.admin-toolbar button:not(.is-selected),
+.admin-row__actions button,
+.admin-row__actions .button-link {
+  background: #ffffff;
+  color: var(--color-action);
+}
+
+.admin-toolbar .is-selected {
+  background: var(--color-action);
+  color: #ffffff;
+}
+
+.admin-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.admin-row {
+  align-items: center;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr auto;
+}
+
+.admin-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.editor-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.editor-form fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-form__section {
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.checkbox-row {
+  align-items: center;
+  display: flex !important;
+  flex-direction: row;
+}
+
+.checkbox-row input {
+  margin: 0;
+  width: auto;
+}
+
+.planner-form select {
+  margin-top: var(--space-2);
+}
+
+.planner-days {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.planner-days legend {
+  font-weight: 700;
+  padding: 0 var(--space-2);
+}
+
+.today-grid,
+.week-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  width: min(100%, 72rem);
+}
+
+.recovery-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.recovery-list section {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.lesson-layout {
+  align-items: start;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  width: min(100%, 72rem);
+}
+
+.lesson-content,
+.lesson-action {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-panel);
+  padding: var(--space-6);
+}
+
+.lesson-content {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.lesson-content section {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.lesson-content section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.lesson-action {
+  display: grid;
+  gap: var(--space-3);
+  position: sticky;
+  top: var(--space-6);
+}
+
+.preserve-lines {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+  .content-header,
+  .admin-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-action {
+    position: static;
+  }
 }

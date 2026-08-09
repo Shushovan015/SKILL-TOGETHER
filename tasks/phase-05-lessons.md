@@ -22,37 +22,37 @@ Turns the Study Plan into actual learning sessions with evidence and durable pro
 
 ## Implementation Tasks
 
-- [ ] Build scheduled Lesson query.
-- [ ] Build Lesson page.
-- [ ] Build Exercise page or section.
-- [ ] Implement start task mutation.
-- [ ] Implement complete task mutation.
-- [ ] Record duration and completion evidence.
-- [ ] Record Learning Reflection with private default.
-- [ ] Update Progress Snapshot after completion.
+- [x] Build scheduled Lesson query.
+- [x] Build Lesson page.
+- [x] Build Exercise page or section.
+- [x] Implement start task mutation.
+- [x] Implement complete task mutation.
+- [x] Record duration and completion evidence.
+- [x] Record Learning Reflection with private default.
+- [x] Update Progress Snapshot after completion.
 
 ## Database Tasks
 
-- [ ] Create task_attempts table.
-- [ ] Create reflections table.
-- [ ] Add lesson snapshot JSON validation.
-- [ ] Add indexes for task attempts and reflections.
+- [x] Create task_attempts table.
+- [x] Create reflections table.
+- [x] Add lesson snapshot JSON validation.
+- [x] Add indexes for task attempts and reflections.
 
 ## Backend Tasks
 
-- [ ] Add LessonCompletionService.
-- [ ] Validate ownership and task status transitions.
-- [ ] Validate completion evidence.
-- [ ] Snapshot Lesson Version fields.
-- [ ] Map completion errors to stable codes.
+- [x] Add LessonCompletionService.
+- [x] Validate ownership and task status transitions.
+- [x] Validate completion evidence.
+- [x] Snapshot Lesson Version fields.
+- [x] Map completion errors to stable codes.
 
 ## Frontend Tasks
 
-- [ ] Render Lesson sections.
-- [ ] Render resources and knowledge checks.
-- [ ] Build evidence form.
-- [ ] Build reflection input.
-- [ ] Handle save, completion, validation, and network errors.
+- [x] Render Lesson sections.
+- [x] Render resources and knowledge checks.
+- [x] Build evidence form.
+- [x] Build reflection input.
+- [x] Handle save, completion, validation, and network errors.
 
 ## Test Tasks
 
@@ -65,14 +65,14 @@ Turns the Study Plan into actual learning sessions with evidence and durable pro
 ## Documentation Tasks
 
 - [ ] Update content model if evidence schema changes.
-- [ ] Update API docs if mutation shape changes.
+- [x] Update API docs if mutation shape changes.
 - [ ] Update testing strategy with any new critical scenario.
 
 ## Security Checks
 
-- [ ] Learners cannot complete another learner's task.
-- [ ] Private reflection is not partner-visible by default.
-- [ ] Markdown rendering is sanitized.
+- [x] Learners cannot complete another learner's task.
+- [x] Private reflection is not partner-visible by default.
+- [x] Markdown rendering is sanitized.
 
 ## Acceptance Criteria
 
@@ -103,7 +103,7 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
+- [x] Implementation complete.
 - [ ] Tests complete.
 - [ ] Security checks complete.
 - [ ] Documentation updated.

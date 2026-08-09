@@ -1,0 +1,43 @@
+<svg
+xmlns="http://www.w3.org/2000/svg"
+width="818"
+height="668"
+viewBox="0 0 818 668"
+preserveAspectRatio="xMidYMid meet">
+
+<style>
+
+text {
+    font-family: "Courier New", monospace;
+    font-size: 15px;
+    fill: #c9d1d9;
+    white-space: pre;
+}
+
+.line {
+    opacity: 0;
+    animation: reveal 0.12s forwards;
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+</style>
+
+<text
+x="4"
+y="4"
+xml:space="preserve">
+
+<tspan x="4" dy="15" class="line" style="animation-delay:0.00s">                                   ....................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.04s">                            ...........    .:        .........</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.08s">                        ............  *%%%%%%%%%%%%%%*: ..........</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.12s">                     ..............+%%%#####%%%%%%#%###%- ...........</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.16s">                  ...............*%%%#%##%%%%%%%%%%%%%%##* .............</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.20s">               ............... *%%##%%%%%@*===----=+%%%%#% ................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.24s">             ................-%%%%%#%%##==------------=#%%#:.................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.28s">           .................:%%%%%%#*=-----------------=#%%#:..................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.32s">          ................. -%%%%%*=-------------------=%#%%=...................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.36s">        ................... -@%%%#*=-==+++=-----=++++=--=%#%= ....................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.40s">       ......................+%#%+===-----------------====%%= .....................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.44s">      .......................=%#%=---#%.%*-------#%.%*---=*%=.......................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.48s">     ........................ +%*-------------------------+%=........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.52s">    ........................:#+#+-------------------------+#++........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.56s">   .........................*=+#=-----------:-::----------+*=#. .......................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.60s">  ..........................*--++=-------==+===++=--------=+=#..........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.64s">  ..........................-*-=#=-------==+=-====-------=*==*..........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.68s"> ...........................:+---==---==-=========-=+----=--*-...........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.72s"> ............................-####=------=--------------=*#*#:...........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.76s">......................... =+%%%%%%*=-------------------=*%%%#+=: .........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.80s">........................=%##%%%##%%+=-----------------=+%%%#%%%##:........................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.84s">.......................=####%%%##%#=+++-----==----====+=%%%##%%##%=.......................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.88s">.......................*#####%%##%#===+*###**+***##*+===%%###%####%- .....................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.92s">.................... :%########%###==---===========---==%###%########  ...................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:0.96s">................... %%##%########%#===----------------=####%#########%* ..................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.00s"> ................. :%%%###%#########*===-------------=####%########%%@+ .................</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.04s"> ............. .##%%#%#%%%##%########%%===----------%%#%%#######%%%##%%%##.  ............</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.08s">  ...........#%##==##%####%%%%%%########%*==-----=#%%%######%%%%#####@#+:*##%+...........</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.12s">  ........+%##==*######%%%%%%%%%%%%%####%%%%*=+*%%####%%%%%%%%%%%%%%######*-=#%#= ......</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.16s">   .... #%##-+#######%%%%%%%%%%%%%%%+#%%##%%%###%%%%%+#%%%%%%%%%%%%%%%#######==#%%* ...</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.20s">    ..*%###-*##################%%%%%%=%%##%%#%%%%%#%#*#%%%###################%%-*#%*..</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.24s">    .*%###=*%####################%%%%%:%%%%######%%*%%%%#####################%%%:##%%-</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.28s">     =%%#=*%%#####################%%%%%%%%#######%%#%%%%######################%%% %%=</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.32s">      -#%:#%%####**####*+=:....+###%%%%:%%######%%-%%%%#######################%%%%+=</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.36s">        -%%%%####+=-.:=--:=:*++.####%%##%%####%%%%#%%%####++==-=:+  =:+-:*####%%%#</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.40s">         -%%%%##############%%######%%#%=%%##%%%%#%#%#######################%%%%-</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.44s">           =%%%%%%#%%%######%%%%##%#+-=%*%%%%%%%%*%*%%%%%%%%%%#%#%%%%%#%%%%%%%+.</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.48s">            :*%%%%%#########%%%##%%%%%%%%%%%%%%%%#%%%%%%%%%%%%%%%%%#**#%%%%%#-</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.52s">              .-%%%%%%%#%##+=*#*++******%%%%%%%%%%*#****#******###*#=*%%%%=.</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.56s">                 =###%#+*########-%#%%%#%#%%%%%%#%%%##%%%%%%#=+####=#%%#=</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.60s">                    +*###+*+######*+#*+*#+%%%%%%*##%%%%%%%%%%%%#=*##*.</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.64s">                      .::*%#*+=+#########*%%%%%%*#++=-=+#%#%%%%%%+..</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.68s">                           .*##%%%%#=::=#+%%%%%%*############=</tspan><tspan x="4" dy="15" class="line" style="animation-delay:1.72s">                                 -+++##%#*%%%%%%##++*+==-</tspan>
+
+</text>
+
+</svg>

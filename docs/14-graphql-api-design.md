@@ -95,6 +95,7 @@ type LearningTrack {
   type: TrackType!
   title: String!
   description: String!
+  active: Boolean!
   modules: [Module!]!
 }
 
@@ -142,17 +143,35 @@ type Enrollment {
   track: LearningTrack!
   startDate: Date!
   targetOutcome: String!
+  experienceLevel: String!
+}
+
+input SelectLearningTrackInput {
+  trackId: ID!
+  startDate: Date!
+  experienceLevel: String!
+  targetOutcome: String!
 }
 
 extend type Query {
   learningTracks(activeOnly: Boolean = true): [LearningTrack!]!
+  learningTrack(slug: String!): LearningTrack!
   enrollment(id: ID!): Enrollment!
+  myEnrollments: [Enrollment!]!
 }
 
 extend type Mutation {
+  selectLearningTrack(input: SelectLearningTrackInput!): Enrollment!
   completeOnboarding(input: OnboardingInput!): Enrollment!
 }
 ```
+
+Phase 3 implementation notes:
+
+- The authenticated catalogue and roadmap use `learningTracks`, `learningTrack`, `myEnrollments`, and `selectLearningTrack`.
+- `selectLearningTrack` creates or updates a DRAFT Enrollment with track, start date, experience level, and target outcome only.
+- `selectLearningTrack` does not create Study Plans, Study Weeks, Daily Tasks, or scheduled Lesson records.
+- `completeOnboarding` remains the Phase 4 scheduling boundary that validates capacity and creates the Study Plan and scheduled Daily Tasks.
 
 ## Daily Plan and Lessons
 
@@ -237,8 +256,14 @@ extend type Mutation {
   completeDailyTask(input: CompleteDailyTaskInput!): DailyTask!
   proposeRecovery(dailyTaskId: ID!): RecoveryProposal!
   applyRecovery(input: RescheduleTaskInput!): [DailyTask!]!
+  pauseEnrollment(input: PauseEnrollmentInput!): Enrollment!
+  resumeEnrollment(enrollmentId: ID!): Enrollment!
 }
 ```
+
+Phase 4 implements planning, missed-session recovery, and pause/resume basics. Lesson completion remains a later phase boundary.
+
+Phase 5 implements `dailyTask`, `startDailyTask`, and `completeDailyTask` for scheduled lesson delivery. `completeDailyTask` records study time, completion evidence, a private reflection when provided, and an immutable lesson snapshot.
 
 ## Assessments
 

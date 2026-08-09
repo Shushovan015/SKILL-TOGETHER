@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client/react";
+import { Link } from "react-router-dom";
 
 import { LogoutButton } from "./LogoutButton.js";
 import { ME_QUERY, type MeQueryData } from "./graphql.js";
@@ -18,6 +19,16 @@ export function TodayPage(): React.JSX.Element {
             ? "Your session is active."
             : `Your session is active, ${data.me.profile.displayName}.`}
         </p>
+        <div className="auth-panel__actions">
+          <Link className="button-link" to="/tracks">
+            Browse tracks
+          </Link>
+          {data?.me.roles.some((role) => role === "CONTENT_ADMIN" || role === "SYSTEM_ADMIN") ? (
+            <Link className="button-link button-link--secondary" to="/admin/content">
+              Content admin
+            </Link>
+          ) : null}
+        </div>
         <LogoutButton />
       </section>
     </main>

@@ -8,6 +8,8 @@ import { ApiConfigService } from "./common/config/api-config.service.js";
 import { GraphqlErrorFilter } from "./common/errors/graphql-error.filter.js";
 import { HealthModule } from "./health/health.module.js";
 import { AuthModule } from "./modules/auth/auth.module.js";
+import { ContentModule } from "./modules/content/content.module.js";
+import { PlanningModule } from "./modules/planning/planning.module.js";
 import type {
   GraphqlContext,
   GraphqlContextFactoryArgs
@@ -33,7 +35,9 @@ import { PrismaModule } from "./prisma/prisma.module.js";
       })
     }),
     HealthModule,
-    AuthModule
+    AuthModule,
+    ContentModule,
+    PlanningModule
   ],
   providers: [
     {

@@ -48,6 +48,7 @@ Indexes:
 | learning_tracks | `id uuid pk`, `slug text unique`, `type track_type`, `title text`, `description text`, `active boolean`, `created_at`, `updated_at` |
 | modules | `id uuid pk`, `track_id uuid fk learning_tracks`, `sequence int`, `title text`, `summary text`, `created_at`, `updated_at`, unique `(track_id, sequence)` |
 | lessons | `id uuid pk`, `module_id uuid fk modules`, `slug text`, `sequence int`, `default_duration_minutes int`, `difficulty text`, `required boolean`, `created_at`, `updated_at`, unique `(module_id, sequence)`, unique `(module_id, slug)` |
+| lesson_prerequisites | `lesson_id uuid fk lessons`, `prerequisite_lesson_id uuid fk lessons`, primary key `(lesson_id, prerequisite_lesson_id)` |
 | lesson_versions | `id uuid pk`, `lesson_id uuid fk lessons`, `version int`, `status content_status`, `title text`, `learning_objective text`, `outcomes jsonb`, `explanation_md text`, `relevance_md text`, `examples jsonb`, `common_mistakes jsonb`, `assessment_tags text[]`, `author_id uuid fk users`, `reviewer_id uuid fk users nullable`, `approved_at timestamptz nullable`, `archived_at timestamptz nullable`, unique `(lesson_id, version)` |
 | resources | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `title text`, `url text`, `resource_type text`, `required boolean`, `approved boolean`, `citation text`, `created_at` |
 | exercises | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `kind text`, `prompt_md text`, `expected_evidence text`, `solution_notes_md text nullable`, `created_at` |
@@ -58,6 +59,7 @@ Indexes:
 - `learning_tracks(type, active)`
 - `modules(track_id, sequence)`
 - `lessons(module_id, sequence)`
+- `lesson_prerequisites(prerequisite_lesson_id)`
 - `lesson_versions(lesson_id, status)`
 - GIN index on `lesson_versions(assessment_tags)`
 

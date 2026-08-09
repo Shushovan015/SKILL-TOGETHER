@@ -45,7 +45,7 @@ import { PrismaAuthRepository } from "./persistence/prisma-auth.repository.js";
       }
     }
   ],
-  exports: [AuthSessionGuard, RolesGuard, OwnershipGuardFoundation]
+  exports: [AuthSessionGuard, CsrfGuard, RolesGuard, OwnershipGuardFoundation]
 })
 // NestJS module classes are intentionally metadata-only; the decorator defines the module.
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
