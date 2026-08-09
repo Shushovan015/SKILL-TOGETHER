@@ -126,6 +126,26 @@ input OnboardingInput {
   preferredSessionTime: Time
   experienceLevel: String!
   targetOutcome: String!
+  germanStartLevel: String
+  germanTargetLevel: String
+  germanSessionDurationMinutes: Int
+  assessmentDay: Int!
+  recoveryDay: Int!
+  pausePeriods: [PausePeriodInput!] = []
+}
+
+input ReconfigureEnrollmentInput {
+  enrollmentId: ID!
+  trackId: ID!
+  startDate: Date!
+  studyDays: [Int!]!
+  availableMinutesByDay: JSON!
+  preferredSessionTime: Time
+  experienceLevel: String!
+  targetOutcome: String!
+  germanStartLevel: String
+  germanTargetLevel: String
+  germanSessionDurationMinutes: Int
   assessmentDay: Int!
   recoveryDay: Int!
   pausePeriods: [PausePeriodInput!] = []
@@ -163,6 +183,8 @@ extend type Query {
 extend type Mutation {
   selectLearningTrack(input: SelectLearningTrackInput!): Enrollment!
   completeOnboarding(input: OnboardingInput!): Enrollment!
+  cancelEnrollment(enrollmentId: ID!): Enrollment!
+  reconfigureEnrollment(input: ReconfigureEnrollmentInput!): Enrollment!
 }
 ```
 
@@ -172,6 +194,8 @@ Phase 3 implementation notes:
 - `selectLearningTrack` creates or updates a DRAFT Enrollment with track, start date, experience level, and target outcome only.
 - `selectLearningTrack` does not create Study Plans, Study Weeks, Daily Tasks, or scheduled Lesson records.
 - `completeOnboarding` remains the Phase 4 scheduling boundary that validates capacity and creates the Study Plan and scheduled Daily Tasks.
+- `cancelEnrollment` marks the learner-owned Enrollment as `CANCELLED` and cancels unfinished Daily Tasks without deleting completed attempts.
+- `reconfigureEnrollment` cancels a learner-owned Enrollment and creates a replacement active Enrollment with a newly generated Study Plan for the same Learning Track.
 
 ## Daily Plan and Lessons
 

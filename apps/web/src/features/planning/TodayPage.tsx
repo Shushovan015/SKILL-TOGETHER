@@ -107,8 +107,7 @@ export function TodayPage(): React.JSX.Element {
         }
       });
       setProposalByTaskId((current) => {
-        const next = { ...current };
-        delete next[proposal.dailyTaskId];
+        const { [proposal.dailyTaskId]: _removed, ...next } = current;
         return next;
       });
     });

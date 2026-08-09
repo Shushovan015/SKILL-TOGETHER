@@ -1,5 +1,5 @@
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { fetchCsrfToken } from "../auth/graphql.js";
@@ -7,9 +7,12 @@ import { MY_ENROLLMENTS_QUERY, type MyEnrollmentsQueryData } from "../content/gr
 import {
   COMPLETE_ONBOARDING_MUTATION,
   PLANNING_TRACKS_QUERY,
+  RECONFIGURE_ENROLLMENT_MUTATION,
   type CompleteOnboardingMutationData,
   type CompleteOnboardingMutationVariables,
-  type LearningTracksQueryData
+  type LearningTracksQueryData,
+  type ReconfigureEnrollmentMutationData,
+  type ReconfigureEnrollmentMutationVariables
 } from "./graphql.js";
 import { toSafePlanningMessage, todayDateInputValue } from "./planning-ui.js";
 
@@ -51,6 +54,11 @@ export function OnboardingPage(): React.JSX.Element {
     CompleteOnboardingMutationData,
     CompleteOnboardingMutationVariables
   >(COMPLETE_ONBOARDING_MUTATION);
+  const [reconfigureEnrollment, reconfigureState] = useMutation<
+    ReconfigureEnrollmentMutationData,
+    ReconfigureEnrollmentMutationVariables
+  >(RECONFIGURE_ENROLLMENT_MUTATION);
+  const reconfigureEnrollmentId = searchParams.get("reconfigureEnrollmentId") ?? "";
   const [trackId, setTrackId] = useState(searchParams.get("trackId") ?? "");
   const [startDate, setStartDate] = useState(todayDateInputValue());
   const [studyDays, setStudyDays] = useState<readonly number[]>(defaultStudyDays);
@@ -64,9 +72,13 @@ export function OnboardingPage(): React.JSX.Element {
   const [germanSessionDurationMinutes, setGermanSessionDurationMinutes] = useState(60);
   const [targetOutcome, setTargetOutcome] = useState("");
   const [formError, setFormError] = useState<string | undefined>();
+  const isReconfiguring = reconfigureEnrollmentId.length > 0;
   const activeTrackIds = new Set(
     (enrollments.data?.myEnrollments ?? [])
-      .filter((enrollment) => ["ACTIVE", "PAUSED"].includes(enrollment.status))
+      .filter((enrollment) =>
+        ["ACTIVE", "PAUSED"].includes(enrollment.status) &&
+        enrollment.id !== reconfigureEnrollmentId
+      )
       .map((enrollment) => enrollment.track.id)
   );
   const availableTrackList = (tracks.data?.learningTracks ?? []).filter((track) => !activeTrackIds.has(track.id));
@@ -80,30 +92,16 @@ export function OnboardingPage(): React.JSX.Element {
   const germanAvailableTargetLevels = germanTargetLevels.filter(
     (level) => compareGermanLevelValues(level.value, normalizedGermanStartLevel(germanStartLevel)) > 0
   );
-
-  useEffect(() => {
-    if (trackId.length === 0 && selectedTrackId.length > 0) {
-      setTrackId(selectedTrackId);
-    }
-  }, [selectedTrackId, trackId]);
-
-  useEffect(() => {
-    if (isGerman) {
-      setMinutes(germanSessionDurationMinutes);
-      setRecoveryMinutes(germanSessionDurationMinutes);
-      setExperienceLevel(germanStartLevel);
-
-      if (!germanAvailableTargetLevels.some((level) => level.value === germanTargetLevel)) {
-        setGermanTargetLevel(germanAvailableTargetLevels[0]?.value ?? "A1.2");
-      }
-    } else {
-      setExperienceLevel(isSoftwareEngineering ? softwareEngineeringExperienceLevel : "Beginner");
-
-      if (!professionalSessionDurations.some((duration) => duration === minutes)) {
-        setMinutes(120);
-      }
-    }
-  }, [germanAvailableTargetLevels, germanSessionDurationMinutes, germanStartLevel, germanTargetLevel, isGerman, isSoftwareEngineering, minutes]);
+  const selectedGermanTargetLevel = germanAvailableTargetLevels.some((level) => level.value === germanTargetLevel)
+    ? germanTargetLevel
+    : germanAvailableTargetLevels[0]?.value ?? "A1.2";
+  const selectedExperienceLevel = isSoftwareEngineering
+    ? softwareEngineeringExperienceLevel
+    : isProjectManagement
+      ? "Beginner"
+      : experienceLevel;
+  const selectedMinutes = isGerman ? germanSessionDurationMinutes : professionalMinutesValue(minutes);
+  const selectedRecoveryMinutes = isGerman ? germanSessionDurationMinutes : recoveryMinutes;
 
   async function submit(): Promise<void> {
     setFormError(undefined);
@@ -120,30 +118,54 @@ export function OnboardingPage(): React.JSX.Element {
 
     try {
       const csrfToken = await fetchCsrfToken(client);
-      await completeOnboarding({
-        variables: {
-          input: {
-            trackId: selectedTrackId,
-            startDate,
-            studyDays,
-            availableMinutesByDay: availabilityByDay(studyDays, minutes, recoveryDay, recoveryMinutes),
-            preferredSessionTime: null,
-            experienceLevel: isGerman ? germanStartLevel : experienceLevel,
-            targetOutcome,
-            germanStartLevel: isGerman ? germanStartLevel : null,
-            germanTargetLevel: isGerman ? germanTargetLevel : null,
-            germanSessionDurationMinutes: isGerman ? germanSessionDurationMinutes : null,
-            assessmentDay,
-            recoveryDay,
-            pausePeriods: []
+      const input = {
+        trackId: selectedTrackId,
+        startDate,
+        studyDays,
+        availableMinutesByDay: availabilityByDay(
+          studyDays,
+          selectedMinutes,
+          recoveryDay,
+          selectedRecoveryMinutes
+        ),
+        preferredSessionTime: null,
+        experienceLevel: isGerman ? germanStartLevel : selectedExperienceLevel,
+        targetOutcome,
+        germanStartLevel: isGerman ? germanStartLevel : null,
+        germanTargetLevel: isGerman ? selectedGermanTargetLevel : null,
+        germanSessionDurationMinutes: isGerman ? germanSessionDurationMinutes : null,
+        assessmentDay,
+        recoveryDay,
+        pausePeriods: []
+      } as const;
+
+      if (isReconfiguring) {
+        await reconfigureEnrollment({
+          variables: {
+            input: {
+              ...input,
+              enrollmentId: reconfigureEnrollmentId
+            }
+          },
+          context: {
+            headers: {
+              "x-csrf-token": csrfToken
+            }
           }
-        },
-        context: {
-          headers: {
-            "x-csrf-token": csrfToken
+        });
+      } else {
+        await completeOnboarding({
+          variables: {
+            input
+          },
+          context: {
+            headers: {
+              "x-csrf-token": csrfToken
+            }
           }
-        }
-      });
+        });
+      }
+
       navigate("/tracks", { replace: true });
     } catch (error) {
       setFormError(toSafePlanningMessage(error));
@@ -181,9 +203,13 @@ export function OnboardingPage(): React.JSX.Element {
     <main className="workspace-page workspace-page--wide" aria-labelledby="onboarding-title">
       <section className="workspace-header content-header">
         <div>
-          <p className="auth-panel__eyebrow">Onboarding</p>
-          <h1 id="onboarding-title">Create your study plan</h1>
-          <p>Choose the track, level, study days, and time you can realistically protect.</p>
+          <p className="auth-panel__eyebrow">{isReconfiguring ? "Change plan" : "Onboarding"}</p>
+          <h1 id="onboarding-title">{isReconfiguring ? "Change your study plan" : "Create your study plan"}</h1>
+          <p>
+            {isReconfiguring
+              ? "Choose the new level, study days, and time for the replacement plan."
+              : "Choose the track, level, study days, and time you can realistically protect."}
+          </p>
         </div>
         <Link className="button-link button-link--secondary" to="/tracks">
           Back to My Tracks
@@ -192,7 +218,7 @@ export function OnboardingPage(): React.JSX.Element {
 
       {availableTrackList.length === 0 ? (
         <section className="content-empty">
-          <p>All available tracks already have active plans.</p>
+          <p>{isReconfiguring ? "This plan is no longer available." : "All available tracks already have active plans."}</p>
           <Link className="button-link" to="/tracks">
             My Tracks
           </Link>
@@ -201,7 +227,11 @@ export function OnboardingPage(): React.JSX.Element {
       <form className="editor-form planner-form" onSubmit={(event) => event.preventDefault()}>
         <label>
           Learning track
-          <select value={selectedTrackId} onChange={(event) => setTrackId(event.target.value)}>
+          <select
+            value={selectedTrackId}
+            disabled={isReconfiguring}
+            onChange={(event) => setTrackId(event.target.value)}
+          >
             {availableTrackList.map((track) => (
               <option value={track.id} key={track.id}>
                 {track.title}
@@ -253,7 +283,7 @@ export function OnboardingPage(): React.JSX.Element {
 
             <label>
               Target level
-              <select value={germanTargetLevel} onChange={(event) => setGermanTargetLevel(event.target.value)}>
+              <select value={selectedGermanTargetLevel} onChange={(event) => setGermanTargetLevel(event.target.value)}>
                 {germanAvailableTargetLevels.map((level) => (
                   <option value={level.value} key={level.value}>
                     {level.label}
@@ -277,7 +307,7 @@ export function OnboardingPage(): React.JSX.Element {
           <>
             <label>
               Current level
-              <select value={experienceLevel} onChange={(event) => setExperienceLevel(event.target.value)}>
+              <select value={selectedExperienceLevel} onChange={(event) => setExperienceLevel(event.target.value)}>
                 {isSoftwareEngineering ? (
                   <option value={softwareEngineeringExperienceLevel}>
                     JavaScript frontend developer, TypeScript new
@@ -296,7 +326,7 @@ export function OnboardingPage(): React.JSX.Element {
 
             <label>
               Available minutes on study days
-              <select value={minutes} onChange={(event) => setMinutes(Number(event.target.value))}>
+              <select value={selectedMinutes} onChange={(event) => setMinutes(Number(event.target.value))}>
                 {professionalSessionDurations.map((duration) => (
                   <option value={duration} key={duration}>
                     {duration} minutes
@@ -347,8 +377,12 @@ export function OnboardingPage(): React.JSX.Element {
           </p>
         )}
 
-        <button type="button" disabled={completeState.loading} onClick={() => void submit()}>
-          {completeState.loading ? "Creating..." : "Create plan"}
+        <button type="button" disabled={completeState.loading || reconfigureState.loading} onClick={() => void submit()}>
+          {completeState.loading || reconfigureState.loading
+            ? "Saving..."
+            : isReconfiguring
+              ? "Save new plan"
+              : "Create plan"}
         </button>
       </form>
       )}
@@ -363,6 +397,10 @@ function normalizedGermanStartLevel(level: string): string {
 function compareGermanLevelValues(left: string, right: string): number {
   const order = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"];
   return order.indexOf(left) - order.indexOf(right);
+}
+
+function professionalMinutesValue(minutes: number): number {
+  return professionalSessionDurations.some((duration) => duration === minutes) ? minutes : 120;
 }
 
 function availabilityByDay(

@@ -5,7 +5,8 @@ import { resolveApiConfig } from "./api-config.service.js";
 const baseSource = {
   DATABASE_URL: "postgresql://skilltogether:password@localhost:5432/skilltogether_test",
   SESSION_SECRET: "test-session-secret-for-config-validation",
-  CSRF_SECRET: "test-csrf-secret-for-config-validation"
+  CSRF_SECRET: "test-csrf-secret-for-config-validation",
+  FRONTEND_URL: "https://skill-together.example.test"
 } as const;
 
 describe("resolveApiConfig", () => {

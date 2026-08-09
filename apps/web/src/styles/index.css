@@ -262,6 +262,16 @@ select[aria-invalid="true"] {
   color: var(--color-action);
 }
 
+.button-link--danger {
+  background: #ffffff;
+  border-color: #b42318;
+  color: #b42318;
+}
+
+.track-action-error {
+  width: min(100%, 72rem);
+}
+
 .logout-action {
   align-items: center;
 }

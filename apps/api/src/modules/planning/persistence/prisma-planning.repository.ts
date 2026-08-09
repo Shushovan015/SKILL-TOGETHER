@@ -28,7 +28,6 @@ import type {
   ApprovedLessonForScheduling,
   CompleteDailyTaskInput,
   DailyTaskRecord,
-  DailyTaskStatus,
   ExistingScheduledTask,
   OnboardingInput,
   PauseEnrollmentInput,
@@ -36,6 +35,8 @@ import type {
   PlanningEnrollmentRecord,
   RecoveryPlanContext,
   RecoveryProposalRecord,
+  ReconfigureEnrollmentInput,
+  ScheduleDraft,
   RescheduleTaskInput,
   TodayDashboardRecord
 } from "../domain/planning.types.js";
@@ -43,7 +44,6 @@ import type { GermanLevel } from "../../content/domain/content.types.js";
 import { RecoveryDomainService, assertRecoveryAvailable } from "../domain/recovery.service.js";
 import {
   dateKey,
-  dayOfWeek,
   hasCapacity,
   isStudyDate,
   weekForDate
@@ -112,15 +112,20 @@ export class PrismaPlanningRepository implements PlanningRepository {
     userId: string,
     input: OnboardingInput
   ): Promise<PlanningEnrollmentRecord> {
-    const track = await this.prisma.learningTrack.findFirst({
+    const track = await this.requireActiveTrack(input.trackId);
+
+    const existingActiveEnrollment = await this.prisma.enrollment.findFirst({
       where: {
-        id: input.trackId,
-        active: true
+        userId,
+        trackId: input.trackId,
+        status: {
+          in: [PrismaEnrollmentStatus.ACTIVE, PrismaEnrollmentStatus.PAUSED]
+        }
       }
     });
 
-    if (track === null) {
-      throw notFoundError();
+    if (existingActiveEnrollment !== null) {
+      throw conflictError();
     }
 
     const lessons = await this.approvedLessonsForTrack(input, track.type);
@@ -133,54 +138,24 @@ export class PrismaPlanningRepository implements PlanningRepository {
 
     try {
       const enrollment = await this.prisma.$transaction(async (transaction) => {
-        const existingEnrollment = await transaction.enrollment.findFirst({
+        const existingDraft = await transaction.enrollment.findFirst({
           where: {
             userId,
             trackId: input.trackId,
-            status: {
-              in: [
-                PrismaEnrollmentStatus.DRAFT,
-                PrismaEnrollmentStatus.ACTIVE,
-                PrismaEnrollmentStatus.PAUSED
-              ]
-            }
+            status: PrismaEnrollmentStatus.DRAFT
           },
           orderBy: {
             createdAt: "desc"
           }
         });
 
-        const savedEnrollment =
-          existingEnrollment === null
-            ? await transaction.enrollment.create({
-                data: {
-                  userId,
-                  trackId: input.trackId,
-                  status: PrismaEnrollmentStatus.ACTIVE,
-                  startDate: input.startDate,
-                  targetOutcome: input.targetOutcome,
-                  experienceLevel: input.experienceLevel,
-                  learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
-                },
-                include: {
-                  track: true
-                }
-              })
-            : await transaction.enrollment.update({
-                where: {
-                  id: existingEnrollment.id
-                },
-                data: {
-                  status: PrismaEnrollmentStatus.ACTIVE,
-                  startDate: input.startDate,
-                  targetOutcome: input.targetOutcome,
-                  experienceLevel: input.experienceLevel,
-                  learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
-                },
-                include: {
-                  track: true
-                }
-              });
+        const savedEnrollment = await this.createOrActivateEnrollment(
+          transaction,
+          userId,
+          input,
+          track.type,
+          existingDraft?.id ?? null
+        );
 
         await transaction.studyPlan.deleteMany({
           where: {
@@ -188,60 +163,98 @@ export class PrismaPlanningRepository implements PlanningRepository {
           }
         });
 
-        const studyPlan = await transaction.studyPlan.create({
-          data: {
-            enrollmentId: savedEnrollment.id,
-            studyDays: [...input.studyDays],
-            availableMinutesByDay: stringifyDayKeys(input.availableMinutesByDay),
-            assessmentDay: input.assessmentDay,
-            recoveryDay: input.recoveryDay,
-            preferredSessionTime: toTimeDate(input.preferredSessionTime),
-            pausePeriods: {
-              create: input.pausePeriods.map((pausePeriod) => ({
-                startsOn: pausePeriod.startsOn,
-                endsOn: pausePeriod.endsOn,
-                reason: pausePeriod.reason
-              }))
-            }
-          }
-        });
-        const weekIdsByNumber = new Map<number, string>();
-
-        for (const week of schedule.weeks) {
-          const savedWeek = await transaction.studyWeek.create({
-            data: {
-              studyPlanId: studyPlan.id,
-              weekNumber: week.weekNumber,
-              startsOn: week.startsOn,
-              endsOn: week.endsOn
-            }
-          });
-          weekIdsByNumber.set(week.weekNumber, savedWeek.id);
-        }
-
-        for (const task of schedule.tasks) {
-          const studyWeekId = weekIdsByNumber.get(task.weekNumber);
-
-          if (studyWeekId === undefined) {
-            throw new Error("Study week was not created for scheduled task.");
-          }
-
-          await transaction.dailyTask.create({
-            data: {
-              studyWeekId,
-              lessonVersionId: task.lessonVersionId,
-              scheduledOn: task.scheduledOn,
-              status: PrismaTaskStatus.PLANNED,
-              plannedDurationMinutes: task.plannedDurationMinutes,
-              isRequired: task.required
-            }
-          });
-        }
+        await this.createStudyPlanSchedule(transaction, savedEnrollment.id, input, schedule);
 
         await this.createAuditEvent(
           transaction,
           userId,
           "ENROLLMENT_ACTIVATED",
+          "enrollments",
+          savedEnrollment.id
+        );
+
+        return savedEnrollment;
+      });
+
+      return mapEnrollment(enrollment);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw conflictError();
+      }
+
+      throw error;
+    }
+  }
+
+  public async cancelEnrollment(
+    userId: string,
+    enrollmentId: string
+  ): Promise<PlanningEnrollmentRecord> {
+    const enrollment = await this.requireEnrollmentForUser(userId, enrollmentId);
+
+    if (enrollment.status === PrismaEnrollmentStatus.CANCELLED) {
+      return mapEnrollment(enrollment);
+    }
+
+    if (
+      enrollment.status !== PrismaEnrollmentStatus.ACTIVE &&
+      enrollment.status !== PrismaEnrollmentStatus.PAUSED &&
+      enrollment.status !== PrismaEnrollmentStatus.DRAFT
+    ) {
+      throw invalidStatusError();
+    }
+
+    const cancelled = await this.prisma.$transaction((transaction) =>
+      this.cancelEnrollmentInTransaction(transaction, userId, enrollment.id)
+    );
+
+    return mapEnrollment(cancelled);
+  }
+
+  public async reconfigureEnrollment(
+    userId: string,
+    input: ReconfigureEnrollmentInput
+  ): Promise<PlanningEnrollmentRecord> {
+    const currentEnrollment = await this.requireEnrollmentForUser(userId, input.enrollmentId);
+
+    if (
+      currentEnrollment.status !== PrismaEnrollmentStatus.ACTIVE &&
+      currentEnrollment.status !== PrismaEnrollmentStatus.PAUSED &&
+      currentEnrollment.status !== PrismaEnrollmentStatus.DRAFT
+    ) {
+      throw invalidStatusError();
+    }
+
+    if (currentEnrollment.trackId !== input.trackId) {
+      throw validationError("trackId");
+    }
+
+    const track = await this.requireActiveTrack(input.trackId);
+    const lessons = await this.approvedLessonsForTrack(input, track.type);
+
+    if (lessons.length === 0) {
+      throw notFoundError();
+    }
+
+    const schedule = this.schedulingService.createSchedule(lessons, input);
+
+    try {
+      const enrollment = await this.prisma.$transaction(async (transaction) => {
+        await this.cancelEnrollmentInTransaction(transaction, userId, currentEnrollment.id);
+
+        const savedEnrollment = await this.createOrActivateEnrollment(
+          transaction,
+          userId,
+          input,
+          track.type,
+          null
+        );
+
+        await this.createStudyPlanSchedule(transaction, savedEnrollment.id, input, schedule);
+        await this.createAuditEvent(
+          transaction,
+          userId,
+          "ENROLLMENT_RECONFIGURED",
           "enrollments",
           savedEnrollment.id
         );
@@ -623,6 +636,166 @@ export class PrismaPlanningRepository implements PlanningRepository {
     });
 
     return mapEnrollment(updated);
+  }
+
+  private async requireActiveTrack(trackId: string): Promise<PrismaLearningTrack> {
+    const track = await this.prisma.learningTrack.findFirst({
+      where: {
+        id: trackId,
+        active: true
+      }
+    });
+
+    if (track === null) {
+      throw notFoundError();
+    }
+
+    return track;
+  }
+
+  private async createOrActivateEnrollment(
+    transaction: Prisma.TransactionClient,
+    userId: string,
+    input: OnboardingInput,
+    trackType: PrismaTrackType,
+    existingDraftEnrollmentId: string | null
+  ): Promise<PrismaEnrollmentWithTrack> {
+    const data = {
+      status: PrismaEnrollmentStatus.ACTIVE,
+      startDate: input.startDate,
+      targetOutcome: input.targetOutcome,
+      experienceLevel: input.experienceLevel,
+      learningPreferences: enrollmentPreferencesForTrack(trackType, input) ?? Prisma.DbNull
+    } as const;
+
+    if (existingDraftEnrollmentId !== null) {
+      return transaction.enrollment.update({
+        where: {
+          id: existingDraftEnrollmentId
+        },
+        data,
+        include: {
+          track: true
+        }
+      });
+    }
+
+    return transaction.enrollment.create({
+      data: {
+        userId,
+        trackId: input.trackId,
+        ...data
+      },
+      include: {
+        track: true
+      }
+    });
+  }
+
+  private async createStudyPlanSchedule(
+    transaction: Prisma.TransactionClient,
+    enrollmentId: string,
+    input: OnboardingInput,
+    schedule: ScheduleDraft
+  ): Promise<void> {
+    const studyPlan = await transaction.studyPlan.create({
+      data: {
+        enrollmentId,
+        studyDays: [...input.studyDays],
+        availableMinutesByDay: stringifyDayKeys(input.availableMinutesByDay),
+        assessmentDay: input.assessmentDay,
+        recoveryDay: input.recoveryDay,
+        preferredSessionTime: toTimeDate(input.preferredSessionTime),
+        pausePeriods: {
+          create: input.pausePeriods.map((pausePeriod) => ({
+            startsOn: pausePeriod.startsOn,
+            endsOn: pausePeriod.endsOn,
+            reason: pausePeriod.reason
+          }))
+        }
+      }
+    });
+    const weekIdsByNumber = new Map<number, string>();
+
+    for (const week of schedule.weeks) {
+      const savedWeek = await transaction.studyWeek.create({
+        data: {
+          studyPlanId: studyPlan.id,
+          weekNumber: week.weekNumber,
+          startsOn: week.startsOn,
+          endsOn: week.endsOn
+        }
+      });
+      weekIdsByNumber.set(week.weekNumber, savedWeek.id);
+    }
+
+    for (const task of schedule.tasks) {
+      const studyWeekId = weekIdsByNumber.get(task.weekNumber);
+
+      if (studyWeekId === undefined) {
+        throw new Error("Study week was not created for scheduled task.");
+      }
+
+      await transaction.dailyTask.create({
+        data: {
+          studyWeekId,
+          lessonVersionId: task.lessonVersionId,
+          scheduledOn: task.scheduledOn,
+          status: PrismaTaskStatus.PLANNED,
+          plannedDurationMinutes: task.plannedDurationMinutes,
+          isRequired: task.required
+        }
+      });
+    }
+  }
+
+  private async cancelEnrollmentInTransaction(
+    transaction: Prisma.TransactionClient,
+    userId: string,
+    enrollmentId: string
+  ): Promise<PrismaEnrollmentWithTrack> {
+    await transaction.dailyTask.updateMany({
+      where: {
+        studyWeek: {
+          studyPlan: {
+            enrollmentId
+          }
+        },
+        status: {
+          in: [
+            PrismaTaskStatus.PLANNED,
+            PrismaTaskStatus.IN_PROGRESS,
+            PrismaTaskStatus.MISSED
+          ]
+        }
+      },
+      data: {
+        status: PrismaTaskStatus.CANCELLED,
+        rescheduleReason: "ENROLLMENT_CANCELLED"
+      }
+    });
+
+    const cancelled = await transaction.enrollment.update({
+      where: {
+        id: enrollmentId
+      },
+      data: {
+        status: PrismaEnrollmentStatus.CANCELLED
+      },
+      include: {
+        track: true
+      }
+    });
+
+    await this.createAuditEvent(
+      transaction,
+      userId,
+      "ENROLLMENT_CANCELLED",
+      "enrollments",
+      enrollmentId
+    );
+
+    return cancelled;
   }
 
   private async approvedLessonsForTrack(

@@ -126,6 +126,30 @@ export interface CompleteOnboardingMutationVariables {
   };
 }
 
+export interface CancelEnrollmentMutationData {
+  readonly cancelEnrollment: {
+    readonly id: string;
+    readonly status: string;
+  };
+}
+
+export interface CancelEnrollmentMutationVariables {
+  readonly enrollmentId: string;
+}
+
+export interface ReconfigureEnrollmentMutationData {
+  readonly reconfigureEnrollment: {
+    readonly id: string;
+    readonly status: string;
+  };
+}
+
+export interface ReconfigureEnrollmentMutationVariables {
+  readonly input: CompleteOnboardingMutationVariables["input"] & {
+    readonly enrollmentId: string;
+  };
+}
+
 export interface TodayDashboardQueryData {
   readonly todayDashboard: TodayDashboard;
 }
@@ -264,6 +288,24 @@ export const DAILY_TASK_QUERY = gql`
 export const COMPLETE_ONBOARDING_MUTATION = gql`
   mutation CompleteOnboarding($input: OnboardingInput!) {
     completeOnboarding(input: $input) {
+      id
+      status
+    }
+  }
+`;
+
+export const CANCEL_ENROLLMENT_MUTATION = gql`
+  mutation CancelEnrollment($enrollmentId: ID!) {
+    cancelEnrollment(enrollmentId: $enrollmentId) {
+      id
+      status
+    }
+  }
+`;
+
+export const RECONFIGURE_ENROLLMENT_MUTATION = gql`
+  mutation ReconfigureEnrollment($input: ReconfigureEnrollmentInput!) {
+    reconfigureEnrollment(input: $input) {
       id
       status
     }

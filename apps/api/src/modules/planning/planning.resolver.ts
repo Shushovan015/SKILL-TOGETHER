@@ -19,6 +19,7 @@ import {
   OnboardingInputDto,
   PauseEnrollmentInputDto,
   RecoveryProposalDto,
+  ReconfigureEnrollmentInputDto,
   RescheduleTaskInputDto,
   TodayDashboardDto
 } from "./dto/planning.dto.js";
@@ -35,6 +36,28 @@ export class PlanningResolver {
   ): Promise<EnrollmentDto> {
     return toPlanningEnrollmentDto(
       await this.planningService.completeOnboarding(requireCurrentUser(context), input)
+    );
+  }
+
+  @Mutation(() => EnrollmentDto)
+  @UseGuards(AuthSessionGuard, CsrfGuard)
+  public async cancelEnrollment(
+    @Args("enrollmentId", { type: () => ID }) enrollmentId: string,
+    @Context() context: GraphqlContext
+  ): Promise<EnrollmentDto> {
+    return toPlanningEnrollmentDto(
+      await this.planningService.cancelEnrollment(requireCurrentUser(context), enrollmentId)
+    );
+  }
+
+  @Mutation(() => EnrollmentDto)
+  @UseGuards(AuthSessionGuard, CsrfGuard)
+  public async reconfigureEnrollment(
+    @Args("input", { type: () => ReconfigureEnrollmentInputDto }) input: ReconfigureEnrollmentInputDto,
+    @Context() context: GraphqlContext
+  ): Promise<EnrollmentDto> {
+    return toPlanningEnrollmentDto(
+      await this.planningService.reconfigureEnrollment(requireCurrentUser(context), input)
     );
   }
 

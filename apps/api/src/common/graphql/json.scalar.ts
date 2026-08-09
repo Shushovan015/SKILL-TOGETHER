@@ -2,7 +2,9 @@ import { Scalar, type CustomScalar } from "@nestjs/graphql";
 import { GraphQLError, Kind, type ValueNode } from "graphql";
 
 export type JsonPrimitive = string | number | boolean | null;
-export type JsonObject = { readonly [key: string]: JsonValue };
+export interface JsonObject {
+  readonly [key: string]: JsonValue;
+}
 export type JsonArray = readonly JsonValue[];
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 

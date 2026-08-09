@@ -6,6 +6,7 @@ import type {
   CompleteDailyTaskInput,
   OnboardingInput,
   PauseEnrollmentInput,
+  ReconfigureEnrollmentInput,
   RescheduleTaskInput
 } from "./planning.types.js";
 
@@ -31,6 +32,7 @@ const germanLevelSchema = z.enum([
 ]);
 const germanTargetLevelSchema = germanLevelSchema.exclude(["COMPLETE_BEGINNER"]);
 const germanSessionDurationSchema = z.union([z.literal(30), z.literal(45), z.literal(60), z.literal(90)]);
+const idSchema = z.string().uuid();
 const timeSchema = z
   .string()
   .regex(/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/u)
@@ -162,6 +164,33 @@ export function validateOnboardingInput(input: unknown): OnboardingInput {
       reason: pausePeriod.reason ?? null
     }))
   };
+}
+
+export function validateReconfigureEnrollmentInput(input: unknown): ReconfigureEnrollmentInput {
+  const enrollmentIdResult = z
+    .object({
+      enrollmentId: idSchema
+    })
+    .safeParse(input);
+
+  if (!enrollmentIdResult.success) {
+    throw validationGraphqlError(enrollmentIdResult.error);
+  }
+
+  return {
+    ...validateOnboardingInput(input),
+    enrollmentId: enrollmentIdResult.data.enrollmentId
+  };
+}
+
+export function validateEnrollmentId(input: unknown): string {
+  const result = idSchema.safeParse(input);
+
+  if (!result.success) {
+    throw validationGraphqlError(result.error);
+  }
+
+  return result.data;
 }
 
 const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;

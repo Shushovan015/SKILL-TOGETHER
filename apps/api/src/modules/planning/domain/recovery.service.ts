@@ -8,7 +8,6 @@ import {
   isStudyDate
 } from "./scheduling.service.js";
 import type {
-  ExistingScheduledTask,
   RecoveryPlanContext,
   RecoveryProposalRecord
 } from "./planning.types.js";

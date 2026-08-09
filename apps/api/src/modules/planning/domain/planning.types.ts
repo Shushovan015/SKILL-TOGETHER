@@ -39,6 +39,10 @@ export interface OnboardingInput {
   readonly pausePeriods: readonly PausePeriodInput[];
 }
 
+export interface ReconfigureEnrollmentInput extends OnboardingInput {
+  readonly enrollmentId: string;
+}
+
 export interface ApprovedLessonForScheduling {
   readonly lessonId: string;
   readonly lessonVersionId: string;

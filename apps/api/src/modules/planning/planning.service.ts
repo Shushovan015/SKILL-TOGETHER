@@ -2,9 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import type { AuthenticatedUser } from "../auth/domain/auth.types.js";
 import {
+  validateEnrollmentId,
   validateOnboardingInput,
   validateCompleteDailyTaskInput,
   validatePauseEnrollmentInput,
+  validateReconfigureEnrollmentInput,
   validateRescheduleTaskInput
 } from "./domain/planning.validation.js";
 import type {
@@ -26,6 +28,20 @@ export class PlanningService {
 
   public completeOnboarding(user: AuthenticatedUser, input: unknown): Promise<PlanningEnrollmentRecord> {
     return this.repository.completeOnboarding(user.id, validateOnboardingInput(input));
+  }
+
+  public cancelEnrollment(
+    user: AuthenticatedUser,
+    enrollmentId: string
+  ): Promise<PlanningEnrollmentRecord> {
+    return this.repository.cancelEnrollment(user.id, validateEnrollmentId(enrollmentId));
+  }
+
+  public reconfigureEnrollment(
+    user: AuthenticatedUser,
+    input: unknown
+  ): Promise<PlanningEnrollmentRecord> {
+    return this.repository.reconfigureEnrollment(user.id, validateReconfigureEnrollmentInput(input));
   }
 
   public todayDashboard(user: AuthenticatedUser, date: Date | undefined): Promise<TodayDashboardRecord> {

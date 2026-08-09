@@ -355,6 +355,8 @@ describe("AuthResolver", () => {
 function configureAuthTestEnvironment(): void {
   process.env["NODE_ENV"] = "test";
   process.env["AUTH_PERSISTENCE"] = "memory";
+  process.env["CONTENT_PERSISTENCE"] = "memory";
+  process.env["SEED_ON_STARTUP"] = "false";
   process.env["DATABASE_URL"] =
     "postgresql://skilltogether:skilltogether_test_password@localhost:5432/skilltogether_test";
   process.env["SESSION_SECRET"] = "test-session-secret-for-auth-resolver-0001";

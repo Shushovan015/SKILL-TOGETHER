@@ -1,6 +1,13 @@
-import { useQuery } from "@apollo/client/react";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { fetchCsrfToken } from "../auth/graphql.js";
+import {
+  CANCEL_ENROLLMENT_MUTATION,
+  type CancelEnrollmentMutationData,
+  type CancelEnrollmentMutationVariables
+} from "../planning/graphql.js";
 import {
   LEARNING_TRACKS_QUERY,
   MY_ENROLLMENTS_QUERY,
@@ -11,12 +18,18 @@ import {
 import { toSafeContentMessage } from "./content-ui.js";
 
 export function TrackCataloguePage(): React.JSX.Element {
+  const client = useApolloClient();
   const tracks = useQuery<LearningTracksQueryData>(LEARNING_TRACKS_QUERY, {
     fetchPolicy: "cache-and-network"
   });
   const enrollments = useQuery<MyEnrollmentsQueryData>(MY_ENROLLMENTS_QUERY, {
     fetchPolicy: "cache-and-network"
   });
+  const [cancelEnrollment, cancelState] = useMutation<
+    CancelEnrollmentMutationData,
+    CancelEnrollmentMutationVariables
+  >(CANCEL_ENROLLMENT_MUTATION);
+  const [actionError, setActionError] = useState<string | undefined>();
 
   if (tracks.loading && tracks.data?.learningTracks === undefined) {
     return (
@@ -39,13 +52,42 @@ export function TrackCataloguePage(): React.JSX.Element {
   const activeEnrollments = enrollmentList.filter((enrollment) =>
     ["ACTIVE", "PAUSED"].includes(enrollment.status)
   );
-  const enrollmentByTrackId = new Map(
-    enrollmentList.map((enrollment) => [enrollment.track.id, enrollment])
+  const activeEnrollmentByTrackId = new Map(
+    activeEnrollments.map((enrollment) => [enrollment.track.id, enrollment])
   );
   const availableTracks = trackList.filter((track) => {
-    const enrollment = enrollmentByTrackId.get(track.id);
-    return enrollment === undefined || !["ACTIVE", "PAUSED"].includes(enrollment.status);
+    const enrollment = activeEnrollmentByTrackId.get(track.id);
+    return enrollment === undefined;
   });
+
+  async function cancelPlan(enrollment: Enrollment): Promise<void> {
+    setActionError(undefined);
+
+    const confirmed = window.confirm(
+      `Cancel your ${enrollment.track.title} plan? Completed lesson history stays saved, but unfinished scheduled tasks will be cancelled.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const csrfToken = await fetchCsrfToken(client);
+      await cancelEnrollment({
+        variables: {
+          enrollmentId: enrollment.id
+        },
+        context: {
+          headers: {
+            "x-csrf-token": csrfToken
+          }
+        },
+        refetchQueries: [MY_ENROLLMENTS_QUERY]
+      });
+    } catch (error) {
+      setActionError(toSafeContentMessage(error));
+    }
+  }
 
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="tracks-title">
@@ -60,6 +102,12 @@ export function TrackCataloguePage(): React.JSX.Element {
         </Link>
       </section>
 
+      {actionError === undefined ? null : (
+        <p className="form-error track-action-error" role="alert">
+          {actionError}
+        </p>
+      )}
+
       {activeEnrollments.length === 0 ? (
         <section className="content-empty">
           <p>No active tracks yet.</p>
@@ -70,7 +118,12 @@ export function TrackCataloguePage(): React.JSX.Element {
       ) : (
         <section className="track-grid" aria-label="My active learning tracks">
           {activeEnrollments.map((enrollment) => (
-            <ActiveTrackCard enrollment={enrollment} key={enrollment.id} />
+            <ActiveTrackCard
+              enrollment={enrollment}
+              cancelDisabled={cancelState.loading}
+              key={enrollment.id}
+              onCancel={() => void cancelPlan(enrollment)}
+            />
           ))}
         </section>
       )}
@@ -122,7 +175,17 @@ export function TrackCataloguePage(): React.JSX.Element {
   );
 }
 
-function ActiveTrackCard({ enrollment }: { readonly enrollment: Enrollment }): React.JSX.Element {
+function ActiveTrackCard({
+  enrollment,
+  cancelDisabled,
+  onCancel
+}: {
+  readonly enrollment: Enrollment;
+  readonly cancelDisabled: boolean;
+  readonly onCancel: () => void;
+}): React.JSX.Element {
+  const changeLabel = enrollment.track.type === "GERMAN" ? "Change level" : "Change plan";
+
   return (
     <article className="track-card">
       <div>
@@ -151,6 +214,15 @@ function ActiveTrackCard({ enrollment }: { readonly enrollment: Enrollment }): R
         <Link className="button-link button-link--secondary" to={`/roadmap?track=${enrollment.track.slug}`}>
           Roadmap
         </Link>
+        <Link
+          className="button-link button-link--secondary"
+          to={`/onboarding?trackId=${enrollment.track.id}&reconfigureEnrollmentId=${enrollment.id}`}
+        >
+          {changeLabel}
+        </Link>
+        <button className="button-link button-link--danger" type="button" disabled={cancelDisabled} onClick={onCancel}>
+          Cancel plan
+        </button>
       </div>
     </article>
   );

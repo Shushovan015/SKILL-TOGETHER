@@ -74,6 +74,12 @@ export class OnboardingInputDto {
   public pausePeriods!: readonly PausePeriodInputDto[];
 }
 
+@InputType("ReconfigureEnrollmentInput")
+export class ReconfigureEnrollmentInputDto extends OnboardingInputDto {
+  @Field(() => ID)
+  public enrollmentId!: string;
+}
+
 @InputType("RescheduleTaskInput")
 export class RescheduleTaskInputDto {
   @Field(() => ID)

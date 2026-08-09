@@ -99,7 +99,7 @@ function TrackSwitcher({
 }
 
 function Roadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX.Element {
-  let markerUsed = false;
+  const firstLessonId = enrollment.track.modules.flatMap((moduleRecord) => moduleRecord.lessons)[0]?.id;
 
   return (
     <section className="roadmap roadmap--learner" aria-label={`${enrollment.track.title} roadmap`}>
@@ -113,8 +113,7 @@ function Roadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX
           <p>{moduleRecord.summary}</p>
           <ol className="roadmap-list">
             {moduleRecord.lessons.map((lesson) => {
-              const marker = markerUsed ? "upcoming" : "current";
-              markerUsed = true;
+              const marker = lesson.id === firstLessonId ? "current" : "upcoming";
 
               return (
                 <li className={`roadmap-list__item roadmap-list__item--${marker}`} key={lesson.id}>

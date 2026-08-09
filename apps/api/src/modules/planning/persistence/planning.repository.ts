@@ -5,6 +5,7 @@ import type {
   PauseEnrollmentInput,
   PlanningEnrollmentRecord,
   RecoveryProposalRecord,
+  ReconfigureEnrollmentInput,
   RescheduleTaskInput,
   TodayDashboardRecord
 } from "../domain/planning.types.js";
@@ -13,6 +14,11 @@ export const PLANNING_REPOSITORY = Symbol("PLANNING_REPOSITORY");
 
 export interface PlanningRepository {
   completeOnboarding(userId: string, input: OnboardingInput): Promise<PlanningEnrollmentRecord>;
+  cancelEnrollment(userId: string, enrollmentId: string): Promise<PlanningEnrollmentRecord>;
+  reconfigureEnrollment(
+    userId: string,
+    input: ReconfigureEnrollmentInput
+  ): Promise<PlanningEnrollmentRecord>;
   todayDashboard(userId: string, date: Date): Promise<TodayDashboardRecord>;
   weeklyPlan(userId: string, weekNumber: number, today: Date): Promise<readonly DailyTaskRecord[]>;
   dailyTask(userId: string, dailyTaskId: string, today: Date): Promise<DailyTaskRecord>;

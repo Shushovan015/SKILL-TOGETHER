@@ -15,7 +15,7 @@ import {
   type StartDailyTaskMutationData,
   type TaskIdMutationVariables
 } from "./graphql.js";
-import { formatDate, toSafePlanningMessage } from "./planning-ui.js";
+import { toSafePlanningMessage } from "./planning-ui.js";
 
 interface LessonPageProps {
   readonly exerciseOnly?: boolean;

@@ -245,12 +245,12 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     firstNonEmpty(validation.values["FRONTEND_URL"], validation.values["WEB_ORIGIN"]) ??
     "http://localhost:5173";
 
-  if (sameSite === "none" && !secure) {
-    throw new Error("SESSION_COOKIE_SECURE must be true when SameSite=None");
-  }
-
   if (nodeEnv === "production" && !secure) {
     throw new Error("SESSION_COOKIE_SECURE must be true in production");
+  }
+
+  if (sameSite === "none" && !secure) {
+    throw new Error("SESSION_COOKIE_SECURE must be true when SameSite=None");
   }
 
   if (nodeEnv === "production" && authPersistence !== "prisma") {
