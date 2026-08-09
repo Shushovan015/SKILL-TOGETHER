@@ -78,13 +78,55 @@ export const phase3SeedTracks: readonly SeedTrackDefinition[] = [
         lesson("DE-A11-S05", "A1.1 Session 5: Formal and Informal Introductions", "Choose du or Sie and hold a polite first-meeting conversation.", ["DE-A11-S04"], 60, "Formal/informal scenario answers and a first-meeting dialogue.", ["A1.1", "du-sie", "review"], "A1.1")
       ]),
       module(2, "A1.1 - Everyday Foundations", "Structured outline: haben, regular present-tense verbs, sentence structure, yes/no questions, articles der/die/das, ein/eine, plural introduction, family, professions, hobbies, days, dates, time, daily routine, food, ordering, shopping, prices, accusative, modal verbs, separable verbs, negation, prepositions, practical dialogues, revision, and A1.1 assessment.", []),
-      module(3, "A1.2 - Expanding Daily Communication", "Objectives: describe routines, needs, plans, places, simple past experiences, and everyday problems. Grammar: separable verbs, modal verbs, accusative and dative basics, possessives, more prepositions. Skills: short emails, simple announcements, everyday listening, guided conversations. Prerequisite: A1.1. Completion: A1.2 practical assessment.", []),
-      module(4, "A2.1 - Everyday Independence", "Objectives: manage travel, appointments, health, housing, work, and services. Grammar: perfect tense, dative verbs, two-way prepositions, comparatives, subordinate clauses with weil. Skills: longer dialogues, forms, short messages, practical phone calls. Prerequisite: A1.2. Completion: A2.1 scenario assessment.", []),
-      module(5, "A2.2 - Connected Everyday Speech", "Objectives: explain preferences, tell simple stories, handle common problems, and understand slower authentic material. Grammar: past tense review, adjective endings introduction, wenn clauses, indirect questions. Skills: connected writing, short presentations, everyday listening. Prerequisite: A2.1. Completion: A2.2 communication assessment.", []),
-      module(6, "B1.1 - Independent Foundations", "Objectives: discuss experiences, plans, opinions, work, study, and social topics. Grammar: subordinate clauses, relative clauses introduction, passive introduction, connectors. Skills: structured reading, everyday media listening, opinion speaking, personal letters. Prerequisite: A2.2. Completion: B1.1 integrated assessment.", []),
-      module(7, "B1.2 - Independent Communication", "Objectives: sustain conversations, explain reasons, summarize information, and write coherent texts. Grammar: Konjunktiv II for polite requests, passive, relative clauses, nominalization basics. Skills: argumentation, short reports, authentic listening. Prerequisite: B1.1. Completion: B1.2 readiness assessment.", []),
-      module(8, "B2.1 - Upper-Intermediate Control", "Objectives: understand complex topics, participate in discussions, and write structured arguments. Grammar: advanced connectors, passive alternatives, participle constructions introduction, style/register. Skills: article reading, presentation, formal correspondence. Prerequisite: B1.2. Completion: B2.1 assessment.", []),
-      module(9, "B2.2 - Professional and Academic Fluency", "Objectives: follow detailed media, defend viewpoints, write polished texts, and communicate professionally. Grammar: advanced sentence style, nuanced modality, idioms, text cohesion. Skills: debate, reports, interviews, workplace scenarios. Prerequisite: B2.1. Completion: B2.2 assessment.", [])
+      module(3, "A1.2 - Expanding Daily Communication", "Objectives: describe routines, needs, plans, places, simple past experiences, and everyday problems. Grammar: separable verbs, modal verbs, accusative and dative basics, possessives, more prepositions. Skills: short emails, simple announcements, everyday listening, guided conversations. Prerequisite: A1.1. Completion: A1.2 practical assessment.", germanLevelLessons("A1.2", "DE-A12", "DE-A11-S05", [
+        ["Daily Routines and Frequency", "Describe regular daily routines using time expressions and frequency words.", "A daily routine paragraph with five time expressions.", ["routines", "frequency"]],
+        ["Places, Directions, and Appointments", "Ask where places are and arrange a simple appointment.", "A short appointment dialogue and direction notes.", ["places", "appointments"]],
+        ["Modal Verbs for Needs and Plans", "Use modal verbs to express what you can, must, want, and would like to do.", "Eight modal-verb sentences about study, work, and errands.", ["modal-verbs", "plans"]],
+        ["Separable Verbs and Everyday Tasks", "Use common separable verbs in main clauses and simple questions.", "A task list rewritten with separable verbs in sentences.", ["separable-verbs", "word-order"]],
+        ["A1.2 Integrated Review and Practical Email", "Write a short practical message using A1.2 routine, place, and plan language.", "A short email plus a self-correction checklist.", ["review", "email"]]
+      ])),
+      module(4, "A2.1 - Everyday Independence", "Objectives: manage travel, appointments, health, housing, work, and services. Grammar: perfect tense, dative verbs, two-way prepositions, comparatives, subordinate clauses with weil. Skills: longer dialogues, forms, short messages, practical phone calls. Prerequisite: A1.2. Completion: A2.1 scenario assessment.", germanLevelLessons("A2.1", "DE-A21", "DE-A12-S05", [
+        ["Travel Planning and Tickets", "Plan a short trip and ask for ticket, platform, and departure information.", "A travel dialogue and itinerary summary.", ["travel", "tickets"]],
+        ["Appointments, Health, and Services", "Explain a simple problem and book or change an appointment.", "A service-call script and symptom notes.", ["health", "services"]],
+        ["Perfect Tense for Recent Experiences", "Use the perfect tense to describe recent everyday events.", "Ten perfect-tense sentences about yesterday or last week.", ["perfect-tense", "experiences"]],
+        ["Dative Verbs and Two-Way Prepositions", "Use high-frequency dative patterns and place/location phrases.", "A room or city description using dative phrases.", ["dative", "prepositions"]],
+        ["A2.1 Scenario Review", "Handle a practical travel, service, or appointment scenario from start to finish.", "A complete scenario response with vocabulary checklist.", ["review", "scenario"]]
+      ])),
+      module(5, "A2.2 - Connected Everyday Speech", "Objectives: explain preferences, tell simple stories, handle common problems, and understand slower authentic material. Grammar: past tense review, adjective endings introduction, wenn clauses, indirect questions. Skills: connected writing, short presentations, everyday listening. Prerequisite: A2.1. Completion: A2.2 communication assessment.", germanLevelLessons("A2.2", "DE-A22", "DE-A21-S05", [
+        ["Telling Short Stories in Sequence", "Tell a simple past event with connectors and clear sequence.", "A 10-sentence story using sequence markers.", ["storytelling", "connectors"]],
+        ["Preferences, Comparisons, and Reasons", "Compare options and explain preferences with simple reasons.", "A comparison paragraph about two choices.", ["comparisons", "reasons"]],
+        ["Adjective Endings for Everyday Descriptions", "Use basic adjective endings in common noun phrases.", "A description table and five corrected sentences.", ["adjective-endings", "descriptions"]],
+        ["Indirect Questions and Problem Solving", "Ask polite indirect questions while solving an everyday problem.", "A customer-service dialogue with indirect questions.", ["indirect-questions", "problem-solving"]],
+        ["A2.2 Communication Review", "Combine narration, preference, description, and problem-solving language.", "A short presentation script with review notes.", ["review", "presentation"]]
+      ])),
+      module(6, "B1.1 - Independent Foundations", "Objectives: discuss experiences, plans, opinions, work, study, and social topics. Grammar: subordinate clauses, relative clauses introduction, passive introduction, connectors. Skills: structured reading, everyday media listening, opinion speaking, personal letters. Prerequisite: A2.2. Completion: B1.1 integrated assessment.", germanLevelLessons("B1.1", "DE-B11", "DE-A22-S05", [
+        ["Work, Study, and Experience Narratives", "Describe work, study, and learning experiences with useful detail.", "A structured experience narrative with corrections.", ["work", "study", "experiences"]],
+        ["Opinions with Reasons and Connectors", "Give opinions and support them with connected reasons.", "An opinion paragraph using at least five connectors.", ["opinions", "connectors"]],
+        ["Subordinate Clauses with weil, dass, and wenn", "Use common subordinate clauses to explain causes, facts, and conditions.", "Sentence transformations with subordinate clauses.", ["subordinate-clauses", "grammar"]],
+        ["Relative Clauses Introduction", "Add short relative clauses to identify people, places, and things.", "Eight relative-clause sentences from prompts.", ["relative-clauses", "descriptions"]],
+        ["B1.1 Integrated Review", "Combine narrative, opinion, and clause control in an integrated response.", "A B1.1 integrated writing and speaking checklist.", ["review", "integrated-skills"]]
+      ])),
+      module(7, "B1.2 - Independent Communication", "Objectives: sustain conversations, explain reasons, summarize information, and write coherent texts. Grammar: Konjunktiv II for polite requests, passive, relative clauses, nominalization basics. Skills: argumentation, short reports, authentic listening. Prerequisite: B1.1. Completion: B1.2 readiness assessment.", germanLevelLessons("B1.2", "DE-B12", "DE-B11-S05", [
+        ["Sustaining Conversations and Follow-up Questions", "Keep a conversation moving with follow-up questions and reactions.", "A conversation script with follow-up moves marked.", ["conversation", "follow-up"]],
+        ["Summarizing Short Texts and Audio", "Summarize main points from a short text or listening source.", "A five-sentence summary with key vocabulary.", ["summary", "listening"]],
+        ["Polite Requests with Konjunktiv II", "Make polite requests, suggestions, and wishes with Konjunktiv II.", "Ten polite request sentences and a short dialogue.", ["konjunktiv-ii", "politeness"]],
+        ["Passive Voice and Process Descriptions", "Describe processes using passive structures where useful.", "A short process description using active and passive forms.", ["passive", "processes"]],
+        ["B1.2 Readiness Review", "Produce a coherent B1-level response across conversation, summary, and process tasks.", "A readiness checklist plus one integrated written response.", ["review", "readiness"]]
+      ])),
+      module(8, "B2.1 - Upper-Intermediate Control", "Objectives: understand complex topics, participate in discussions, and write structured arguments. Grammar: advanced connectors, passive alternatives, participle constructions introduction, style/register. Skills: article reading, presentation, formal correspondence. Prerequisite: B1.2. Completion: B2.1 assessment.", germanLevelLessons("B2.1", "DE-B21", "DE-B12-S05", [
+        ["Structured Arguments and Discussion Language", "Build a clear argument with claim, reason, example, and limitation.", "A structured argument paragraph and speaking outline.", ["argumentation", "discussion"]],
+        ["Formal Correspondence and Register", "Write formal messages with appropriate register and clear requests.", "A formal email with register notes.", ["formal-writing", "register"]],
+        ["Advanced Connectors and Text Cohesion", "Use advanced connectors to link contrast, cause, result, and concession.", "A revised text showing cohesion improvements.", ["advanced-connectors", "cohesion"]],
+        ["Presentations on Complex Topics", "Prepare and deliver a short structured presentation on a complex topic.", "A presentation outline with introduction, transitions, and conclusion.", ["presentation", "complex-topics"]],
+        ["B2.1 Assessment Preparation", "Review B2.1 argument, register, cohesion, and presentation skills.", "A B2.1 preparation response with self-assessment.", ["review", "assessment-prep"]]
+      ])),
+      module(9, "B2.2 - Professional and Academic Fluency", "Objectives: follow detailed media, defend viewpoints, write polished texts, and communicate professionally. Grammar: advanced sentence style, nuanced modality, idioms, text cohesion. Skills: debate, reports, interviews, workplace scenarios. Prerequisite: B2.1. Completion: B2.2 assessment.", germanLevelLessons("B2.2", "DE-B22", "DE-B21-S05", [
+        ["Professional Meetings and Interviews", "Participate in professional conversations with precise answers and follow-up questions.", "An interview answer bank and meeting response script.", ["interviews", "meetings"]],
+        ["Academic and Media Comprehension", "Extract arguments, evidence, and stance from advanced texts or media.", "A comprehension map with thesis, support, and open questions.", ["media", "academic-reading"]],
+        ["Debate, Nuance, and Counterarguments", "Defend a viewpoint while acknowledging tradeoffs and counterarguments.", "A debate outline with counterargument responses.", ["debate", "nuance"]],
+        ["Reports, Recommendations, and Executive Summaries", "Write a concise report or recommendation with evidence and next steps.", "A one-page report draft with revision notes.", ["reports", "recommendations"]],
+        ["B2.2 Fluency Review", "Integrate professional, academic, and debate language in a final B2.2 response.", "A final fluency portfolio entry and self-assessment.", ["review", "fluency"]]
+      ]))
     ]
   }
 ];
@@ -752,7 +794,7 @@ function germanTopic(lessonDefinition: SeedLessonDefinition) {
       "Write a short answer without copying the examples."
     ],
     explanationMarkdown:
-      `${lessonDefinition.title} gives you a small, usable piece of A1 German. Focus on short sentences, clear pronunciation, and repeating the pattern until it feels familiar.`,
+      `${lessonDefinition.title} gives you a focused, usable piece of German for ${lessonDefinition.level ?? "your current level"}. Focus on controlled sentences, clear pronunciation, and repeating the pattern until it becomes usable.`,
     examples: [
       "German: Ich lerne Deutsch.\nEnglish: I am learning German.",
       "German: Das ist gut.\nEnglish: That is good.",
@@ -851,6 +893,36 @@ function module(
     summary,
     lessons
   };
+}
+
+function germanLevelLessons(
+  level: string,
+  identifierPrefix: string,
+  firstPrerequisite: string,
+  definitions: readonly [
+    title: string,
+    objective: string,
+    evidence: string,
+    tags: readonly string[]
+  ][]
+): readonly SeedLessonDefinition[] {
+  return definitions.map(([title, objective, evidence, tags], index) => {
+    const identifier = `${identifierPrefix}-S${String(index + 1).padStart(2, "0")}`;
+    const prerequisite = index === 0
+      ? firstPrerequisite
+      : `${identifierPrefix}-S${String(index).padStart(2, "0")}`;
+
+    return lesson(
+      identifier,
+      `${level} Session ${index + 1}: ${title}`,
+      objective,
+      [prerequisite],
+      60,
+      evidence,
+      [level, ...tags],
+      level
+    );
+  });
 }
 
 function lesson(
