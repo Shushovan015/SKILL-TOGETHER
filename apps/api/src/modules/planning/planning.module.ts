@@ -1,7 +1,5 @@
 import { Module } from "@nestjs/common";
 
-import { DateScalar } from "../../common/graphql/date.scalar.js";
-import { JsonScalar } from "../../common/graphql/json.scalar.js";
 import { PrismaService } from "../../prisma/prisma.service.js";
 import { AuthModule } from "../auth/auth.module.js";
 import { LessonCompletionService } from "./domain/lesson-completion.service.js";
@@ -20,8 +18,6 @@ import { PlanningService } from "./planning.service.js";
     SchedulingDomainService,
     RecoveryDomainService,
     LessonCompletionService,
-    DateScalar,
-    JsonScalar,
     {
       provide: PLANNING_REPOSITORY,
       inject: [

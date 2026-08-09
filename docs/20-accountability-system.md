@@ -49,6 +49,8 @@ Rules:
 - Accepting an invitation creates a Partner Connection.
 - Rejected, expired, or revoked invitations cannot be accepted later.
 
+Phase 7 implementation stores only a hashed invitation token, normalizes invitee email addresses, and lets an authenticated invitee accept or reject a pending invitation when their account email matches the invitation.
+
 ## Connection Removal
 
 - Either user may remove a Partner Connection.
@@ -78,6 +80,8 @@ Rules:
 ## Shared Progress
 
 Shared progress comes from `ProgressSnapshot`, not raw task attempts. The DTO must include only fields approved in this document.
+
+Phase 7 exposes shared progress through `partnerDashboard`, `partnerInvitations`, `partnerConnections`, and `partnerProgress`. These operations do not expose private reflections, assessment answers, AI conversations, password or session data, or partner email addresses for active connections.
 
 Example:
 

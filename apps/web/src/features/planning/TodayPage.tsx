@@ -160,6 +160,11 @@ export function TodayPage(): React.JSX.Element {
           </p>
         </div>
         <LogoutButton />
+        <div className="auth-panel__actions">
+          <Link className="button-link button-link--secondary" to="/partner">
+            Partner
+          </Link>
+        </div>
       </section>
 
       {actionError === undefined ? null : (

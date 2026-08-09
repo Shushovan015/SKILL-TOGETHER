@@ -55,6 +55,7 @@ export interface ScheduledLesson {
 
 export interface DailyTask {
   readonly id: string;
+  readonly studyWeekId: string;
   readonly scheduledOn: string;
   readonly status: DailyTaskStatus;
   readonly plannedDurationMinutes: number;
@@ -188,6 +189,7 @@ export const PLANNING_TRACKS_QUERY = gql`
 export const DAILY_TASK_FIELDS = gql`
   fragment DailyTaskFields on DailyTask {
     id
+    studyWeekId
     scheduledOn
     status
     plannedDurationMinutes

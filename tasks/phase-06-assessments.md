@@ -23,38 +23,38 @@ Gives learners proof of understanding and directs revision instead of relying on
 
 ## Implementation Tasks
 
-- [ ] Implement assessment eligibility.
-- [ ] Implement Assessment Version and Question management.
-- [ ] Create Weekly Assessment Attempt.
-- [ ] Implement answer draft or submission flow.
-- [ ] Implement objective scoring.
-- [ ] Implement manual grading pending state.
-- [ ] Implement assessment result page.
-- [ ] Implement weak-topic revision recommendations.
+- [x] Implement assessment eligibility.
+- [x] Implement Assessment Version and Question management.
+- [x] Create Weekly Assessment Attempt.
+- [x] Implement answer draft or submission flow.
+- [x] Implement objective scoring.
+- [x] Implement manual grading pending state.
+- [x] Implement assessment result page.
+- [x] Implement weak-topic revision recommendations.
 
 ## Database Tasks
 
-- [ ] Create assessments, assessment_versions, questions tables.
-- [ ] Create assessment_attempts and answers tables.
-- [ ] Add assessment status and question type enums.
-- [ ] Add snapshots for attempts and answers.
+- [x] Create assessments, assessment_versions, questions tables.
+- [x] Create assessment_attempts and answers tables.
+- [x] Add assessment status and question type enums.
+- [x] Add snapshots for attempts and answers.
 
 ## Backend Tasks
 
-- [ ] Add AssessmentModule.
-- [ ] Add eligibility service.
-- [ ] Add deterministic question selection.
-- [ ] Add scoring service.
-- [ ] Add weak-topic detection service.
-- [ ] Add GraphQL assessment operations.
+- [x] Add AssessmentModule.
+- [x] Add eligibility service.
+- [x] Add deterministic question selection.
+- [x] Add scoring service.
+- [x] Add weak-topic detection service.
+- [x] Add GraphQL assessment operations.
 
 ## Frontend Tasks
 
-- [ ] Build Weekly Assessment page.
-- [ ] Build question controls for MVP question types.
-- [ ] Build result page.
-- [ ] Show manual grading pending state.
-- [ ] Link revision recommendations to lessons or tasks.
+- [x] Build Weekly Assessment page.
+- [x] Build question controls for MVP question types.
+- [x] Build result page.
+- [x] Show manual grading pending state.
+- [x] Link revision recommendations to lessons or tasks.
 
 ## Test Tasks
 
@@ -66,15 +66,15 @@ Gives learners proof of understanding and directs revision instead of relying on
 
 ## Documentation Tasks
 
-- [ ] Update assessment engine with implemented scoring details.
-- [ ] Update API docs if contract changes.
+- [x] Update assessment engine with implemented scoring details.
+- [x] Update API docs if contract changes.
 - [ ] Update seed data with reviewed question IDs.
 
 ## Security Checks
 
-- [ ] Learner can access only own Assessment Attempts.
-- [ ] Partner cannot see exact answers.
-- [ ] Official assessments exclude unapproved content.
+- [x] Learner can access only own Assessment Attempts.
+- [x] Partner cannot see exact answers.
+- [x] Official assessments exclude unapproved content.
 
 ## Acceptance Criteria
 
@@ -106,8 +106,8 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
+- [x] Implementation complete.
 - [ ] Tests complete.
-- [ ] Security checks complete.
-- [ ] Documentation updated.
+- [x] Security checks complete.
+- [x] Documentation updated.
 - [ ] Validation commands passed.

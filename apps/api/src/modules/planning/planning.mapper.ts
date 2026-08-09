@@ -20,6 +20,7 @@ export function toPlanningEnrollmentDto(enrollment: PlanningEnrollmentRecord): E
 export function toDailyTaskDto(task: DailyTaskRecord): DailyTaskDto {
   return {
     id: task.id,
+    studyWeekId: task.studyWeekId,
     scheduledOn: task.scheduledOn,
     status: task.status as DailyTaskStatusDto,
     plannedDurationMinutes: task.plannedDurationMinutes,

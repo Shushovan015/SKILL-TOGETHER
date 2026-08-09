@@ -126,6 +126,7 @@ export interface ScheduledLessonRecord {
 
 export interface DailyTaskRecord {
   readonly id: string;
+  readonly studyWeekId: string;
   readonly scheduledOn: Date;
   readonly status: DailyTaskStatus;
   readonly plannedDurationMinutes: number;

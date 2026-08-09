@@ -2,10 +2,13 @@ import { ApolloProvider } from "@apollo/client/react";
 import { useMemo } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import { PartnerPage } from "../features/accountability/PartnerPage.js";
 import { HomePage } from "../features/auth/HomePage.js";
 import { LoginPage } from "../features/auth/LoginPage.js";
 import { ProtectedRoute } from "../features/auth/ProtectedRoute.js";
 import { RegisterPage } from "../features/auth/RegisterPage.js";
+import { AssessmentPage } from "../features/assessment/AssessmentPage.js";
+import { AssessmentResultPage } from "../features/assessment/AssessmentResultPage.js";
 import { AdminContentPage } from "../features/content/AdminContentPage.js";
 import { AdminLessonEditorPage } from "../features/content/AdminLessonEditorPage.js";
 import { AdminRoute } from "../features/content/AdminRoute.js";
@@ -64,6 +67,30 @@ export function App(): React.JSX.Element {
             element={
               <ProtectedRoute>
                 <LessonPage exerciseOnly />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assessments/week/:studyWeekId"
+            element={
+              <ProtectedRoute>
+                <AssessmentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assessments/:attemptId/result"
+            element={
+              <ProtectedRoute>
+                <AssessmentResultPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/partner"
+            element={
+              <ProtectedRoute>
+                <PartnerPage />
               </ProtectedRoute>
             }
           />

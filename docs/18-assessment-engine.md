@@ -67,12 +67,16 @@ MVP selection is deterministic:
 - Manual questions store rubric and grader.
 - AI-assisted feedback may suggest formative comments but cannot finalize production grades without review controls.
 
+Phase 6 implements predefined reviewed objective questions seeded from approved lesson assessment tags. Multiple choice, multiple select, and true/false questions are auto-scored; manual question types enter `NEEDS_MANUAL_GRADING` with nullable score outcome fields until a later review workflow exists.
+
 ## Retakes
 
 - MVP default: one retake per Weekly Assessment.
 - Retake uses the same Assessment Version but can select alternate questions if configured.
 - Historical attempts remain visible to the learner.
 - Highest score and latest score are both stored for reporting.
+
+Phase 6 stores each retake as a new `attempt_number` for the same learner, Study Week, and Assessment Version. A passed attempt prevents additional retakes.
 
 ## Answer Storage
 

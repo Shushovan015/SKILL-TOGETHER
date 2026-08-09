@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 
 import { ApiConfigService } from "../../common/config/api-config.service.js";
-import { DateScalar } from "../../common/graphql/date.scalar.js";
 import { PrismaService } from "../../prisma/prisma.service.js";
 import { AuthModule } from "../auth/auth.module.js";
 import { ContentResolver } from "./content.resolver.js";
@@ -15,7 +14,6 @@ import { PrismaContentRepository } from "./persistence/prisma-content.repository
   providers: [
     ContentResolver,
     ContentService,
-    DateScalar,
     {
       provide: CONTENT_REPOSITORY,
       inject: [ApiConfigService, PrismaService],

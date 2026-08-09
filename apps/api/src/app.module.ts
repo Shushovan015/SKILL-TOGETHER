@@ -6,7 +6,12 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { ApiConfigModule } from "./common/config/api-config.module.js";
 import { ApiConfigService } from "./common/config/api-config.service.js";
 import { GraphqlErrorFilter } from "./common/errors/graphql-error.filter.js";
+import { DateTimeScalar } from "./common/graphql/date-time.scalar.js";
+import { DateScalar } from "./common/graphql/date.scalar.js";
+import { JsonScalar } from "./common/graphql/json.scalar.js";
 import { HealthModule } from "./health/health.module.js";
+import { AccountabilityModule } from "./modules/accountability/accountability.module.js";
+import { AssessmentModule } from "./modules/assessment/assessment.module.js";
 import { AuthModule } from "./modules/auth/auth.module.js";
 import { ContentModule } from "./modules/content/content.module.js";
 import { PlanningModule } from "./modules/planning/planning.module.js";
@@ -37,9 +42,14 @@ import { PrismaModule } from "./prisma/prisma.module.js";
     HealthModule,
     AuthModule,
     ContentModule,
-    PlanningModule
+    PlanningModule,
+    AssessmentModule,
+    AccountabilityModule
   ],
   providers: [
+    DateScalar,
+    DateTimeScalar,
+    JsonScalar,
     {
       provide: APP_FILTER,
       useClass: GraphqlErrorFilter

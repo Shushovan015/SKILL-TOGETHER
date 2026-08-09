@@ -270,10 +270,15 @@ Phase 5 implements `dailyTask`, `startDailyTask`, and `completeDailyTask` for sc
 ```graphql
 type AssessmentAttempt {
   id: ID!
+  studyWeekId: ID!
   status: AssessmentAttemptStatus!
   studyWeekNumber: Int!
+  attemptNumber: Int!
+  startedAt: DateTime!
+  submittedAt: DateTime
+  gradedAt: DateTime
   questions: [AssessmentQuestion!]!
-  result: AssessmentResult
+  result: AssessmentAttemptResult
 }
 
 type AssessmentQuestion {
@@ -282,6 +287,7 @@ type AssessmentQuestion {
   promptMarkdown: String!
   options: JSON
   points: Int!
+  assessmentTags: [String!]!
 }
 
 input AssessmentAnswerInput {
@@ -294,11 +300,22 @@ input SubmitAssessmentInput {
   answers: [AssessmentAnswerInput!]!
 }
 
+type AssessmentAttemptResult {
+  scoreEarned: Float
+  scorePossible: Float
+  percentage: Float
+  passed: Boolean
+  weakTopics: [String!]!
+  revisionRecommendations: [DailyTask!]!
+}
+
 type AssessmentResult {
-  scoreEarned: Float!
-  scorePossible: Float!
-  percentage: Float!
-  passed: Boolean!
+  attemptId: ID!
+  status: AssessmentAttemptStatus!
+  scoreEarned: Float
+  scorePossible: Float
+  percentage: Float
+  passed: Boolean
   weakTopics: [String!]!
   revisionRecommendations: [DailyTask!]!
 }
@@ -319,9 +336,20 @@ extend type Mutation {
 ```graphql
 type PartnerInvitation {
   id: ID!
+  inviterDisplayName: String!
   inviteeEmail: String!
   status: InvitationStatus!
   expiresAt: DateTime!
+  createdAt: DateTime!
+  direction: String!
+}
+
+type PartnerConnection {
+  id: ID!
+  partnerUserId: ID!
+  partnerDisplayName: String!
+  status: String!
+  createdAt: DateTime!
 }
 
 type PartnerProgressSummary {
@@ -340,8 +368,16 @@ input InvitePartnerInput {
   email: String!
 }
 
+type PartnerDashboard {
+  invitations: [PartnerInvitation!]!
+  connections: [PartnerConnection!]!
+  progress: [PartnerProgressSummary!]!
+}
+
 extend type Query {
+  partnerDashboard: PartnerDashboard!
   partnerInvitations: [PartnerInvitation!]!
+  partnerConnections: [PartnerConnection!]!
   partnerProgress: [PartnerProgressSummary!]!
 }
 
@@ -349,6 +385,7 @@ extend type Mutation {
   invitePartner(input: InvitePartnerInput!): PartnerInvitation!
   acceptPartnerInvitation(invitationId: ID!): PartnerInvitation!
   rejectPartnerInvitation(invitationId: ID!): PartnerInvitation!
+  revokePartnerInvitation(invitationId: ID!): PartnerInvitation!
   removePartnerConnection(connectionId: ID!): Boolean!
   blockUser(userId: ID!): Boolean!
 }
@@ -412,6 +449,7 @@ Return stable codes from [37 API Error Catalogue](37-api-error-catalogue.md), in
 - `completeOnboarding` creates Enrollment, Study Plan, Study Weeks, and Daily Tasks.
 - `completeDailyTask` creates Task Attempt, snapshots content, updates progress, and may unlock assessment eligibility.
 - `applyRecovery` changes future Daily Tasks and writes audit events.
-- `submitAssessment` stores answers and starts scoring.
+- `submitAssessment` stores answer snapshots, auto-scores objective questions, and leaves manual question types pending review.
 - `acceptPartnerInvitation` creates Partner Connection and audit event.
+- `blockUser` revokes pending invitations and removes active Partner Connections.
 - Admin approval changes content eligibility for future schedules only.

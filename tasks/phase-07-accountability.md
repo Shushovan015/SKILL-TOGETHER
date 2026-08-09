@@ -23,38 +23,38 @@ Supports consistency through cooperation while protecting private learner data.
 
 ## Implementation Tasks
 
-- [ ] Implement invitation creation.
-- [ ] Implement invitation acceptance and rejection.
-- [ ] Implement invitation expiration.
-- [ ] Implement Partner Connection shared progress query.
-- [ ] Implement connection removal.
-- [ ] Implement blocking.
-- [ ] Implement encouragement status if included in MVP slice.
+- [x] Implement invitation creation.
+- [x] Implement invitation acceptance and rejection.
+- [x] Implement invitation expiration.
+- [x] Implement Partner Connection shared progress query.
+- [x] Implement connection removal.
+- [x] Implement blocking.
+- [x] Implement encouragement status if included in MVP slice.
 
 ## Database Tasks
 
-- [ ] Create partner_invitations table.
-- [ ] Create partner_connections table.
-- [ ] Create blocked_users table.
-- [ ] Add progress snapshot fields used for sharing.
-- [ ] Add indexes for invitation and connection lookups.
+- [x] Create partner_invitations table.
+- [x] Create partner_connections table.
+- [x] Create blocked_users table.
+- [x] Add progress snapshot fields used for sharing.
+- [x] Add indexes for invitation and connection lookups.
 
 ## Backend Tasks
 
-- [ ] Add AccountabilityModule.
-- [ ] Add invitation service.
-- [ ] Add partner visibility service.
-- [ ] Add progress DTO mapper.
-- [ ] Add audit events for acceptance, removal, and blocking.
+- [x] Add AccountabilityModule.
+- [x] Add invitation service.
+- [x] Add partner visibility service.
+- [x] Add progress DTO mapper.
+- [x] Add audit events for acceptance, removal, and blocking.
 
 ## Frontend Tasks
 
-- [ ] Build Partner page.
-- [ ] Show visibility summary before invitation.
-- [ ] Build invitation form.
-- [ ] Build accept/reject states.
-- [ ] Build shared progress dashboard.
-- [ ] Build remove and block confirmations.
+- [x] Build Partner page.
+- [x] Show visibility summary before invitation.
+- [x] Build invitation form.
+- [x] Build accept/reject states.
+- [x] Build shared progress dashboard.
+- [x] Build remove and block confirmations.
 
 ## Test Tasks
 
@@ -66,16 +66,16 @@ Supports consistency through cooperation while protecting private learner data.
 
 ## Documentation Tasks
 
-- [ ] Update accountability doc with implemented expiration duration.
-- [ ] Update API docs if operation names change.
-- [ ] Update security doc for any sharing changes.
+- [x] Update accountability doc with implemented expiration duration.
+- [x] Update API docs if operation names change.
+- [x] Update security doc for any sharing changes.
 
 ## Security Checks
 
-- [ ] Partner cannot view private reflections by default.
-- [ ] Partner cannot view exact answers or AI conversations.
-- [ ] Blocked users cannot send valid invitations.
-- [ ] Invitation tokens are stored hashed.
+- [x] Partner cannot view private reflections by default.
+- [x] Partner cannot view exact answers or AI conversations.
+- [x] Blocked users cannot send valid invitations.
+- [x] Invitation tokens are stored hashed.
 
 ## Acceptance Criteria
 
@@ -108,8 +108,8 @@ pnpm build
 
 ## Checklist
 
-- [ ] Implementation complete.
+- [x] Implementation complete.
 - [ ] Tests complete.
-- [ ] Privacy checks complete.
-- [ ] Documentation updated.
+- [x] Privacy checks complete.
+- [x] Documentation updated.
 - [ ] Validation commands passed.

@@ -928,6 +928,7 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
 
   return {
     id: task.id,
+    studyWeekId: task.studyWeekId,
     scheduledOn: task.scheduledOn,
     status: task.status,
     plannedDurationMinutes: task.plannedDurationMinutes,

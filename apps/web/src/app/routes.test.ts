@@ -9,6 +9,22 @@ describe("route shell", () => {
       "authenticated",
       "admin"
     ]);
-    expect(appRoutes.map((route) => route.path)).toEqual(["/", "/register", "/login", "/today"]);
+    expect(appRoutes.map((route) => route.path)).toEqual([
+      "/",
+      "/register",
+      "/login",
+      "/today",
+      "/onboarding",
+      "/plan/week/:weekNumber",
+      "/lessons/:dailyTaskId",
+      "/lessons/:dailyTaskId/exercise",
+      "/assessments/week/:studyWeekId",
+      "/assessments/:attemptId/result",
+      "/partner",
+      "/tracks",
+      "/tracks/:slug",
+      "/admin/content",
+      "/admin/content/:versionId"
+    ]);
   });
 });

@@ -89,8 +89,8 @@ Indexes:
 | assessments | `id uuid pk`, `track_id uuid fk learning_tracks`, `title text`, `type text`, `created_at`, `updated_at` |
 | assessment_versions | `id uuid pk`, `assessment_id uuid fk assessments`, `version int`, `status content_status`, `passing_percentage numeric(5,2)`, `rules jsonb`, `created_at`, `approved_at`, unique `(assessment_id, version)` |
 | questions | `id uuid pk`, `assessment_version_id uuid fk assessment_versions`, `type question_type`, `prompt_md text`, `options jsonb`, `answer_key jsonb`, `points int`, `assessment_tags text[]`, `grading_mode text`, `created_at` |
-| assessment_attempts | `id uuid pk`, `user_id uuid fk users`, `study_week_id uuid fk study_weeks`, `assessment_version_id uuid fk assessment_versions`, `status assessment_attempt_status`, `started_at`, `submitted_at`, `graded_at`, `score_earned numeric`, `score_possible numeric`, `percentage numeric`, `passed boolean`, `assessment_snapshot jsonb`, unique `(user_id, study_week_id, assessment_version_id)` |
-| answers | `id uuid pk`, `assessment_attempt_id uuid fk assessment_attempts`, `question_id uuid fk questions`, `response jsonb`, `score numeric nullable`, `feedback text nullable`, `grader_type text`, `created_at`, `updated_at` |
+| assessment_attempts | `id uuid pk`, `user_id uuid fk users`, `study_week_id uuid fk study_weeks`, `assessment_version_id uuid fk assessment_versions`, `attempt_number int`, `status assessment_attempt_status`, `started_at`, `submitted_at`, `graded_at`, `score_earned numeric`, `score_possible numeric`, `percentage numeric`, `passed boolean`, `assessment_snapshot jsonb`, unique `(user_id, study_week_id, assessment_version_id, attempt_number)` |
+| answers | `id uuid pk`, `assessment_attempt_id uuid fk assessment_attempts`, `question_id uuid fk questions`, `response jsonb`, `question_snapshot jsonb`, `score numeric nullable`, `feedback text nullable`, `grader_type text`, `created_at`, `updated_at` |
 
 Indexes:
 
@@ -112,6 +112,7 @@ Indexes:
 
 - `partner_invitations(inviter_id, status)`
 - `partner_invitations(invitee_email, status)`
+- Partial unique index on pending `partner_invitations(inviter_id, invitee_email)`
 - `partner_connections(user_a_id)`
 - `partner_connections(user_b_id)`
 - `progress_snapshots(user_id, enrollment_id, study_week_id)`

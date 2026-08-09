@@ -28,7 +28,7 @@ export class PausePeriodInputDto {
   @Field(() => DateValue)
   public endsOn!: Date;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public reason!: string | null;
 }
 
@@ -88,7 +88,7 @@ export class CompleteDailyTaskInputDto {
   @Field(() => GraphqlJsonValue)
   public completionEvidence!: JsonValue;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public reflection!: string | null;
 }
 
@@ -103,7 +103,7 @@ export class PauseEnrollmentInputDto {
   @Field(() => DateValue)
   public endsOn!: Date;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public reason!: string | null;
 }
 
@@ -157,6 +157,9 @@ export class DailyTaskDto {
   @Field(() => ID)
   public id!: string;
 
+  @Field(() => ID)
+  public studyWeekId!: string;
+
   @Field(() => DateValue)
   public scheduledOn!: Date;
 
@@ -172,7 +175,7 @@ export class DailyTaskDto {
   @Field(() => ScheduledLessonDto)
   public lesson!: ScheduledLessonDto;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public rescheduleReason!: string | null;
 
   @Field(() => Int)
@@ -204,6 +207,27 @@ export class PartnerProgressSummaryDto {
 
   @Field()
   public displayName!: string;
+
+  @Field(() => Int)
+  public plannedSessionCount!: number;
+
+  @Field(() => Int)
+  public completedSessionCount!: number;
+
+  @Field()
+  public weeklyCompletionPercentage!: number;
+
+  @Field(() => Int)
+  public currentStreak!: number;
+
+  @Field()
+  public assessmentCompleted!: boolean;
+
+  @Field()
+  public overallTrackProgressPercentage!: number;
+
+  @Field(() => String, { nullable: true })
+  public encouragementStatus!: string | null;
 }
 
 @ObjectType("TodayDashboard")

@@ -68,6 +68,43 @@ enum ReflectionVisibility {
   @@map("reflection_visibility")
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  REVOKED
+
+  @@map("invitation_status")
+}
+
+enum AssessmentAttemptStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  NEEDS_MANUAL_GRADING
+  GRADED
+  PASSED
+  FAILED
+
+  @@map("assessment_attempt_status")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  MULTIPLE_SELECT
+  TRUE_FALSE
+  SHORT_ANSWER
+  CODE_CHALLENGE
+  DEBUGGING_CHALLENGE
+  SCENARIO
+  CASE_STUDY
+  PRACTICAL_ASSIGNMENT
+  REFLECTION
+
+  @@map("question_type")
+}
+
 model User {
   id                     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email                  String               @unique
@@ -82,6 +119,13 @@ model User {
   taskAttempts           TaskAttempt[]
   reflections            Reflection[]
   progressSnapshots      ProgressSnapshot[]
+  assessmentAttempts     AssessmentAttempt[]
+  sentPartnerInvitations PartnerInvitation[]  @relation("PartnerInvitationInviter")
+  receivedPartnerInvitations PartnerInvitation[] @relation("PartnerInvitationInvitee")
+  partnerConnectionsAsA  PartnerConnection[]  @relation("PartnerConnectionUserA")
+  partnerConnectionsAsB  PartnerConnection[]  @relation("PartnerConnectionUserB")
+  blockedUsers           BlockedUser[]        @relation("BlockedUserBlocker")
+  blockedByUsers         BlockedUser[]        @relation("BlockedUserBlocked")
   authoredLessonVersions LessonVersion[]      @relation("LessonVersionAuthor")
   reviewedLessonVersions LessonVersion[]      @relation("LessonVersionReviewer")
   auditEvents            AuditEvent[]         @relation("AuditEventActor")
@@ -134,6 +178,7 @@ model LearningTrack {
   updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   modules     LearningModule[]
   enrollments Enrollment[]
+  assessments Assessment[]
 
   @@index([type, active], map: "learning_tracks_type_active_idx")
   @@map("learning_tracks")
@@ -319,6 +364,7 @@ model StudyWeek {
   dailyTasks  DailyTask[]
   reflections Reflection[]
   progressSnapshots ProgressSnapshot[]
+  assessmentAttempts AssessmentAttempt[]
 
   @@unique([studyPlanId, weekNumber], map: "study_weeks_study_plan_id_week_number_key")
   @@index([studyPlanId, startsOn], map: "study_weeks_study_plan_id_starts_on_idx")
@@ -405,6 +451,149 @@ model ProgressSnapshot {
   @@unique([userId, enrollmentId, studyWeekId], map: "progress_snapshots_user_enrollment_week_key")
   @@index([userId, enrollmentId, studyWeekId], map: "progress_snapshots_user_id_enrollment_id_study_week_id_idx")
   @@map("progress_snapshots")
+}
+
+model PartnerInvitation {
+  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  inviterId     String           @map("inviter_id") @db.Uuid
+  inviteeEmail  String           @map("invitee_email")
+  inviteeUserId String?          @map("invitee_user_id") @db.Uuid
+  status        InvitationStatus @default(PENDING)
+  tokenHash     String           @unique @map("token_hash")
+  expiresAt     DateTime         @map("expires_at") @db.Timestamptz(6)
+  respondedAt   DateTime?        @map("responded_at") @db.Timestamptz(6)
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  inviter       User             @relation("PartnerInvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee       User?            @relation("PartnerInvitationInvitee", fields: [inviteeUserId], references: [id], onDelete: SetNull)
+
+  @@index([inviterId, status], map: "partner_invitations_inviter_id_status_idx")
+  @@index([inviteeEmail, status], map: "partner_invitations_invitee_email_status_idx")
+  @@index([inviteeUserId, status], map: "partner_invitations_invitee_user_id_status_idx")
+  @@map("partner_invitations")
+}
+
+model PartnerConnection {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userAId         String    @map("user_a_id") @db.Uuid
+  userBId         String    @map("user_b_id") @db.Uuid
+  status          String    @default("ACTIVE")
+  sharingSettings Json      @map("sharing_settings") @db.JsonB
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  removedAt       DateTime? @map("removed_at") @db.Timestamptz(6)
+  userA           User      @relation("PartnerConnectionUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB           User      @relation("PartnerConnectionUserB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  @@unique([userAId, userBId], map: "partner_connections_user_a_id_user_b_id_key")
+  @@index([userAId, status], map: "partner_connections_user_a_id_status_idx")
+  @@index([userBId, status], map: "partner_connections_user_b_id_status_idx")
+  @@map("partner_connections")
+}
+
+model BlockedUser {
+  blockerId     String   @map("blocker_id") @db.Uuid
+  blockedUserId String   @map("blocked_user_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  blocker       User     @relation("BlockedUserBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedUser   User     @relation("BlockedUserBlocked", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedUserId])
+  @@index([blockedUserId], map: "blocked_users_blocked_user_id_idx")
+  @@map("blocked_users")
+}
+
+model Assessment {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trackId   String              @map("track_id") @db.Uuid
+  title     String
+  type      String
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  track     LearningTrack       @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  versions  AssessmentVersion[]
+
+  @@unique([trackId, type], map: "assessments_track_id_type_key")
+  @@map("assessments")
+}
+
+model AssessmentVersion {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessmentId      String              @map("assessment_id") @db.Uuid
+  version           Int
+  status            ContentStatus       @default(REVIEWED)
+  passingPercentage Decimal             @map("passing_percentage") @db.Decimal(5, 2)
+  rules             Json                @db.JsonB
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  approvedAt        DateTime?           @map("approved_at") @db.Timestamptz(6)
+  assessment        Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questions         Question[]
+  attempts          AssessmentAttempt[]
+
+  @@unique([assessmentId, version], map: "assessment_versions_assessment_id_version_key")
+  @@index([assessmentId, status], map: "assessment_versions_assessment_id_status_idx")
+  @@map("assessment_versions")
+}
+
+model Question {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessmentVersionId String            @map("assessment_version_id") @db.Uuid
+  type                QuestionType
+  promptMd            String            @map("prompt_md")
+  options             Json?             @db.JsonB
+  answerKey           Json              @map("answer_key") @db.JsonB
+  points              Int
+  assessmentTags      String[]          @map("assessment_tags")
+  gradingMode         String            @map("grading_mode")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  assessmentVersion   AssessmentVersion @relation(fields: [assessmentVersionId], references: [id], onDelete: Cascade)
+  answers             Answer[]
+
+  @@unique([assessmentVersionId, promptMd], map: "questions_assessment_version_id_prompt_md_key")
+  @@index([assessmentVersionId, type], map: "questions_assessment_version_id_type_idx")
+  @@map("questions")
+}
+
+model AssessmentAttempt {
+  id                  String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String                  @map("user_id") @db.Uuid
+  studyWeekId         String                  @map("study_week_id") @db.Uuid
+  assessmentVersionId String                  @map("assessment_version_id") @db.Uuid
+  attemptNumber       Int                     @default(1) @map("attempt_number")
+  status              AssessmentAttemptStatus @default(NOT_STARTED)
+  startedAt           DateTime                @default(now()) @map("started_at") @db.Timestamptz(6)
+  submittedAt         DateTime?               @map("submitted_at") @db.Timestamptz(6)
+  gradedAt            DateTime?               @map("graded_at") @db.Timestamptz(6)
+  scoreEarned         Decimal?                @map("score_earned") @db.Decimal(7, 2)
+  scorePossible       Decimal?                @map("score_possible") @db.Decimal(7, 2)
+  percentage          Decimal?                @db.Decimal(5, 2)
+  passed              Boolean?
+  assessmentSnapshot  Json                    @map("assessment_snapshot") @db.JsonB
+  user                User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studyWeek           StudyWeek               @relation(fields: [studyWeekId], references: [id], onDelete: Cascade)
+  assessmentVersion   AssessmentVersion       @relation(fields: [assessmentVersionId], references: [id], onDelete: Restrict)
+  answers             Answer[]
+
+  @@unique([userId, studyWeekId, assessmentVersionId, attemptNumber], map: "assessment_attempts_user_week_version_attempt_key")
+  @@index([userId, studyWeekId], map: "assessment_attempts_user_id_study_week_id_idx")
+  @@map("assessment_attempts")
+}
+
+model Answer {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessmentAttemptId String            @map("assessment_attempt_id") @db.Uuid
+  questionId          String            @map("question_id") @db.Uuid
+  response            Json              @db.JsonB
+  questionSnapshot    Json              @map("question_snapshot") @db.JsonB
+  score               Decimal?          @db.Decimal(7, 2)
+  feedback            String?
+  graderType          String            @map("grader_type")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  assessmentAttempt   AssessmentAttempt @relation(fields: [assessmentAttemptId], references: [id], onDelete: Cascade)
+  question            Question          @relation(fields: [questionId], references: [id], onDelete: Restrict)
+
+  @@unique([assessmentAttemptId, questionId], map: "answers_assessment_attempt_id_question_id_key")
+  @@map("answers")
 }
 
 model AuditEvent {

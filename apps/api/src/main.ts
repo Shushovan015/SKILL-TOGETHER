@@ -7,7 +7,9 @@ import { AppModule } from "./app.module.js";
 import { ApiConfigService } from "./common/config/api-config.service.js";
 import { configureApplication } from "./configure-app.js";
 
-loadEnvironment();
+loadEnvironment({
+  path: [".env", "../../.env"]
+});
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);

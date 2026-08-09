@@ -102,6 +102,8 @@ Never log:
 - Keep partner sharing explicit.
 - Document future account deletion before production if required by jurisdiction.
 
+Phase 7 partner sharing is connection-scoped and returns only `ProgressSnapshot` summary fields. Invitation tokens are stored hashed; active partner dashboards do not expose private reflections, assessment answers, AI conversations, credentials, or session data.
+
 ## Backups
 
 - Use managed PostgreSQL backups in production.

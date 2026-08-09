@@ -1,5 +1,6 @@
 import { Field, ID, InputType, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
 
+import { DateTimeValue } from "../../../common/graphql/date-time.scalar.js";
 import { DateValue } from "../../../common/graphql/date.scalar.js";
 
 export enum TrackTypeDto {
@@ -73,7 +74,7 @@ export class ExerciseDto {
   @Field()
   public expectedEvidence!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public solutionNotesMarkdown!: string | null;
 }
 
@@ -136,10 +137,10 @@ export class LessonVersionDto {
   @Field(() => ID, { nullable: true })
   public reviewerId!: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => DateTimeValue, { nullable: true })
   public approvedAt!: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => DateTimeValue, { nullable: true })
   public archivedAt!: Date | null;
 
   @Field(() => [ResourceDto])
@@ -292,7 +293,7 @@ export class ExerciseInputDto {
   @Field()
   public expectedEvidence!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   public solutionNotesMarkdown!: string | null;
 }
 

@@ -37,6 +37,7 @@ export function WeeklyPlanPage(): React.JSX.Element {
 
   const tasks = query.data?.weeklyPlan ?? [];
   const tasksByDate = groupTasksByDate(tasks);
+  const studyWeekId = tasks[0]?.studyWeekId;
 
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="weekly-plan-title">
@@ -56,6 +57,11 @@ export function WeeklyPlanPage(): React.JSX.Element {
           <Link className="button-link" to={`/plan/week/${weekNumber + 1}`}>
             Next
           </Link>
+          {studyWeekId === undefined ? null : (
+            <Link className="button-link" to={`/assessments/week/${studyWeekId}`}>
+              Assessment
+            </Link>
+          )}
         </div>
       </section>
 

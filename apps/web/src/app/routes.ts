@@ -68,6 +68,21 @@ export const appRoutes = [
     scope: "authenticated"
   },
   {
+    path: "/assessments/week/:studyWeekId",
+    label: "Weekly assessment",
+    scope: "authenticated"
+  },
+  {
+    path: "/assessments/:attemptId/result",
+    label: "Assessment result",
+    scope: "authenticated"
+  },
+  {
+    path: "/partner",
+    label: "Partner",
+    scope: "authenticated"
+  },
+  {
     path: "/tracks",
     label: "Tracks",
     scope: "authenticated"
