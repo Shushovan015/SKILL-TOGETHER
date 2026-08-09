@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const enrollmentFormSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u, "Choose a start date."),
-  experienceLevel: z.string().trim().min(1, "Experience level is required."),
+  experienceLevel: z.enum(["Beginner", "Intermediate", "Advanced"]),
   targetOutcome: z.string().trim().min(1, "Target outcome is required.")
 });
 
@@ -18,8 +18,13 @@ export const lessonEditorFormSchema = z.object({
   commonMistakes: z.string().trim().min(1, "Add at least one common mistake."),
   assessmentTags: z.string().trim().min(1, "Add at least one assessment tag."),
   resourceTitle: z.string().trim().min(1, "Resource title is required."),
+  resourceProvider: z.string().trim().min(1, "Resource provider is required."),
   resourceUrl: z.string().trim().url("Enter a valid resource URL."),
   resourceType: z.string().trim().min(1, "Resource type is required."),
+  resourceDifficulty: z.string().trim().min(1, "Resource difficulty is required."),
+  resourceEstimatedMinutes: z.number().int().min(1, "Estimated time is required."),
+  resourceDescription: z.string().trim().min(1, "Resource description is required."),
+  resourceVerificationStatus: z.string().trim().min(1, "Verification status is required."),
   resourceRequired: z.boolean(),
   resourceApproved: z.boolean(),
   resourceCitation: z.string().trim().min(1, "Citation is required."),

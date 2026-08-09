@@ -1,8 +1,9 @@
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { fetchCsrfToken } from "../auth/graphql.js";
+import { MY_ENROLLMENTS_QUERY, type MyEnrollmentsQueryData } from "../content/graphql.js";
 import {
   COMPLETE_ONBOARDING_MUTATION,
   PLANNING_TRACKS_QUERY,
@@ -13,6 +14,21 @@ import {
 import { toSafePlanningMessage, todayDateInputValue } from "./planning-ui.js";
 
 const defaultStudyDays = [1, 2, 3, 4, 5] as const;
+const germanLevels = [
+  { value: "COMPLETE_BEGINNER", label: "Complete Beginner" },
+  { value: "A1.1", label: "A1.1" },
+  { value: "A1.2", label: "A1.2" },
+  { value: "A2.1", label: "A2.1" },
+  { value: "A2.2", label: "A2.2" },
+  { value: "B1.1", label: "B1.1" },
+  { value: "B1.2", label: "B1.2" },
+  { value: "B2.1", label: "B2.1" },
+  { value: "B2.2", label: "B2.2" }
+] as const;
+const germanTargetLevels = germanLevels.filter((level) => level.value !== "COMPLETE_BEGINNER");
+const germanSessionDurations = [30, 45, 60, 90] as const;
+const professionalSessionDurations = [60, 90, 120] as const;
+const softwareEngineeringExperienceLevel = "JavaScript Frontend Developer - TypeScript New";
 const dayOptions = [
   ["0", "Sun"],
   ["1", "Mon"],
@@ -26,12 +42,16 @@ const dayOptions = [
 export function OnboardingPage(): React.JSX.Element {
   const client = useApolloClient();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const tracks = useQuery<LearningTracksQueryData>(PLANNING_TRACKS_QUERY);
+  const enrollments = useQuery<MyEnrollmentsQueryData>(MY_ENROLLMENTS_QUERY, {
+    fetchPolicy: "cache-and-network"
+  });
   const [completeOnboarding, completeState] = useMutation<
     CompleteOnboardingMutationData,
     CompleteOnboardingMutationVariables
   >(COMPLETE_ONBOARDING_MUTATION);
-  const [trackId, setTrackId] = useState("");
+  const [trackId, setTrackId] = useState(searchParams.get("trackId") ?? "");
   const [startDate, setStartDate] = useState(todayDateInputValue());
   const [studyDays, setStudyDays] = useState<readonly number[]>(defaultStudyDays);
   const [minutes, setMinutes] = useState(120);
@@ -39,10 +59,27 @@ export function OnboardingPage(): React.JSX.Element {
   const [assessmentDay, setAssessmentDay] = useState(5);
   const [recoveryDay, setRecoveryDay] = useState(6);
   const [experienceLevel, setExperienceLevel] = useState("Beginner");
+  const [germanStartLevel, setGermanStartLevel] = useState("COMPLETE_BEGINNER");
+  const [germanTargetLevel, setGermanTargetLevel] = useState("A1.2");
+  const [germanSessionDurationMinutes, setGermanSessionDurationMinutes] = useState(60);
   const [targetOutcome, setTargetOutcome] = useState("");
   const [formError, setFormError] = useState<string | undefined>();
-  const trackList = tracks.data?.learningTracks ?? [];
-  const selectedTrackId = trackId.length === 0 ? trackList[0]?.id ?? "" : trackId;
+  const activeTrackIds = new Set(
+    (enrollments.data?.myEnrollments ?? [])
+      .filter((enrollment) => ["ACTIVE", "PAUSED"].includes(enrollment.status))
+      .map((enrollment) => enrollment.track.id)
+  );
+  const availableTrackList = (tracks.data?.learningTracks ?? []).filter((track) => !activeTrackIds.has(track.id));
+  const selectedTrackId = availableTrackList.some((track) => track.id === trackId)
+    ? trackId
+    : availableTrackList[0]?.id ?? "";
+  const selectedTrack = availableTrackList.find((track) => track.id === selectedTrackId);
+  const isGerman = selectedTrack?.type === "GERMAN";
+  const isSoftwareEngineering = selectedTrack?.type === "SOFTWARE_ENGINEERING";
+  const isProjectManagement = selectedTrack?.type === "PROJECT_MANAGEMENT";
+  const germanAvailableTargetLevels = germanTargetLevels.filter(
+    (level) => compareGermanLevelValues(level.value, normalizedGermanStartLevel(germanStartLevel)) > 0
+  );
 
   useEffect(() => {
     if (trackId.length === 0 && selectedTrackId.length > 0) {
@@ -50,11 +87,34 @@ export function OnboardingPage(): React.JSX.Element {
     }
   }, [selectedTrackId, trackId]);
 
+  useEffect(() => {
+    if (isGerman) {
+      setMinutes(germanSessionDurationMinutes);
+      setRecoveryMinutes(germanSessionDurationMinutes);
+      setExperienceLevel(germanStartLevel);
+
+      if (!germanAvailableTargetLevels.some((level) => level.value === germanTargetLevel)) {
+        setGermanTargetLevel(germanAvailableTargetLevels[0]?.value ?? "A1.2");
+      }
+    } else {
+      setExperienceLevel(isSoftwareEngineering ? softwareEngineeringExperienceLevel : "Beginner");
+
+      if (!professionalSessionDurations.some((duration) => duration === minutes)) {
+        setMinutes(120);
+      }
+    }
+  }, [germanAvailableTargetLevels, germanSessionDurationMinutes, germanStartLevel, germanTargetLevel, isGerman, isSoftwareEngineering, minutes]);
+
   async function submit(): Promise<void> {
     setFormError(undefined);
 
-    if (trackId.length === 0 || targetOutcome.trim().length === 0) {
+    if (selectedTrackId.length === 0 || targetOutcome.trim().length === 0) {
       setFormError("Choose a track and target outcome.");
+      return;
+    }
+
+    if (isGerman && germanAvailableTargetLevels.length === 0) {
+      setFormError("Choose a German target level above your current level.");
       return;
     }
 
@@ -63,13 +123,16 @@ export function OnboardingPage(): React.JSX.Element {
       await completeOnboarding({
         variables: {
           input: {
-            trackId,
+            trackId: selectedTrackId,
             startDate,
             studyDays,
             availableMinutesByDay: availabilityByDay(studyDays, minutes, recoveryDay, recoveryMinutes),
             preferredSessionTime: null,
-            experienceLevel,
+            experienceLevel: isGerman ? germanStartLevel : experienceLevel,
             targetOutcome,
+            germanStartLevel: isGerman ? germanStartLevel : null,
+            germanTargetLevel: isGerman ? germanTargetLevel : null,
+            germanSessionDurationMinutes: isGerman ? germanSessionDurationMinutes : null,
             assessmentDay,
             recoveryDay,
             pausePeriods: []
@@ -81,13 +144,16 @@ export function OnboardingPage(): React.JSX.Element {
           }
         }
       });
-      navigate("/today", { replace: true });
+      navigate("/tracks", { replace: true });
     } catch (error) {
       setFormError(toSafePlanningMessage(error));
     }
   }
 
-  if (tracks.loading && tracks.data?.learningTracks === undefined) {
+  if (
+    (tracks.loading && tracks.data?.learningTracks === undefined) ||
+    (enrollments.loading && enrollments.data?.myEnrollments === undefined)
+  ) {
     return (
       <main className="status-page" aria-live="polite">
         Loading onboarding...
@@ -103,21 +169,40 @@ export function OnboardingPage(): React.JSX.Element {
     );
   }
 
+  if (enrollments.error !== undefined && enrollments.data?.myEnrollments === undefined) {
+    return (
+      <main className="status-page" role="alert">
+        {toSafePlanningMessage(enrollments.error)}
+      </main>
+    );
+  }
+
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="onboarding-title">
       <section className="workspace-header content-header">
         <div>
           <p className="auth-panel__eyebrow">Onboarding</p>
           <h1 id="onboarding-title">Create your study plan</h1>
-          <p>Set your track, days, and available minutes.</p>
+          <p>Choose the track, level, study days, and time you can realistically protect.</p>
         </div>
+        <Link className="button-link button-link--secondary" to="/tracks">
+          Back to My Tracks
+        </Link>
       </section>
 
+      {availableTrackList.length === 0 ? (
+        <section className="content-empty">
+          <p>All available tracks already have active plans.</p>
+          <Link className="button-link" to="/tracks">
+            My Tracks
+          </Link>
+        </section>
+      ) : (
       <form className="editor-form planner-form" onSubmit={(event) => event.preventDefault()}>
         <label>
           Learning track
           <select value={selectedTrackId} onChange={(event) => setTrackId(event.target.value)}>
-            {trackList.map((track) => (
+            {availableTrackList.map((track) => (
               <option value={track.id} key={track.id}>
                 {track.title}
               </option>
@@ -153,10 +238,74 @@ export function OnboardingPage(): React.JSX.Element {
           })}
         </fieldset>
 
-        <label>
-          Available minutes on study days
-          <input type="number" min={15} max={480} value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} />
-        </label>
+        {isGerman ? (
+          <>
+            <label>
+              Current level
+              <select value={germanStartLevel} onChange={(event) => setGermanStartLevel(event.target.value)}>
+                {germanLevels.map((level) => (
+                  <option value={level.value} key={level.value}>
+                    {level.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Target level
+              <select value={germanTargetLevel} onChange={(event) => setGermanTargetLevel(event.target.value)}>
+                {germanAvailableTargetLevels.map((level) => (
+                  <option value={level.value} key={level.value}>
+                    {level.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Preferred German session duration
+              <select value={germanSessionDurationMinutes} onChange={(event) => setGermanSessionDurationMinutes(Number(event.target.value))}>
+                {germanSessionDurations.map((duration) => (
+                  <option value={duration} key={duration}>
+                    {duration} minutes
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        ) : (
+          <>
+            <label>
+              Current level
+              <select value={experienceLevel} onChange={(event) => setExperienceLevel(event.target.value)}>
+                {isSoftwareEngineering ? (
+                  <option value={softwareEngineeringExperienceLevel}>
+                    JavaScript frontend developer, TypeScript new
+                  </option>
+                ) : null}
+                {isProjectManagement ? <option value="Beginner">Beginner</option> : null}
+                {!isSoftwareEngineering && !isProjectManagement ? (
+                  <>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </>
+                ) : null}
+              </select>
+            </label>
+
+            <label>
+              Available minutes on study days
+              <select value={minutes} onChange={(event) => setMinutes(Number(event.target.value))}>
+                {professionalSessionDurations.map((duration) => (
+                  <option value={duration} key={duration}>
+                    {duration} minutes
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
 
         <label>
           Assessment day
@@ -180,15 +329,12 @@ export function OnboardingPage(): React.JSX.Element {
           </select>
         </label>
 
-        <label>
-          Recovery-day minutes
-          <input type="number" min={15} max={480} value={recoveryMinutes} onChange={(event) => setRecoveryMinutes(Number(event.target.value))} />
-        </label>
-
-        <label>
-          Experience level
-          <input value={experienceLevel} onChange={(event) => setExperienceLevel(event.target.value)} />
-        </label>
+        {!isGerman ? (
+          <label>
+            Recovery-day minutes
+            <input type="number" min={15} max={480} value={recoveryMinutes} onChange={(event) => setRecoveryMinutes(Number(event.target.value))} />
+          </label>
+        ) : null}
 
         <label>
           Target outcome
@@ -205,8 +351,18 @@ export function OnboardingPage(): React.JSX.Element {
           {completeState.loading ? "Creating..." : "Create plan"}
         </button>
       </form>
+      )}
     </main>
   );
+}
+
+function normalizedGermanStartLevel(level: string): string {
+  return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
+}
+
+function compareGermanLevelValues(left: string, right: string): number {
+  const order = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"];
+  return order.indexOf(left) - order.indexOf(right);
 }
 
 function availabilityByDay(

@@ -76,8 +76,13 @@ Examples must be:
 Resources must include:
 
 - title;
+- provider;
 - URL or internal reference;
 - resource type;
+- difficulty;
+- estimated time;
+- description;
+- verification status;
 - required or optional flag;
 - citation or source notes;
 - approval state;

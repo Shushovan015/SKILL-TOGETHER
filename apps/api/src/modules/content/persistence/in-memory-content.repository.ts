@@ -73,6 +73,9 @@ interface StoredEnrollment {
   readonly startDate: Date;
   readonly targetOutcome: string;
   readonly experienceLevel: string;
+  readonly germanStartLevel: EnrollmentRecord["germanStartLevel"];
+  readonly germanTargetLevel: EnrollmentRecord["germanTargetLevel"];
+  readonly germanSessionDurationMinutes: EnrollmentRecord["germanSessionDurationMinutes"];
 }
 
 export class InMemoryContentRepository implements ContentRepository {
@@ -166,7 +169,10 @@ export class InMemoryContentRepository implements ContentRepository {
       status: "DRAFT",
       startDate: new Date(input.startDate),
       targetOutcome: input.targetOutcome,
-      experienceLevel: input.experienceLevel
+      experienceLevel: input.experienceLevel,
+      germanStartLevel: input.germanStartLevel,
+      germanTargetLevel: input.germanTargetLevel,
+      germanSessionDurationMinutes: input.germanSessionDurationMinutes
     };
 
     this.enrollmentsById.set(enrollment.id, enrollment);
@@ -318,7 +324,7 @@ export class InMemoryContentRepository implements ContentRepository {
       slug: lessonSlug(lessonDefinition.identifier),
       sequence,
       defaultDurationMinutes: lessonDefinition.durationMinutes,
-      difficulty: "Beginner",
+      difficulty: lessonDefinition.level ?? "Beginner",
       required: lessonDefinition.required,
       prerequisites: [],
       versions: [
@@ -371,7 +377,7 @@ export class InMemoryContentRepository implements ContentRepository {
 
   private toLearningTrackRecord(track: StoredTrack): LearningTrackRecord | null {
     const modules = track.modules
-      .map((moduleRecord): ModuleRecord | null => {
+      .map((moduleRecord): ModuleRecord => {
         const lessons = moduleRecord.lessons
           .map((lesson) => {
             const approvedVersion = this.currentApprovedVersion(lesson);
@@ -394,10 +400,6 @@ export class InMemoryContentRepository implements ContentRepository {
           .filter((lesson): lesson is NonNullable<typeof lesson> => lesson !== null)
           .sort((left, right) => left.sequence - right.sequence);
 
-        if (lessons.length === 0) {
-          return null;
-        }
-
         return {
           id: moduleRecord.id,
           sequence: moduleRecord.sequence,
@@ -406,7 +408,6 @@ export class InMemoryContentRepository implements ContentRepository {
           lessons
         };
       })
-      .filter((moduleRecord): moduleRecord is ModuleRecord => moduleRecord !== null)
       .sort((left, right) => left.sequence - right.sequence);
 
     return {
@@ -435,7 +436,10 @@ export class InMemoryContentRepository implements ContentRepository {
       track: trackRecord,
       startDate: new Date(enrollment.startDate),
       targetOutcome: enrollment.targetOutcome,
-      experienceLevel: enrollment.experienceLevel
+      experienceLevel: enrollment.experienceLevel,
+      germanStartLevel: enrollment.germanStartLevel,
+      germanTargetLevel: enrollment.germanTargetLevel,
+      germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes
     };
   }
 

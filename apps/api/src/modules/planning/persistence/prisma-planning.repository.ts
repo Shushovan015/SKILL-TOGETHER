@@ -17,6 +17,7 @@ import {
   ContentStatus as PrismaContentStatus,
   EnrollmentStatus as PrismaEnrollmentStatus,
   Prisma,
+  TrackType as PrismaTrackType,
   ReflectionVisibility as PrismaReflectionVisibility,
   TaskStatus as PrismaTaskStatus
 } from "../../../generated/prisma/client.js";
@@ -38,6 +39,7 @@ import type {
   RescheduleTaskInput,
   TodayDashboardRecord
 } from "../domain/planning.types.js";
+import type { GermanLevel } from "../../content/domain/content.types.js";
 import { RecoveryDomainService, assertRecoveryAvailable } from "../domain/recovery.service.js";
 import {
   dateKey,
@@ -110,9 +112,20 @@ export class PrismaPlanningRepository implements PlanningRepository {
     userId: string,
     input: OnboardingInput
   ): Promise<PlanningEnrollmentRecord> {
-    const lessons = await this.approvedLessonsForTrack(input.trackId);
+    const track = await this.prisma.learningTrack.findFirst({
+      where: {
+        id: input.trackId,
+        active: true
+      }
+    });
 
-    if (lessons.length === 0) {
+    if (track === null) {
+      throw notFoundError();
+    }
+
+    const lessons = await this.approvedLessonsForTrack(input, track.type);
+
+    if (lessons.length === 0 && track.type !== PrismaTrackType.GERMAN) {
       throw notFoundError();
     }
 
@@ -146,7 +159,8 @@ export class PrismaPlanningRepository implements PlanningRepository {
                   status: PrismaEnrollmentStatus.ACTIVE,
                   startDate: input.startDate,
                   targetOutcome: input.targetOutcome,
-                  experienceLevel: input.experienceLevel
+                  experienceLevel: input.experienceLevel,
+                  learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
                 },
                 include: {
                   track: true
@@ -160,7 +174,8 @@ export class PrismaPlanningRepository implements PlanningRepository {
                   status: PrismaEnrollmentStatus.ACTIVE,
                   startDate: input.startDate,
                   targetOutcome: input.targetOutcome,
-                  experienceLevel: input.experienceLevel
+                  experienceLevel: input.experienceLevel,
+                  learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
                 },
                 include: {
                   track: true
@@ -294,7 +309,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
         }
       }
     });
-    const mappedToday = todaysTasks.map(mapDailyTask);
+    const mappedToday = todaysTasks.map(mapDailyTask).sort(compareDailyTasksForLearner);
     const mainTask = mappedToday.find((task) => task.lesson.trackType !== "GERMAN") ?? null;
     const germanTask = mappedToday.find((task) => task.lesson.trackType === "GERMAN") ?? null;
     const plannedCount = weeklyTasks.length;
@@ -302,6 +317,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
 
     return {
       date,
+      tasks: mappedToday,
       mainTask,
       germanTask,
       estimatedStudyMinutes: mappedToday.reduce(
@@ -610,12 +626,13 @@ export class PrismaPlanningRepository implements PlanningRepository {
   }
 
   private async approvedLessonsForTrack(
-    trackId: string
+    input: OnboardingInput,
+    trackType: PrismaTrackType
   ): Promise<readonly ApprovedLessonForScheduling[]> {
     const lessons = await this.prisma.lesson.findMany({
       where: {
         module: {
-          trackId
+          trackId: input.trackId
         },
         versions: {
           some: {
@@ -661,9 +678,11 @@ export class PrismaPlanningRepository implements PlanningRepository {
       ]
     });
 
-    return lessons
+    const mappedLessons = lessons
       .map((lesson) => mapApprovedLesson(lesson))
       .filter((lesson): lesson is ApprovedLessonForScheduling => lesson !== null);
+
+    return filterLessonsForEnrollment(mappedLessons, input, trackType);
   }
 
   private async markMissedTasks(userId: string, today: Date): Promise<void> {
@@ -939,6 +958,7 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
       moduleTitle: version.lesson.module.title,
       trackTitle: version.lesson.module.track.title,
       trackType: version.lesson.module.track.type,
+      difficulty: version.lesson.difficulty,
       learningObjective: version.learningObjective,
       outcomes: toStringArray(version.outcomes),
       explanationMarkdown: version.explanationMd,
@@ -954,6 +974,14 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
     rescheduleReason: task.rescheduleReason,
     studyWeekNumber: task.studyWeek.weekNumber
   };
+}
+
+function compareDailyTasksForLearner(left: DailyTaskRecord, right: DailyTaskRecord): number {
+  return (
+    left.lesson.trackTitle.localeCompare(right.lesson.trackTitle) ||
+    left.lesson.moduleTitle.localeCompare(right.lesson.moduleTitle) ||
+    left.lesson.title.localeCompare(right.lesson.title)
+  );
 }
 
 function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): PlanningEnrollmentRecord {
@@ -972,8 +1000,148 @@ function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): PlanningEnrollmen
     },
     startDate: enrollment.startDate,
     targetOutcome: enrollment.targetOutcome,
-    experienceLevel: enrollment.experienceLevel
+    experienceLevel: enrollment.experienceLevel,
+    ...germanEnrollmentFields(enrollment.learningPreferences)
   };
+}
+
+function filterLessonsForEnrollment(
+  lessons: readonly ApprovedLessonForScheduling[],
+  input: OnboardingInput,
+  trackType: PrismaTrackType
+): readonly ApprovedLessonForScheduling[] {
+  if (trackType !== PrismaTrackType.GERMAN) {
+    return lessons;
+  }
+
+  if (
+    input.germanStartLevel === null ||
+    input.germanTargetLevel === null ||
+    input.germanSessionDurationMinutes === null
+  ) {
+    throw validationError("germanStartLevel");
+  }
+
+  const startLevel = normalizedGermanStartLevel(input.germanStartLevel);
+  const targetLevel = input.germanTargetLevel;
+
+  const sessionDurationMinutes = input.germanSessionDurationMinutes;
+
+  return lessons
+    .filter((lesson) => {
+      const level = germanLevelFromDifficulty(lesson.title, lesson.moduleTitle);
+
+      if (level === null) {
+        return false;
+      }
+
+      return compareGermanLevels(level, startLevel) >= 0 && compareGermanLevels(level, targetLevel) <= 0;
+    })
+    .map((lesson) => ({
+      ...lesson,
+      durationMinutes: sessionDurationMinutes
+    }));
+}
+
+function enrollmentPreferencesForTrack(
+  trackType: PrismaTrackType,
+  input: OnboardingInput
+): Prisma.InputJsonObject | null {
+  if (trackType !== PrismaTrackType.GERMAN) {
+    return null;
+  }
+
+  if (
+    input.germanStartLevel === null ||
+    input.germanTargetLevel === null ||
+    input.germanSessionDurationMinutes === null
+  ) {
+    throw validationError("germanStartLevel");
+  }
+
+  return {
+    german: {
+      startLevel: input.germanStartLevel,
+      targetLevel: input.germanTargetLevel,
+      sessionDurationMinutes: input.germanSessionDurationMinutes
+    }
+  };
+}
+
+function germanEnrollmentFields(value: Prisma.JsonValue | null): Pick<
+  PlanningEnrollmentRecord,
+  "germanStartLevel" | "germanTargetLevel" | "germanSessionDurationMinutes"
+> {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    !("german" in value) ||
+    typeof value["german"] !== "object" ||
+    value["german"] === null ||
+    Array.isArray(value["german"])
+  ) {
+    return {
+      germanStartLevel: null,
+      germanTargetLevel: null,
+      germanSessionDurationMinutes: null
+    };
+  }
+
+  const german = value["german"];
+  const startLevel = german["startLevel"];
+  const targetLevel = german["targetLevel"];
+  const sessionDurationMinutes = german["sessionDurationMinutes"];
+
+  return {
+    germanStartLevel: isGermanLevel(startLevel) ? startLevel : null,
+    germanTargetLevel: isGermanTargetLevel(targetLevel) ? targetLevel : null,
+    germanSessionDurationMinutes:
+      isGermanSessionDuration(sessionDurationMinutes) ? sessionDurationMinutes : null
+  };
+}
+
+const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;
+
+function normalizedGermanStartLevel(level: GermanLevel): Exclude<GermanLevel, "COMPLETE_BEGINNER"> {
+  return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
+}
+
+function germanLevelFromDifficulty(
+  title: string,
+  moduleTitle: string
+): Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null {
+  const source = `${moduleTitle} ${title}`;
+  return germanLevelOrder.find((level) => source.includes(level)) ?? null;
+}
+
+function compareGermanLevels(
+  left: Exclude<GermanLevel, "COMPLETE_BEGINNER">,
+  right: Exclude<GermanLevel, "COMPLETE_BEGINNER">
+): number {
+  return germanLevelOrder.indexOf(left) - germanLevelOrder.indexOf(right);
+}
+
+function isGermanLevel(value: unknown): value is GermanLevel {
+  return (
+    value === "COMPLETE_BEGINNER" ||
+    value === "A1.1" ||
+    value === "A1.2" ||
+    value === "A2.1" ||
+    value === "A2.2" ||
+    value === "B1.1" ||
+    value === "B1.2" ||
+    value === "B2.1" ||
+    value === "B2.2"
+  );
+}
+
+function isGermanTargetLevel(value: unknown): value is Exclude<GermanLevel, "COMPLETE_BEGINNER"> {
+  return isGermanLevel(value) && value !== "COMPLETE_BEGINNER";
+}
+
+function isGermanSessionDuration(value: unknown): value is 30 | 45 | 60 | 90 {
+  return value === 30 || value === 45 || value === 60 || value === 90;
 }
 
 function mapPlanPreferences(plan: PrismaStudyPlan & {
@@ -998,8 +1166,13 @@ function mapResource(resource: PrismaResource) {
   return {
     id: resource.id,
     title: resource.title,
+    provider: resource.provider,
     url: resource.url,
     resourceType: resource.resourceType,
+    difficulty: resource.difficulty,
+    estimatedMinutes: resource.estimatedMinutes,
+    description: resource.description,
+    verificationStatus: resource.verificationStatus,
     required: resource.required,
     approved: resource.approved,
     citation: resource.citation
@@ -1190,6 +1363,15 @@ function conflictError(): Error {
     code: "CONFLICT",
     message: apiErrorMessages.CONFLICT,
     retryable: true
+  });
+}
+
+function validationError(field: string): Error {
+  return createApiGraphqlError({
+    code: "VALIDATION_FAILED",
+    message: apiErrorMessages.VALIDATION_FAILED,
+    retryable: false,
+    field
   });
 }
 

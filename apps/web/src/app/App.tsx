@@ -12,10 +12,12 @@ import { AssessmentResultPage } from "../features/assessment/AssessmentResultPag
 import { AdminContentPage } from "../features/content/AdminContentPage.js";
 import { AdminLessonEditorPage } from "../features/content/AdminLessonEditorPage.js";
 import { AdminRoute } from "../features/content/AdminRoute.js";
+import { RoadmapPage } from "../features/content/RoadmapPage.js";
 import { TrackCataloguePage } from "../features/content/TrackCataloguePage.js";
 import { TrackDetailPage } from "../features/content/TrackDetailPage.js";
 import { OnboardingPage } from "../features/planning/OnboardingPage.js";
 import { LessonPage } from "../features/planning/LessonPage.js";
+import { ProgressPage } from "../features/planning/ProgressPage.js";
 import { TodayPage } from "../features/planning/TodayPage.js";
 import { WeeklyPlanPage } from "../features/planning/WeeklyPlanPage.js";
 import { createApolloClient } from "./apollo-client.js";
@@ -51,6 +53,22 @@ export function App(): React.JSX.Element {
             element={
               <ProtectedRoute>
                 <WeeklyPlanPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roadmap"
+            element={
+              <ProtectedRoute>
+                <RoadmapPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <ProgressPage />
               </ProtectedRoute>
             }
           />

@@ -12,16 +12,26 @@ Build practical project-management capability, artifact fluency, and employment 
 - Recovery day on Saturday.
 - First four weeks are detailed for MVP seed data.
 
-## Phase Overview
+## Professional Phase Overview
 
 | Phase | Focus | Outcome |
 | --- | --- | --- |
-| Phase 1 | Foundations and charter | Define project purpose, objectives, stakeholders. |
-| Phase 2 | Scope and planning | Build WBS, schedule, milestones, dependencies. |
-| Phase 3 | Risk, issue, and stakeholder management | Manage delivery uncertainty and communication. |
-| Phase 4 | Agile and delivery control | Apply Scrum, Kanban, retrospectives, metrics. |
-| Phase 5 | Tools and portfolio case study | Produce a complete PM artifact portfolio. |
-| Phase 6 | Employment preparation | CV, interviews, and case-study storytelling. |
+| Phase 1 | Project Management Fundamentals | Project vs operations, lifecycle, roles, objectives, SMART goals, business case, charter, governance, and kickoff readiness. |
+| Phase 2 | Project Initiation and Scope | Requirements, scope boundaries, exclusions, WBS, milestones, dependencies, assumptions, signoff, and change control. |
+| Phase 3 | Planning and Scheduling | Estimation, Gantt-style schedules, critical path, resources, budget, baselines, and schedule defense. |
+| Phase 4 | Cost and Resources | Resource allocation, capacity, cost assumptions, budget baselines, and resource-risk communication. |
+| Phase 5 | Risk and Issues | Risk register, qualitative scoring, responses, issue management, RAID, escalation, and contingency. |
+| Phase 6 | Stakeholder Management | Stakeholder register, power-interest matrix, engagement strategy, conflict, negotiation, and sponsor alignment. |
+| Phase 7 | Communication | Communication plans, meetings, decision logs, status reports, escalation writing, and presentation practice. |
+| Phase 8 | Agile, Scrum and Kanban | Agile principles, Scrum roles/events/artifacts, sprint planning, backlog, story points, Kanban, WIP, metrics, and retrospectives. |
+| Phase 9 | Quality and Change Management | Acceptance, quality criteria, change requests, impact analysis, governance, and lessons learned. |
+| Phase 10 | Project Monitoring and Reporting | KPIs, forecast thinking, RAID updates, executive reports, corrective actions, and governance reviews. |
+| Phase 11 | Tools and Professional Workflows | Jira, Confluence, Trello, spreadsheets, dashboards, documentation hygiene, templates, and tool-neutral workflows. |
+| Phase 12 | Interview and Career Preparation | PM CV, portfolio, terminology, situational, behavioral, Agile, risk, stakeholder, and case interviews. |
+| Phase 13 | Project Management Capstone | Simulated SaaS launch with charter, business case, stakeholders, requirements, scope, WBS, schedule, budget, risks, RAID, communications, changes, sprint plan, retrospective, and closure. |
+| Phase 14 | Final Professional Review | Fundamentals, planning, risk, stakeholders, Agile, reporting, tools, artifact portfolio, capstone, and mock PM interview. |
+
+The current seed fully authors the first 15 beginner-to-junior PM sessions and stores the remaining phases as structured roadmap/session outlines. Detailed later-phase sessions should be authored in reviewed batches.
 
 ## Detailed MVP Seed Curriculum
 

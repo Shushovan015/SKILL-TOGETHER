@@ -190,12 +190,32 @@ export function AdminLessonEditorPage(): React.JSX.Element {
               <input {...register("resourceTitle")} />
             </label>
             <label>
+              Provider
+              <input {...register("resourceProvider")} />
+            </label>
+            <label>
               URL
               <input {...register("resourceUrl")} />
             </label>
             <label>
               Type
               <input {...register("resourceType")} />
+            </label>
+            <label>
+              Difficulty
+              <input {...register("resourceDifficulty")} />
+            </label>
+            <label>
+              Estimated minutes
+              <input type="number" min={1} {...register("resourceEstimatedMinutes", { valueAsNumber: true })} />
+            </label>
+            <label>
+              Description
+              <textarea rows={3} {...register("resourceDescription")} />
+            </label>
+            <label>
+              Verification status
+              <input {...register("resourceVerificationStatus")} />
             </label>
             <label>
               Citation
@@ -277,8 +297,13 @@ function emptyEditorValues(): LessonEditorFormValues {
     commonMistakes: "",
     assessmentTags: "",
     resourceTitle: "",
+    resourceProvider: "Unknown",
     resourceUrl: "https://example.test/",
-    resourceType: "curriculum-reference",
+    resourceType: "reference",
+    resourceDifficulty: "Foundational",
+    resourceEstimatedMinutes: 15,
+    resourceDescription: "Supplemental resource for this lesson.",
+    resourceVerificationStatus: "NEEDS_VERIFICATION",
     resourceRequired: false,
     resourceApproved: true,
     resourceCitation: "",
@@ -307,8 +332,13 @@ function toEditorValues(version: AdminLessonVersion): LessonEditorFormValues {
     commonMistakes: version.commonMistakes.join("\n"),
     assessmentTags: version.assessmentTags.join(", "),
     resourceTitle: resource?.title ?? "",
+    resourceProvider: resource?.provider ?? "Unknown",
     resourceUrl: resource?.url ?? "https://example.test/",
-    resourceType: resource?.resourceType ?? "curriculum-reference",
+    resourceType: resource?.resourceType ?? "reference",
+    resourceDifficulty: resource?.difficulty ?? "Foundational",
+    resourceEstimatedMinutes: resource?.estimatedMinutes ?? 15,
+    resourceDescription: resource?.description ?? "Supplemental resource for this lesson.",
+    resourceVerificationStatus: resource?.verificationStatus ?? "NEEDS_VERIFICATION",
     resourceRequired: resource?.required ?? false,
     resourceApproved: resource?.approved ?? true,
     resourceCitation: resource?.citation ?? "",
@@ -338,8 +368,13 @@ function toLessonVersionInput(values: LessonEditorFormValues): LessonVersionEdit
     resources: [
       {
         title: values.resourceTitle.trim(),
+        provider: values.resourceProvider.trim(),
         url: values.resourceUrl.trim(),
         resourceType: values.resourceType.trim(),
+        difficulty: values.resourceDifficulty.trim(),
+        estimatedMinutes: values.resourceEstimatedMinutes,
+        description: values.resourceDescription.trim(),
+        verificationStatus: values.resourceVerificationStatus.trim(),
         required: values.resourceRequired,
         approved: values.resourceApproved,
         citation: values.resourceCitation.trim()

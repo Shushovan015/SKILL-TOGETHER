@@ -10,10 +10,30 @@ Support 30 to 60 minutes of German study on five days per week with vocabulary, 
 
 ## Structure
 
+- One German Learning Track contains CEFR sublevels `A1.1`, `A1.2`, `A2.1`, `A2.2`, `B1.1`, `B1.2`, `B2.1`, and `B2.2`.
+- `COMPLETE_BEGINNER` starts at `A1.1`.
+- German Enrollment stores starting level, target level, and preferred session duration in enrollment preferences.
 - Five sessions per week.
-- 30 to 60 minutes per session.
+- 30, 45, 60, or 90 minutes per session.
 - Friday combines review and short assessment.
 - Can be studied alongside a main Learning Track.
+
+## Session Composition
+
+German Daily Tasks are learning sessions, not tiny standalone topics. Sessions combine review, vocabulary, pronunciation, grammar, reading or listening, guided practice, speaking or writing production, and knowledge checks. Session duration controls how much activity is scheduled, with deterministic review of recent prior material in later sessions.
+
+## CEFR Outline
+
+| Level | Focus | Prerequisite | Completion |
+| --- | --- | --- | --- |
+| A1.1 | Introductions, spelling, numbers, countries, personal information, basic verbs, articles, time, food, shopping, negation, practical dialogues. | None | A1.1 practical assessment |
+| A1.2 | Daily communication, routine, places, needs, plans, modal verbs, separable verbs, accusative/dative foundations. | A1.1 | A1.2 assessment |
+| A2.1 | Travel, appointments, health, housing, services, perfect tense, dative verbs, two-way prepositions. | A1.2 | A2.1 scenario assessment |
+| A2.2 | Connected speech, stories, problems, preferences, adjective endings introduction, indirect questions. | A2.1 | A2.2 communication assessment |
+| B1.1 | Experiences, plans, opinions, work, study, subordinate clauses, relative clauses, passive introduction. | A2.2 | B1.1 integrated assessment |
+| B1.2 | Sustained conversations, summaries, coherent texts, polite requests, passive, relative clauses. | B1.1 | B1.2 readiness assessment |
+| B2.1 | Complex topics, discussions, structured arguments, advanced connectors, formal correspondence. | B1.2 | B2.1 assessment |
+| B2.2 | Professional and academic fluency, media comprehension, debate, reports, interviews. | B2.1 | B2.2 assessment |
 
 ## Week 1: Greetings, Introductions, and Pronunciation
 

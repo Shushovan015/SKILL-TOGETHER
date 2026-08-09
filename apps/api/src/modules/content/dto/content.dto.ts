@@ -45,10 +45,25 @@ export class ResourceDto {
   public title!: string;
 
   @Field()
+  public provider!: string;
+
+  @Field()
   public url!: string;
 
   @Field()
   public resourceType!: string;
+
+  @Field()
+  public difficulty!: string;
+
+  @Field(() => Int)
+  public estimatedMinutes!: number;
+
+  @Field()
+  public description!: string;
+
+  @Field()
+  public verificationStatus!: string;
 
   @Field()
   public required!: boolean;
@@ -259,6 +274,15 @@ export class EnrollmentDto {
 
   @Field()
   public experienceLevel!: string;
+
+  @Field(() => String, { nullable: true })
+  public germanStartLevel!: string | null;
+
+  @Field(() => String, { nullable: true })
+  public germanTargetLevel!: string | null;
+
+  @Field(() => Int, { nullable: true })
+  public germanSessionDurationMinutes!: number | null;
 }
 
 @InputType("ResourceInput")
@@ -267,10 +291,25 @@ export class ResourceInputDto {
   public title!: string;
 
   @Field()
+  public provider!: string;
+
+  @Field()
   public url!: string;
 
   @Field()
   public resourceType!: string;
+
+  @Field()
+  public difficulty!: string;
+
+  @Field(() => Int)
+  public estimatedMinutes!: number;
+
+  @Field()
+  public description!: string;
+
+  @Field()
+  public verificationStatus!: string;
 
   @Field()
   public required!: boolean;
@@ -358,4 +397,13 @@ export class SelectLearningTrackInputDto {
 
   @Field()
   public targetOutcome!: string;
+
+  @Field(() => String, { nullable: true })
+  public germanStartLevel!: string | null;
+
+  @Field(() => String, { nullable: true })
+  public germanTargetLevel!: string | null;
+
+  @Field(() => Int, { nullable: true })
+  public germanSessionDurationMinutes!: number | null;
 }

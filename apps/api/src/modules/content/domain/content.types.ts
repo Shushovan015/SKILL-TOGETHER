@@ -1,12 +1,33 @@
 export type TrackType = "SOFTWARE_ENGINEERING" | "PROJECT_MANAGEMENT" | "GERMAN";
 export type ContentStatus = "DRAFT" | "REVIEWED" | "APPROVED" | "ARCHIVED";
 export type EnrollmentStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELLED";
+export type GermanLevel =
+  | "COMPLETE_BEGINNER"
+  | "A1.1"
+  | "A1.2"
+  | "A2.1"
+  | "A2.2"
+  | "B1.1"
+  | "B1.2"
+  | "B2.1"
+  | "B2.2";
+
+export interface GermanEnrollmentPreferences {
+  readonly startLevel: GermanLevel;
+  readonly targetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER">;
+  readonly sessionDurationMinutes: 30 | 45 | 60 | 90;
+}
 
 export interface ResourceRecord {
   readonly id: string;
   readonly title: string;
+  readonly provider: string;
   readonly url: string;
   readonly resourceType: string;
+  readonly difficulty: string;
+  readonly estimatedMinutes: number;
+  readonly description: string;
+  readonly verificationStatus: string;
   readonly required: boolean;
   readonly approved: boolean;
   readonly citation: string;
@@ -86,6 +107,9 @@ export interface EnrollmentRecord {
   readonly startDate: Date;
   readonly targetOutcome: string;
   readonly experienceLevel: string;
+  readonly germanStartLevel: GermanLevel | null;
+  readonly germanTargetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null;
+  readonly germanSessionDurationMinutes: 30 | 45 | 60 | 90 | null;
 }
 
 export interface LessonVersionEditorInput {
@@ -114,4 +138,7 @@ export interface SelectLearningTrackInput {
   readonly startDate: Date;
   readonly experienceLevel: string;
   readonly targetOutcome: string;
+  readonly germanStartLevel: GermanLevel | null;
+  readonly germanTargetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null;
+  readonly germanSessionDurationMinutes: 30 | 45 | 60 | 90 | null;
 }

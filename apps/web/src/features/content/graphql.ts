@@ -41,13 +41,21 @@ export interface Enrollment {
   readonly startDate: string;
   readonly targetOutcome: string;
   readonly experienceLevel: string;
+  readonly germanStartLevel: string | null;
+  readonly germanTargetLevel: string | null;
+  readonly germanSessionDurationMinutes: number | null;
 }
 
 export interface Resource {
   readonly id: string;
   readonly title: string;
+  readonly provider: string;
   readonly url: string;
   readonly resourceType: string;
+  readonly difficulty: string;
+  readonly estimatedMinutes: number;
+  readonly description: string;
+  readonly verificationStatus: string;
   readonly required: boolean;
   readonly approved: boolean;
   readonly citation: string;
@@ -134,6 +142,9 @@ export interface SelectLearningTrackMutationVariables {
     readonly startDate: string;
     readonly experienceLevel: string;
     readonly targetOutcome: string;
+    readonly germanStartLevel: string | null;
+    readonly germanTargetLevel: string | null;
+    readonly germanSessionDurationMinutes: number | null;
   };
 }
 
@@ -240,8 +251,13 @@ export const ADMIN_LESSON_VERSION_FIELDS = gql`
     resources {
       id
       title
+      provider
       url
       resourceType
+      difficulty
+      estimatedMinutes
+      description
+      verificationStatus
       required
       approved
       citation
@@ -289,6 +305,9 @@ export const MY_ENROLLMENTS_QUERY = gql`
       startDate
       targetOutcome
       experienceLevel
+      germanStartLevel
+      germanTargetLevel
+      germanSessionDurationMinutes
       track {
         ...TrackFields
       }
@@ -305,6 +324,9 @@ export const SELECT_LEARNING_TRACK_MUTATION = gql`
       startDate
       targetOutcome
       experienceLevel
+      germanStartLevel
+      germanTargetLevel
+      germanSessionDurationMinutes
       track {
         id
         slug

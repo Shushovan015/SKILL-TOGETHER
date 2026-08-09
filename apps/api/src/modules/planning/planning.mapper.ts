@@ -30,6 +30,7 @@ export function toDailyTaskDto(task: DailyTaskRecord): DailyTaskDto {
       title: task.lesson.title,
       moduleTitle: task.lesson.moduleTitle,
       trackTitle: task.lesson.trackTitle,
+      difficulty: task.lesson.difficulty,
       learningObjective: task.lesson.learningObjective,
       outcomes: [...task.lesson.outcomes],
       explanationMarkdown: task.lesson.explanationMarkdown,
@@ -51,6 +52,7 @@ export function toDailyTaskDto(task: DailyTaskRecord): DailyTaskDto {
 export function toTodayDashboardDto(dashboard: TodayDashboardRecord): TodayDashboardDto {
   return {
     date: dashboard.date,
+    tasks: dashboard.tasks.map(toDailyTaskDto),
     mainTask: dashboard.mainTask === null ? null : toDailyTaskDto(dashboard.mainTask),
     germanTask: dashboard.germanTask === null ? null : toDailyTaskDto(dashboard.germanTask),
     estimatedStudyMinutes: dashboard.estimatedStudyMinutes,

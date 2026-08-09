@@ -6,6 +6,25 @@ import type { LessonVersionEditorInput, SelectLearningTrackInput } from "./conte
 
 const textField = z.string().trim().min(1).max(4_000);
 const shortTextField = z.string().trim().min(1).max(200);
+const learnerLevelSchema = z.enum([
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+  "JavaScript Frontend Developer - TypeScript New"
+]);
+const germanLevelSchema = z.enum([
+  "COMPLETE_BEGINNER",
+  "A1.1",
+  "A1.2",
+  "A2.1",
+  "A2.2",
+  "B1.1",
+  "B1.2",
+  "B2.1",
+  "B2.2"
+]);
+const germanTargetLevelSchema = germanLevelSchema.exclude(["COMPLETE_BEGINNER"]);
+const germanSessionDurationSchema = z.union([z.literal(30), z.literal(45), z.literal(60), z.literal(90)]);
 const tagSchema = z
   .string()
   .trim()
@@ -15,6 +34,7 @@ const tagSchema = z
 
 const resourceSchema = z.object({
   title: shortTextField,
+  provider: shortTextField,
   url: z
     .string()
     .trim()
@@ -24,6 +44,10 @@ const resourceSchema = z.object({
       return url.protocol === "https:";
     }, "Resource URLs must use HTTPS."),
   resourceType: shortTextField,
+  difficulty: shortTextField,
+  estimatedMinutes: z.number().int().min(1).max(240),
+  description: textField,
+  verificationStatus: z.enum(["VERIFIED", "NEEDS_VERIFICATION"]),
   required: z.boolean(),
   approved: z.boolean(),
   citation: textField
@@ -56,12 +80,31 @@ const lessonVersionEditorSchema = z.object({
   knowledgeChecks: z.array(knowledgeCheckSchema).min(1).max(10)
 });
 
-const selectLearningTrackSchema = z.object({
-  trackId: z.string().uuid(),
-  startDate: z.union([z.date(), z.string().transform(parseDateOnly)]),
-  experienceLevel: shortTextField,
-  targetOutcome: textField
-});
+const selectLearningTrackSchema = z
+  .object({
+    trackId: z.string().uuid(),
+    startDate: z.union([z.date(), z.string().transform(parseDateOnly)]),
+    experienceLevel: z.union([learnerLevelSchema, germanLevelSchema]),
+    targetOutcome: textField,
+    germanStartLevel: germanLevelSchema.nullable().optional(),
+    germanTargetLevel: germanTargetLevelSchema.nullable().optional(),
+    germanSessionDurationMinutes: germanSessionDurationSchema.nullable().optional()
+  })
+  .superRefine((value, context) => {
+    if (
+      value.germanStartLevel !== undefined &&
+      value.germanStartLevel !== null &&
+      value.germanTargetLevel !== undefined &&
+      value.germanTargetLevel !== null &&
+      compareGermanLevels(value.germanTargetLevel, normalizedGermanStartLevel(value.germanStartLevel)) <= 0
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "German target level must be above the starting level.",
+        path: ["germanTargetLevel"]
+      });
+    }
+  });
 
 export function validateLessonVersionEditorInput(input: unknown): LessonVersionEditorInput {
   const result = lessonVersionEditorSchema.safeParse(input);
@@ -80,7 +123,12 @@ export function validateSelectLearningTrackInput(input: unknown): SelectLearning
     throw validationGraphqlError(result.error);
   }
 
-  return result.data;
+  return {
+    ...result.data,
+    germanStartLevel: result.data.germanStartLevel ?? null,
+    germanTargetLevel: result.data.germanTargetLevel ?? null,
+    germanSessionDurationMinutes: result.data.germanSessionDurationMinutes ?? null
+  };
 }
 
 export function assertLessonVersionIsApprovable(input: LessonVersionEditorInput): void {
@@ -94,6 +142,19 @@ export function assertLessonVersionIsApprovable(input: LessonVersionEditorInput)
       field: "resources"
     });
   }
+}
+
+const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;
+
+function normalizedGermanStartLevel(level: z.infer<typeof germanLevelSchema>): Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER"> {
+  return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
+}
+
+function compareGermanLevels(
+  left: Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER">,
+  right: Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER">
+): number {
+  return germanLevelOrder.indexOf(left) - germanLevelOrder.indexOf(right);
 }
 
 function validationGraphqlError(error: ZodError): Error {

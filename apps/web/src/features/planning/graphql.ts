@@ -22,8 +22,13 @@ export interface Exercise {
 export interface Resource {
   readonly id: string;
   readonly title: string;
+  readonly provider: string;
   readonly url: string;
   readonly resourceType: string;
+  readonly difficulty: string;
+  readonly estimatedMinutes: number;
+  readonly description: string;
+  readonly verificationStatus: string;
   readonly required: boolean;
   readonly approved: boolean;
   readonly citation: string;
@@ -41,6 +46,7 @@ export interface ScheduledLesson {
   readonly title: string;
   readonly moduleTitle: string;
   readonly trackTitle: string;
+  readonly difficulty: string;
   readonly learningObjective: string;
   readonly outcomes: readonly string[];
   readonly explanationMarkdown: string;
@@ -73,6 +79,7 @@ export interface ProgressSummary {
 
 export interface TodayDashboard {
   readonly date: string;
+  readonly tasks: readonly DailyTask[];
   readonly mainTask: DailyTask | null;
   readonly germanTask: DailyTask | null;
   readonly estimatedStudyMinutes: number;
@@ -110,6 +117,9 @@ export interface CompleteOnboardingMutationVariables {
     readonly preferredSessionTime: string | null;
     readonly experienceLevel: string;
     readonly targetOutcome: string;
+    readonly germanStartLevel: string | null;
+    readonly germanTargetLevel: string | null;
+    readonly germanSessionDurationMinutes: number | null;
     readonly assessmentDay: number;
     readonly recoveryDay: number;
     readonly pausePeriods: readonly [];
@@ -201,6 +211,7 @@ export const DAILY_TASK_FIELDS = gql`
       title
       moduleTitle
       trackTitle
+      difficulty
       learningObjective
       outcomes
       explanationMarkdown
@@ -226,8 +237,13 @@ export const DAILY_TASK_FIELDS = gql`
       resources {
         id
         title
+        provider
         url
         resourceType
+        difficulty
+        estimatedMinutes
+        description
+        verificationStatus
         required
         approved
         citation
@@ -258,6 +274,9 @@ export const TODAY_DASHBOARD_QUERY = gql`
   query TodayDashboard {
     todayDashboard {
       date
+      tasks {
+        ...DailyTaskFields
+      }
       mainTask {
         ...DailyTaskFields
       }

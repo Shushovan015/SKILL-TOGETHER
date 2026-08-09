@@ -16,6 +16,8 @@ describe("route shell", () => {
       "/today",
       "/onboarding",
       "/plan/week/:weekNumber",
+      "/roadmap",
+      "/progress",
       "/lessons/:dailyTaskId",
       "/lessons/:dailyTaskId/exercise",
       "/assessments/week/:studyWeekId",

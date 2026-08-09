@@ -13,16 +13,26 @@ Build advanced practical software-engineering capability, portfolio evidence, an
 - First four weeks are detailed for MVP seed data.
 - Later months are module-level outlines.
 
-## Phase Overview
+## Professional Phase Overview
 
 | Phase | Focus | Outcome |
 | --- | --- | --- |
-| Phase 1 | TypeScript and frontend foundations | Strong typed React foundation. |
-| Phase 2 | React architecture and testing | Maintainable component and state architecture. |
-| Phase 3 | GraphQL, backend, and database | Full-stack application capability. |
-| Phase 4 | Auth, security, performance, accessibility | Production-quality engineering habits. |
-| Phase 5 | System design and portfolio | Scalable design, polished project evidence. |
-| Phase 6 | Interviews and job preparation | Technical and behavioral readiness. |
+| Phase 1 | TypeScript Professional Foundation | Strict TypeScript, inference, nullability, object/function typing, unions, narrowing, validation, and error modeling for JavaScript-experienced frontend developers. |
+| Phase 2 | Advanced TypeScript | Generics, constraints, keyof, mapped types, conditional types, infer, utility types, branded types, satisfies, const assertions, and type-safe architecture. |
+| Phase 3 | Professional React and Frontend Architecture | Feature organization, composition, state ownership, forms, server state, accessibility, testing, and performance. |
+| Phase 4 | Testing, Accessibility and Performance | Unit, integration, E2E, accessibility, profiling, code splitting, and quality gates. |
+| Phase 5 | GraphQL Professional Development | Schema design, resolvers, authorization, pagination, DataLoader, caching, security, Apollo Client, and GraphQL testing. |
+| Phase 6 | Backend Engineering with FastAPI | Python typing, FastAPI, Pydantic, services, repositories, SQLAlchemy, transactions, async work, errors, logging, and tests. |
+| Phase 7 | Databases and Data Modeling | PostgreSQL, schema design, constraints, indexes, joins, query planning, transactions, concurrency, migrations, and SQL interview practice. |
+| Phase 8 | Authentication, Authorization and Security | Sessions, cookies, JWT tradeoffs, object authorization, CSRF, CORS, secrets, GraphQL security, and threat modeling. |
+| Phase 9 | Full-Stack Architecture | Modular monoliths, layered design, API contracts, domain services, transactions, errors, and ADRs. |
+| Phase 10 | Data Structures and Algorithms | DSA patterns for interviews and practical problem solving. |
+| Phase 11 | System Design | Scalability, caching, queues, consistency, rate limiting, observability, failure handling, and design cases. |
+| Phase 12 | Production Engineering | Docker, CI/CD, environments, logging, monitoring, debugging, incidents, dependencies, and release readiness. |
+| Phase 13 | Interview Preparation | CV, GitHub, portfolio, DSA, system design, technical, debugging, code-review, and behavioral interviews. |
+| Phase 14 | Capstone Project | Production-grade collaborative workflow platform with React, TypeScript, GraphQL, FastAPI, PostgreSQL, Docker, CI, tests, docs, deployment notes, demo, and retrospective. |
+
+The current seed fully authors the first 15 professional sessions and stores the remaining phases as structured roadmap/session outlines. Detailed later-phase sessions should be authored in reviewed batches.
 
 ## Detailed MVP Seed Curriculum
 

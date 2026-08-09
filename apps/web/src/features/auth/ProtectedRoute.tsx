@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client/react";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
+import { LearnerLayout } from "../../app/LearnerLayout.js";
 import { getFirstGraphqlErrorCode } from "../../shared/graphql/errors.js";
 import { ME_QUERY, type MeQueryData } from "./graphql.js";
 
@@ -36,5 +37,5 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): React.JSX.Ele
     );
   }
 
-  return <>{children}</>;
+  return <LearnerLayout>{children}</LearnerLayout>;
 }

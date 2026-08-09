@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { fetchCsrfToken, ME_QUERY, type MeQueryData } from "../auth/graphql.js";
-import { LogoutButton } from "../auth/LogoutButton.js";
 import {
   APPLY_RECOVERY_MUTATION,
   PROPOSE_RECOVERY_MUTATION,
@@ -142,8 +141,7 @@ export function TodayPage(): React.JSX.Element {
   }
 
   const hasPlan =
-    data.mainTask !== null ||
-    data.germanTask !== null ||
+    data.tasks.length > 0 ||
     data.missedTasks.length > 0 ||
     data.weeklyProgress.plannedCount > 0;
 
@@ -155,14 +153,16 @@ export function TodayPage(): React.JSX.Element {
           <h1 id="today-title">{formatDate(data.date)}</h1>
           <p>
             {me.data?.me.profile.displayName === undefined
-              ? "Your plan is ready."
-              : `Your plan is ready, ${me.data.me.profile.displayName}.`}
+              ? "Start with the lessons scheduled for today."
+              : `Start with today's lessons, ${me.data.me.profile.displayName}.`}
           </p>
         </div>
-        <LogoutButton />
         <div className="auth-panel__actions">
-          <Link className="button-link button-link--secondary" to="/partner">
-            Partner
+          <Link className="button-link button-link--secondary" to="/tracks">
+            My Tracks
+          </Link>
+          <Link className="button-link button-link--secondary" to="/plan/week/1">
+            This Week
           </Link>
         </div>
       </section>
@@ -181,60 +181,78 @@ export function TodayPage(): React.JSX.Element {
           </Link>
         </section>
       ) : (
-        <section className="today-grid">
-          <TaskPanel task={data.mainTask} title="Main task" onStart={(taskId) => void startTask(taskId)} loading={startState.loading} />
-          <TaskPanel task={data.germanTask} title="German task" onStart={(taskId) => void startTask(taskId)} loading={startState.loading} />
-
-          <article className="module-panel">
-            <h2>Week progress</h2>
-            <p>
-              {data.weeklyProgress.completedCount} of {data.weeklyProgress.plannedCount} tasks complete ·{" "}
-              {data.weeklyProgress.weeklyCompletionPercentage}%
-            </p>
-            <p>{data.estimatedStudyMinutes} planned minutes today.</p>
-            <Link className="button-link button-link--secondary" to="/plan/week/1">
-              View weekly plan
-            </Link>
-          </article>
-
-          <article className="module-panel">
-            <h2>Missed sessions</h2>
-            {data.missedTasks.length === 0 ? (
-              <p>No missed sessions need recovery.</p>
+        <>
+          <section className="today-plan" aria-label="Today's plan">
+            <div className="section-heading">
+              <h2>Your plan</h2>
+              <p>
+                {data.tasks.length} {data.tasks.length === 1 ? "lesson" : "lessons"} -{" "}
+                {formatMinutes(data.estimatedStudyMinutes)} total
+              </p>
+            </div>
+            {data.tasks.length === 0 ? (
+              <section className="content-empty">No lessons are scheduled for today.</section>
             ) : (
-              <div className="recovery-list">
-                {data.missedTasks.map((task) => {
-                  const proposal = proposalByTaskId[task.id];
-
-                  return (
-                    <section key={task.id}>
-                      <h3>{task.lesson.title}</h3>
-                      <p>
-                        Missed on {formatDate(task.scheduledOn)} · {task.plannedDurationMinutes} min
-                      </p>
-                      {proposal === undefined ? (
-                        <button type="button" disabled={proposeState.loading} onClick={() => void recover(task.id)}>
-                          Propose recovery
-                        </button>
-                      ) : (
-                        <div>
-                          <p>
-                            {proposal.targetDate === null
-                              ? proposal.reason
-                              : `Move to ${formatDate(proposal.targetDate)}.`}
-                          </p>
-                          <button type="button" disabled={applyState.loading || proposal.targetDate === null} onClick={() => void apply(proposal)}>
-                            Apply recovery
-                          </button>
-                        </div>
-                      )}
-                    </section>
-                  );
-                })}
+              <div className="today-task-list">
+                {data.tasks.map((task) => (
+                  <TaskPanel key={task.id} task={task} onStart={(taskId) => void startTask(taskId)} loading={startState.loading} />
+                ))}
               </div>
             )}
-          </article>
-        </section>
+          </section>
+
+          <section className="today-grid">
+            <article className="module-panel">
+              <h2>Week progress</h2>
+              <p>
+                {data.weeklyProgress.completedCount} of {data.weeklyProgress.plannedCount} lessons complete -{" "}
+                {data.weeklyProgress.weeklyCompletionPercentage}%
+              </p>
+              <p>{formatMinutes(data.estimatedStudyMinutes)} planned today.</p>
+              <Link className="button-link button-link--secondary" to="/plan/week/1">
+                View weekly plan
+              </Link>
+            </article>
+
+            <article className="module-panel">
+              <h2>Missed sessions</h2>
+              {data.missedTasks.length === 0 ? (
+                <p>No missed sessions need recovery.</p>
+              ) : (
+                <div className="recovery-list">
+                  {data.missedTasks.map((task) => {
+                    const proposal = proposalByTaskId[task.id];
+
+                    return (
+                      <section key={task.id}>
+                        <h3>{task.lesson.title}</h3>
+                        <p>
+                          {task.lesson.trackTitle} - missed on {formatDate(task.scheduledOn)} - {task.plannedDurationMinutes} min
+                        </p>
+                        {proposal === undefined ? (
+                          <button type="button" disabled={proposeState.loading} onClick={() => void recover(task.id)}>
+                            Propose recovery
+                          </button>
+                        ) : (
+                          <div>
+                            <p>
+                              {proposal.targetDate === null
+                                ? proposal.reason
+                                : `Move to ${formatDate(proposal.targetDate)}.`}
+                            </p>
+                            <button type="button" disabled={applyState.loading || proposal.targetDate === null} onClick={() => void apply(proposal)}>
+                              Apply recovery
+                            </button>
+                          </div>
+                        )}
+                      </section>
+                    );
+                  })}
+                </div>
+              )}
+            </article>
+          </section>
+        </>
       )}
     </main>
   );
@@ -243,37 +261,62 @@ export function TodayPage(): React.JSX.Element {
 function TaskPanel({
   loading,
   onStart,
-  task,
-  title
+  task
 }: {
   readonly loading: boolean;
   readonly onStart: (taskId: string) => void;
-  readonly task: DailyTask | null;
-  readonly title: string;
+  readonly task: DailyTask;
 }): React.JSX.Element {
+  const isGerman = task.lesson.trackTitle === "German";
+  const isProfessional =
+    task.lesson.trackTitle === "Software Engineering" || task.lesson.trackTitle === "Project Management";
+
   return (
-    <article className="module-panel">
-      <h2>{title}</h2>
-      {task === null ? (
-        <p>No task scheduled today.</p>
-      ) : (
-        <>
-          <p className="track-card__type">{task.lesson.trackTitle} · {task.lesson.moduleTitle}</p>
-          <h3>{task.lesson.title}</h3>
+    <article className="today-task-card">
+      <div>
+        <p className="track-card__type">
+          {task.lesson.trackTitle}
+          {isGerman ? ` - ${task.lesson.difficulty}` : ` - ${task.lesson.moduleTitle}`}
+        </p>
+        <h3>{task.lesson.title}</h3>
+        {isGerman || isProfessional ? (
+          <>
+            <p>Today you&apos;ll {isGerman ? "practise" : "work on"}:</p>
+            <ul className="today-practice-list">
+              {task.lesson.outcomes.slice(0, 5).map((outcome) => (
+                <li key={outcome}>{outcome}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
           <p>{task.lesson.learningObjective}</p>
-          <p>
-            {task.plannedDurationMinutes} min · {task.status}
-          </p>
-          <div className="auth-panel__actions">
-            <Link className="button-link" to={`/lessons/${task.id}`}>
-              Open lesson
-            </Link>
-            <button type="button" disabled={loading || task.status !== "PLANNED"} onClick={() => onStart(task.id)}>
-              {task.status === "IN_PROGRESS" ? "In progress" : "Start task"}
-            </button>
-          </div>
-        </>
-      )}
+        )}
+        <p>
+          {isGerman ? "about " : ""}
+          {task.plannedDurationMinutes} min - {task.status.toLowerCase().replace("_", " ")}
+        </p>
+      </div>
+      <div className="auth-panel__actions">
+        <Link className="button-link" to={`/lessons/${task.id}`}>
+          {isGerman ? "Start German session" : isProfessional ? "Start session" : "Start lesson"}
+        </Link>
+        <button type="button" disabled={loading || task.status !== "PLANNED"} onClick={() => onStart(task.id)}>
+          {task.status === "IN_PROGRESS" ? "In progress" : "Start"}
+        </button>
+      </div>
     </article>
   );
+}
+
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  return remainingMinutes === 0
+    ? `${hours} ${hours === 1 ? "hour" : "hours"}`
+    : `${hours} hr ${remainingMinutes} min`;
 }

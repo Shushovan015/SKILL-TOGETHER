@@ -129,6 +129,64 @@ select[aria-invalid="true"] {
   place-items: center;
 }
 
+.learner-shell {
+  min-height: 100vh;
+}
+
+.learner-shell__content {
+  padding: var(--space-6);
+}
+
+.learner-shell .workspace-page,
+.learner-shell .status-page {
+  min-height: auto;
+  padding: 0;
+}
+
+.app-nav {
+  align-items: center;
+  background: var(--color-surface-panel);
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: auto 1fr auto;
+  padding: var(--space-4) var(--space-6);
+}
+
+.app-nav__brand {
+  color: var(--color-text-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.app-nav__links,
+.app-nav__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.app-nav__links {
+  justify-content: center;
+}
+
+.app-nav__actions {
+  justify-content: flex-end;
+}
+
+.app-nav__link {
+  border-radius: 0.375rem;
+  color: var(--color-text-secondary);
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+}
+
+.app-nav__link--active {
+  background: #e8f3f2;
+  color: var(--color-action);
+}
+
 .workspace-page--wide {
   align-content: start;
   gap: var(--space-6);
@@ -220,7 +278,11 @@ select[aria-invalid="true"] {
 .admin-list,
 .admin-toolbar,
 .editor-form,
-.content-empty {
+.content-empty,
+.workspace-section,
+.today-plan,
+.track-switcher,
+.progress-summary {
   width: min(100%, 72rem);
 }
 
@@ -334,6 +396,23 @@ select[aria-invalid="true"] {
   text-align: center;
 }
 
+.workspace-section,
+.today-plan {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.section-heading h2,
+.roadmap-title h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.section-heading p,
+.roadmap-title p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
 .form-success {
   color: var(--color-action);
   font-weight: 700;
@@ -440,6 +519,37 @@ select[aria-invalid="true"] {
   width: min(100%, 72rem);
 }
 
+.today-task-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.today-task-card {
+  align-items: center;
+  background: var(--color-surface-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--space-6);
+}
+
+.today-task-card h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.today-task-card p {
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.today-practice-list {
+  color: var(--color-text-secondary);
+  margin: var(--space-2) 0;
+  padding-left: 1.25rem;
+}
+
 .recovery-list {
   display: grid;
   gap: var(--space-4);
@@ -466,9 +576,22 @@ select[aria-invalid="true"] {
   padding: var(--space-6);
 }
 
+.lesson-header {
+  width: min(100%, 72rem);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-3);
+}
+
 .lesson-content {
   display: grid;
   gap: var(--space-6);
+}
+
+.lesson-content--learning {
+  line-height: 1.7;
 }
 
 .lesson-content section {
@@ -492,14 +615,56 @@ select[aria-invalid="true"] {
   white-space: pre-wrap;
 }
 
+.example-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.track-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.roadmap--learner {
+  width: min(100%, 72rem);
+}
+
+.roadmap-list {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.roadmap-list__item {
+  align-items: start;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+}
+
+.roadmap-list__item > span:first-child {
+  color: var(--color-action);
+  font-weight: 800;
+}
+
 @media (max-width: 760px) {
+  .app-nav,
   .content-header,
   .admin-row {
     align-items: stretch;
     grid-template-columns: 1fr;
   }
 
+  .app-nav__links,
+  .app-nav__actions {
+    justify-content: flex-start;
+  }
+
   .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .today-task-card {
     grid-template-columns: 1fr;
   }
 

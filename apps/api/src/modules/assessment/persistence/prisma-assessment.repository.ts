@@ -111,7 +111,7 @@ interface AttemptSnapshot {
 const assessmentType = "WEEKLY";
 const defaultMaxRetakes = 1;
 const defaultPassingPercentage = 70;
-const maxQuestionCount = 5;
+const maxQuestionCount = 18;
 const objectiveSeedSource = "phase-06-reviewed-seed";
 
 export class PrismaAssessmentRepository implements AssessmentRepository {
@@ -187,32 +187,34 @@ export class PrismaAssessmentRepository implements AssessmentRepository {
       });
 
       for (const tag of tags) {
-        await this.prisma.question.upsert({
-          where: {
-            assessmentVersionId_promptMd: {
+        for (const question of questionSeeds(track.type, tag)) {
+          await this.prisma.question.upsert({
+            where: {
+              assessmentVersionId_promptMd: {
+                assessmentVersionId: version.id,
+                promptMd: question.promptMd
+              }
+            },
+            update: {
+              type: question.type,
+              options: question.options,
+              answerKey: question.answerKey,
+              points: question.points,
+              assessmentTags: [...question.assessmentTags],
+              gradingMode: question.gradingMode
+            },
+            create: {
               assessmentVersionId: version.id,
-              promptMd: questionPrompt(tag)
+              type: question.type,
+              promptMd: question.promptMd,
+              options: question.options,
+              answerKey: question.answerKey,
+              points: question.points,
+              assessmentTags: [...question.assessmentTags],
+              gradingMode: question.gradingMode
             }
-          },
-          update: {
-            type: PrismaQuestionType.MULTIPLE_CHOICE,
-            options: questionOptions(tag),
-            answerKey: "target",
-            points: 1,
-            assessmentTags: [tag],
-            gradingMode: "AUTO"
-          },
-          create: {
-            assessmentVersionId: version.id,
-            type: PrismaQuestionType.MULTIPLE_CHOICE,
-            promptMd: questionPrompt(tag),
-            options: questionOptions(tag),
-            answerKey: "target",
-            points: 1,
-            assessmentTags: [tag],
-            gradingMode: "AUTO"
-          }
-        });
+          });
+        }
       }
     }
   }
@@ -793,10 +795,27 @@ function selectQuestions(
     question.assessmentTags.some((tag) => completedTagSet.has(tag))
   );
   const selected = taggedQuestions.length === 0 ? questions : taggedQuestions;
+  const selectedById = new Map<string, PrismaQuestion>();
 
-  return [...selected]
-    .sort((left, right) => left.promptMd.localeCompare(right.promptMd))
-    .slice(0, maxQuestionCount);
+  for (const tag of [...completedTags].sort((left, right) => left.localeCompare(right))) {
+    const question = [...selected]
+      .filter((candidate) => candidate.assessmentTags.includes(tag))
+      .sort(compareAssessmentQuestions)[0];
+
+    if (question !== undefined) {
+      selectedById.set(question.id, question);
+    }
+  }
+
+  for (const question of [...selected].sort(compareAssessmentQuestions)) {
+    if (selectedById.size >= maxQuestionCount) {
+      break;
+    }
+
+    selectedById.set(question.id, question);
+  }
+
+  return [...selectedById.values()];
 }
 
 function questionsForAttempt(attempt: PrismaAttemptWithRelations): readonly PrismaQuestion[] {
@@ -868,21 +887,171 @@ function readPassingPercentage(value: Prisma.JsonValue): number {
   return snapshot?.passingPercentage ?? defaultPassingPercentage;
 }
 
-function questionPrompt(tag: string): string {
-  return `Which weekly topic does "${humanizeTag(tag)}" represent?`;
+interface QuestionSeed {
+  readonly type: PrismaQuestionType;
+  readonly promptMd: string;
+  readonly options: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+  readonly answerKey: Prisma.InputJsonValue;
+  readonly points: number;
+  readonly assessmentTags: readonly string[];
+  readonly gradingMode: string;
 }
 
-function questionOptions(tag: string): Prisma.InputJsonArray {
+function questionSeeds(trackType: PrismaLearningTrack["type"], tag: string): readonly QuestionSeed[] {
+  if (trackType === "SOFTWARE_ENGINEERING") {
+    return professionalQuestionSeeds("Software Engineering", tag, [
+      "It names a production decision and the TypeScript, frontend, backend, data, or architecture tradeoff behind it.",
+      "It is an internal metadata label that should be memorized.",
+      "It is only useful for syntax recall.",
+      "It should be skipped unless a library requires it."
+    ]);
+  }
+
+  if (trackType === "PROJECT_MANAGEMENT") {
+    return professionalQuestionSeeds("Project Management", tag, [
+      "It connects terminology to a project decision, stakeholder impact, artifact, and delivery risk.",
+      "It is a document title with no decision value.",
+      "It is only useful after project closure.",
+      "It should replace stakeholder communication."
+    ]);
+  }
+
   return [
     {
-      id: "target",
-      label: humanizeTag(tag)
-    },
-    {
-      id: "unrelated",
-      label: "Unrelated review topic"
+      type: PrismaQuestionType.MULTIPLE_CHOICE,
+      promptMd: `Part A - Knowledge: Which completed German topic does "${humanizeTag(tag)}" represent?`,
+      options: choiceOptions([
+        humanizeTag(tag),
+        "Unrelated review topic",
+        "Future grammar topic",
+        "Internal scheduling setting"
+      ]),
+      answerKey: "target",
+      points: 1,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
     }
   ];
+}
+
+function professionalQuestionSeeds(
+  trackName: string,
+  tag: string,
+  knowledgeOptions: readonly string[]
+): readonly QuestionSeed[] {
+  const topic = humanizeTag(tag);
+  const metadata = questionMetadata(trackName, topic, tag);
+
+  return [
+    {
+      type: PrismaQuestionType.MULTIPLE_CHOICE,
+      promptMd: `Part A - Knowledge: In ${trackName}, what is the professional value of ${topic}?`,
+      options: choiceOptions(knowledgeOptions),
+      answerKey: "target",
+      points: 1,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
+    },
+    {
+      type: PrismaQuestionType.MULTIPLE_SELECT,
+      promptMd: `Part B - Application: Which actions show professional use of ${topic}?`,
+      options: choiceOptions([
+        "Connect the concept to a realistic scenario.",
+        "Create or review evidence that can be checked.",
+        "Ignore tradeoffs until the final assessment.",
+        "Use the term without explaining the decision."
+      ]),
+      answerKey: ["target", "supporting"],
+      points: 2,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
+    },
+    {
+      type: trackName === "Software Engineering" ? PrismaQuestionType.CASE_STUDY : PrismaQuestionType.SCENARIO,
+      promptMd:
+        trackName === "Software Engineering"
+          ? `Part C - Practical scenario: A production feature touched ${topic}. Explain the design decision, implementation evidence, tests, and review concerns.`
+          : `Part C - Project scenario: A stakeholder challenge touched ${topic}. Identify the issue, PM action, communication plan, artifact update, and risk.  
+
+Store your answer as a structured response.`,
+      options: metadata,
+      answerKey: {
+        expectedAnswer:
+          "Names the situation, applies the topic, explains tradeoffs, identifies evidence, and states verification or follow-up.",
+        scoringGuidance:
+          "Award credit for scenario fit, concrete action, tradeoff reasoning, evidence quality, and communication clarity."
+      },
+      points: 4,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.SHORT_ANSWER,
+      promptMd: `Part E - Interview: Explain ${topic} to an interviewer using a real example and one tradeoff.`,
+      options: {
+        ...metadata,
+        interviewRelevance: true
+      },
+      answerKey: {
+        expectedAnswer:
+          "Uses concise terminology, gives a realistic example, explains a tradeoff, and describes how success would be checked."
+      },
+      points: 3,
+      assessmentTags: [tag, "interview-prep"],
+      gradingMode: "MANUAL"
+    }
+  ];
+}
+
+function choiceOptions(labels: readonly string[]): Prisma.InputJsonArray {
+  return labels.map((label, index) => ({
+    id: index === 0 ? "target" : index === 1 ? "supporting" : `distractor-${index}`,
+    label
+  }));
+}
+
+function questionMetadata(trackName: string, topic: string, tag: string): Prisma.InputJsonObject {
+  return {
+    topic,
+    learningObjective: `Apply ${topic} in a ${trackName} professional scenario.`,
+    difficulty: "Professional",
+    expectedAnswer: "Scenario-specific answer with evidence and tradeoffs.",
+    scoringGuidance: "Score concept accuracy, application, evidence, tradeoffs, and communication.",
+    interviewRelevance: true,
+    sourceTag: tag
+  };
+}
+
+function compareAssessmentQuestions(left: PrismaQuestion, right: PrismaQuestion): number {
+  const priority = questionPriority(left) - questionPriority(right);
+
+  return priority === 0 ? left.promptMd.localeCompare(right.promptMd) : priority;
+}
+
+function questionPriority(question: PrismaQuestion): number {
+  if (question.promptMd.startsWith("Which weekly topic does ")) {
+    return 9;
+  }
+
+  switch (question.type) {
+    case PrismaQuestionType.MULTIPLE_CHOICE:
+      return 0;
+    case PrismaQuestionType.MULTIPLE_SELECT:
+      return 1;
+    case PrismaQuestionType.CASE_STUDY:
+    case PrismaQuestionType.SCENARIO:
+    case PrismaQuestionType.PRACTICAL_ASSIGNMENT:
+      return 2;
+    case PrismaQuestionType.SHORT_ANSWER:
+      return 3;
+    case PrismaQuestionType.DEBUGGING_CHALLENGE:
+    case PrismaQuestionType.CODE_CHALLENGE:
+      return 4;
+    case PrismaQuestionType.REFLECTION:
+      return 5;
+    case PrismaQuestionType.TRUE_FALSE:
+      return 6;
+  }
 }
 
 function humanizeTag(tag: string): string {
@@ -941,6 +1110,7 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
       moduleTitle: version.lesson.module.title,
       trackTitle: version.lesson.module.track.title,
       trackType: version.lesson.module.track.type,
+      difficulty: version.lesson.difficulty,
       learningObjective: version.learningObjective,
       outcomes: toStringArray(version.outcomes),
       explanationMarkdown: version.explanationMd,
@@ -962,8 +1132,13 @@ function mapResource(resource: PrismaResource) {
   return {
     id: resource.id,
     title: resource.title,
+    provider: resource.provider,
     url: resource.url,
     resourceType: resource.resourceType,
+    difficulty: resource.difficulty,
+    estimatedMinutes: resource.estimatedMinutes,
+    description: resource.description,
+    verificationStatus: resource.verificationStatus,
     required: resource.required,
     approved: resource.approved,
     citation: resource.citation

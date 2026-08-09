@@ -2,6 +2,7 @@ import type {
   ContentStatus,
   EnrollmentStatus,
   ExerciseRecord,
+  GermanLevel,
   KnowledgeCheckRecord,
   ResourceRecord,
   TrackType
@@ -30,6 +31,9 @@ export interface OnboardingInput {
   readonly preferredSessionTime: string | null;
   readonly experienceLevel: string;
   readonly targetOutcome: string;
+  readonly germanStartLevel: GermanLevel | null;
+  readonly germanTargetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null;
+  readonly germanSessionDurationMinutes: 30 | 45 | 60 | 90 | null;
   readonly assessmentDay: number;
   readonly recoveryDay: number;
   readonly pausePeriods: readonly PausePeriodInput[];
@@ -103,6 +107,9 @@ export interface PlanningEnrollmentRecord {
   readonly startDate: Date;
   readonly targetOutcome: string;
   readonly experienceLevel: string;
+  readonly germanStartLevel: GermanLevel | null;
+  readonly germanTargetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null;
+  readonly germanSessionDurationMinutes: 30 | 45 | 60 | 90 | null;
 }
 
 export interface ScheduledLessonRecord {
@@ -111,6 +118,7 @@ export interface ScheduledLessonRecord {
   readonly moduleTitle: string;
   readonly trackTitle: string;
   readonly trackType: TrackType;
+  readonly difficulty: string;
   readonly learningObjective: string;
   readonly outcomes: readonly string[];
   readonly explanationMarkdown: string;
@@ -144,6 +152,7 @@ export interface ProgressSummaryRecord {
 
 export interface TodayDashboardRecord {
   readonly date: Date;
+  readonly tasks: readonly DailyTaskRecord[];
   readonly mainTask: DailyTaskRecord | null;
   readonly germanTask: DailyTaskRecord | null;
   readonly estimatedStudyMinutes: number;

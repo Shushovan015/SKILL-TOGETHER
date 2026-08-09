@@ -50,7 +50,7 @@ Indexes:
 | lessons | `id uuid pk`, `module_id uuid fk modules`, `slug text`, `sequence int`, `default_duration_minutes int`, `difficulty text`, `required boolean`, `created_at`, `updated_at`, unique `(module_id, sequence)`, unique `(module_id, slug)` |
 | lesson_prerequisites | `lesson_id uuid fk lessons`, `prerequisite_lesson_id uuid fk lessons`, primary key `(lesson_id, prerequisite_lesson_id)` |
 | lesson_versions | `id uuid pk`, `lesson_id uuid fk lessons`, `version int`, `status content_status`, `title text`, `learning_objective text`, `outcomes jsonb`, `explanation_md text`, `relevance_md text`, `examples jsonb`, `common_mistakes jsonb`, `assessment_tags text[]`, `author_id uuid fk users`, `reviewer_id uuid fk users nullable`, `approved_at timestamptz nullable`, `archived_at timestamptz nullable`, unique `(lesson_id, version)` |
-| resources | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `title text`, `url text`, `resource_type text`, `required boolean`, `approved boolean`, `citation text`, `created_at` |
+| resources | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `title text`, `provider text`, `url text`, `resource_type text`, `difficulty text`, `estimated_minutes int`, `description text`, `verification_status text`, `required boolean`, `approved boolean`, `citation text`, `created_at` |
 | exercises | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `kind text`, `prompt_md text`, `expected_evidence text`, `solution_notes_md text nullable`, `created_at` |
 | knowledge_checks | `id uuid pk`, `lesson_version_id uuid fk lesson_versions`, `question text`, `answer_key jsonb`, `explanation text`, `created_at` |
 
@@ -67,7 +67,7 @@ Indexes:
 
 | Table | Columns |
 | --- | --- |
-| enrollments | `id uuid pk`, `user_id uuid fk users`, `track_id uuid fk learning_tracks`, `status enrollment_status`, `start_date date`, `target_outcome text`, `experience_level text`, `created_at`, `updated_at` |
+| enrollments | `id uuid pk`, `user_id uuid fk users`, `track_id uuid fk learning_tracks`, `status enrollment_status`, `start_date date`, `target_outcome text`, `experience_level text`, `learning_preferences jsonb nullable`, `created_at`, `updated_at` |
 | study_plans | `id uuid pk`, `enrollment_id uuid unique fk enrollments`, `study_days int[]`, `available_minutes_by_day jsonb`, `assessment_day int`, `recovery_day int`, `preferred_session_time time`, `created_at`, `updated_at` |
 | pause_periods | `id uuid pk`, `study_plan_id uuid fk study_plans`, `starts_on date`, `ends_on date`, `reason text nullable`, `created_at` |
 | study_weeks | `id uuid pk`, `study_plan_id uuid fk study_plans`, `week_number int`, `starts_on date`, `ends_on date`, `created_at`, unique `(study_plan_id, week_number)` |

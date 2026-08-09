@@ -118,7 +118,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
       independentEvidence.trim().length === 0 &&
       completionNotes.trim().length === 0
     ) {
-      setActionError("Add the required completion evidence.");
+      setActionError("Write something in the practice boxes before completing the lesson.");
       return;
     }
 
@@ -143,28 +143,31 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
           }
         }
       });
-      setSuccessMessage("Lesson completed. Your evidence and reflection were saved.");
+      setSuccessMessage("Lesson completed. Your practice and reflection were saved.");
     });
   }
 
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="lesson-title">
-      <section className="workspace-header content-header">
+      <section className="workspace-header lesson-header">
         <div>
+          <Link className="back-link" to={exerciseOnly ? `/lessons/${taskId}` : "/today"}>
+            {exerciseOnly ? "< Back to lesson" : "< Back to Today"}
+          </Link>
           <p className="auth-panel__eyebrow">
-            {task.lesson.trackTitle} · {task.lesson.moduleTitle} · {formatDate(task.scheduledOn)}
+            {task.lesson.trackTitle} &gt; Week {task.studyWeekNumber}
           </p>
           <h1 id="lesson-title">{task.lesson.title}</h1>
           <p>
-            {task.plannedDurationMinutes} planned minutes · {task.status}
+            {task.lesson.difficulty} - {task.plannedDurationMinutes} minutes - {formatStatus(task.status)}
           </p>
         </div>
         <div className="auth-panel__actions">
-          <Link className="button-link button-link--secondary" to="/today">
-            Today
-          </Link>
           <Link className="button-link button-link--secondary" to={`/plan/week/${task.studyWeekNumber}`}>
-            Week
+            This Week
+          </Link>
+          <Link className="button-link button-link--secondary" to={`/roadmap`}>
+            Roadmap
           </Link>
         </div>
       </section>
@@ -200,15 +203,15 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
         />
       ) : (
         <section className="lesson-layout">
-          <article className="lesson-content">
+          <article className="lesson-content lesson-content--learning">
             <LessonSections task={task} />
           </article>
           <aside className="lesson-action" aria-label="Lesson actions">
             <button type="button" disabled={startState.loading || task.status !== "PLANNED"} onClick={() => void startTask()}>
-              {task.status === "PLANNED" ? "Start task" : "Task started"}
+              {task.status === "PLANNED" ? "Start lesson" : "Lesson started"}
             </button>
             <button type="button" onClick={() => navigate(`/lessons/${taskId}/exercise`)}>
-              Complete evidence
+              Finish lesson
             </button>
           </aside>
         </section>
@@ -221,11 +224,8 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
   return (
     <>
       <section>
-        <h2>Learning objective</h2>
-        <p>{task.lesson.learningObjective}</p>
-      </section>
-      <section>
-        <h2>Expected outcomes</h2>
+        <h2>What You Will Learn</h2>
+        <p>By the end of this lesson you will be able to:</p>
         <ul>
           {task.lesson.outcomes.map((outcome) => (
             <li key={outcome}>{outcome}</li>
@@ -233,25 +233,37 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
         </ul>
       </section>
       <section>
-        <h2>Explanation</h2>
+        <h2>Before You Start</h2>
+        <p>{beforeStartCopy(task)}</p>
+      </section>
+      <section>
+        <h2>Learn</h2>
         <p className="preserve-lines">{task.lesson.explanationMarkdown}</p>
       </section>
       <section>
-        <h2>Professional relevance</h2>
+        <h2>Why This Matters</h2>
         <p className="preserve-lines">{task.lesson.businessRelevanceMarkdown}</p>
       </section>
       <section>
         <h2>Examples</h2>
-        <ul>
+        <ul className="example-list">
           {task.lesson.examples.map((example) => (
-            <li key={example}>{example}</li>
+            <li className="preserve-lines" key={example}>{example}</li>
           ))}
         </ul>
       </section>
-      <ExerciseSection title="Guided exercise" prompt={task.lesson.guidedExercise.promptMarkdown} evidence={task.lesson.guidedExercise.expectedEvidence} />
-      <ExerciseSection title="Independent exercise" prompt={task.lesson.independentExercise.promptMarkdown} evidence={task.lesson.independentExercise.expectedEvidence} />
+      <ExerciseSection
+        evidence={task.lesson.guidedExercise.expectedEvidence}
+        prompt={task.lesson.guidedExercise.promptMarkdown}
+        title="Try It With Me"
+      />
+      <ExerciseSection
+        evidence={task.lesson.independentExercise.expectedEvidence}
+        prompt={task.lesson.independentExercise.promptMarkdown}
+        title="Practice By Yourself"
+      />
       <section>
-        <h2>Knowledge checks</h2>
+        <h2>Check Your Understanding</h2>
         <ol>
           {task.lesson.knowledgeChecks.map((check) => (
             <li key={check.id}>{check.question}</li>
@@ -259,7 +271,7 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
         </ol>
       </section>
       <section>
-        <h2>Common mistakes</h2>
+        <h2>Common Mistakes</h2>
         <ul>
           {task.lesson.commonMistakes.map((mistake) => (
             <li key={mistake}>{mistake}</li>
@@ -267,17 +279,22 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
         </ul>
       </section>
       <section>
-        <h2>Approved resources</h2>
+        <h2>Learning Resources</h2>
         {task.lesson.resources.length === 0 ? (
-          <p>No extra resources are required.</p>
+          <p>No extra resources are required for this lesson.</p>
         ) : (
           <ul>
             {task.lesson.resources.map((resource) => (
               <li key={resource.id}>
                 <a href={resource.url} rel="noreferrer" target="_blank">
                   {resource.title}
-                </a>{" "}
-                · {resource.resourceType}
+                </a>
+                <small>
+                  {resource.provider} - {resource.resourceType} - {resource.estimatedMinutes} min -{" "}
+                  {resource.required ? "Recommended before practice" : "Optional"} -{" "}
+                  {resource.verificationStatus === "VERIFIED" ? "Verified" : "Needs verification"}
+                </small>
+                {resource.description.length === 0 ? null : <p>{resource.description}</p>}
               </li>
             ))}
           </ul>
@@ -301,7 +318,7 @@ function ExerciseSection({
       <h2>{title}</h2>
       <p className="preserve-lines">{prompt}</p>
       <p>
-        <strong>Expected evidence:</strong> {evidence}
+        <strong>What to write down:</strong> {evidence}
       </p>
     </section>
   );
@@ -343,10 +360,10 @@ function LessonCompletionForm({
   return (
     <section className="lesson-layout">
       <article className="lesson-content">
-        <ExerciseSection title="Guided exercise" prompt={task.lesson.guidedExercise.promptMarkdown} evidence={task.lesson.guidedExercise.expectedEvidence} />
-        <ExerciseSection title="Independent exercise" prompt={task.lesson.independentExercise.promptMarkdown} evidence={task.lesson.independentExercise.expectedEvidence} />
+        <ExerciseSection title="Try It With Me" prompt={task.lesson.guidedExercise.promptMarkdown} evidence={task.lesson.guidedExercise.expectedEvidence} />
+        <ExerciseSection title="Practice By Yourself" prompt={task.lesson.independentExercise.promptMarkdown} evidence={task.lesson.independentExercise.expectedEvidence} />
         <section>
-          <h2>Knowledge checks</h2>
+          <h2>Check Your Understanding</h2>
           <ol>
             {task.lesson.knowledgeChecks.map((check) => (
               <li key={check.id}>{check.question}</li>
@@ -355,25 +372,25 @@ function LessonCompletionForm({
         </section>
       </article>
       <form className="content-form" onSubmit={(event) => event.preventDefault()}>
-        <h2>Completion evidence</h2>
+        <h2>Finish Lesson</h2>
         <label>
           Study time in minutes
           <input type="number" min={1} max={480} value={durationMinutes} onChange={(event) => setDurationMinutes(Number(event.target.value))} />
         </label>
         <label>
-          Guided exercise evidence
+          Try It With Me
           <textarea rows={4} value={guidedEvidence} onChange={(event) => setGuidedEvidence(event.target.value)} />
         </label>
         <label>
-          Independent exercise evidence
+          Practice By Yourself
           <textarea rows={4} value={independentEvidence} onChange={(event) => setIndependentEvidence(event.target.value)} />
         </label>
         <label>
-          Knowledge check answers
+          Check Your Understanding
           <textarea rows={4} value={knowledgeCheckEvidence} onChange={(event) => setKnowledgeCheckEvidence(event.target.value)} />
         </label>
         <label>
-          Additional completion notes
+          Notes
           <textarea rows={4} value={notes} onChange={(event) => setNotes(event.target.value)} />
         </label>
         <label>
@@ -381,9 +398,29 @@ function LessonCompletionForm({
           <textarea rows={4} value={reflection} onChange={(event) => setReflection(event.target.value)} />
         </label>
         <button type="button" disabled={completeLoading || task.status === "COMPLETED"} onClick={onComplete}>
-          {completeLoading ? "Completing..." : "Complete task"}
+          {completeLoading ? "Saving..." : "Complete lesson"}
         </button>
       </form>
     </section>
   );
+}
+
+function beforeStartCopy(task: DailyTask): string {
+  if (task.lesson.trackTitle === "German" && task.studyWeekNumber === 1) {
+    return "No previous German knowledge required.";
+  }
+
+  if (task.lesson.trackTitle === "Software Engineering") {
+    return "You should be comfortable reading short JavaScript examples.";
+  }
+
+  if (task.lesson.trackTitle === "Project Management") {
+    return "No formal project-management experience required.";
+  }
+
+  return "Review the previous lesson if this topic feels unfamiliar.";
+}
+
+function formatStatus(status: DailyTask["status"]): string {
+  return status.toLowerCase().replace("_", " ");
 }

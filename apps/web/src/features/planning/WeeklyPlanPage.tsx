@@ -45,7 +45,7 @@ export function WeeklyPlanPage(): React.JSX.Element {
         <div>
           <p className="auth-panel__eyebrow">Weekly plan</p>
           <h1 id="weekly-plan-title">Week {weekNumber}</h1>
-          <p>Scheduled lessons preserve prerequisite order and daily capacity.</p>
+          <p>Your lessons for this week, grouped by study day.</p>
         </div>
         <div className="auth-panel__actions">
           <Link className="button-link button-link--secondary" to="/today">
@@ -66,7 +66,7 @@ export function WeeklyPlanPage(): React.JSX.Element {
       </section>
 
       {tasks.length === 0 ? (
-        <section className="content-empty">No tasks are scheduled for this week.</section>
+        <section className="content-empty">No lessons are scheduled for this week.</section>
       ) : (
         <section className="week-grid" aria-label="Scheduled daily tasks">
           {[...tasksByDate.entries()].map(([date, dayTasks]) => (

@@ -23,6 +23,7 @@ import type {
   ContentStatus,
   EnrollmentRecord,
   ExerciseRecord,
+  GermanLevel,
   KnowledgeCheckRecord,
   LessonVersionEditorInput,
   LearningTrackRecord,
@@ -82,6 +83,7 @@ interface PrismaEnrollmentWithTrack {
   readonly startDate: Date;
   readonly targetOutcome: string;
   readonly experienceLevel: string;
+  readonly learningPreferences: Prisma.JsonValue | null;
 }
 
 const disabledSeedPasswordHash = "disabled-seed-content-admin-no-login";
@@ -208,7 +210,8 @@ export class PrismaContentRepository implements ContentRepository {
               status: PrismaEnrollmentStatus.DRAFT,
               startDate: input.startDate,
               targetOutcome: input.targetOutcome,
-              experienceLevel: input.experienceLevel
+              experienceLevel: input.experienceLevel,
+              learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
             },
             include: {
               track: {
@@ -223,7 +226,8 @@ export class PrismaContentRepository implements ContentRepository {
             data: {
               startDate: input.startDate,
               targetOutcome: input.targetOutcome,
-              experienceLevel: input.experienceLevel
+              experienceLevel: input.experienceLevel,
+              learningPreferences: enrollmentPreferencesForTrack(track.type, input) ?? Prisma.DbNull
             },
             include: {
               track: {
@@ -502,7 +506,7 @@ export class PrismaContentRepository implements ContentRepository {
             update: {
               slug: lessonSlug(lessonDefinition.identifier),
               defaultDurationMinutes: lessonDefinition.durationMinutes,
-              difficulty: "Beginner",
+              difficulty: lessonDefinition.level ?? "Beginner",
               required: lessonDefinition.required
             },
             create: {
@@ -510,13 +514,45 @@ export class PrismaContentRepository implements ContentRepository {
               slug: lessonSlug(lessonDefinition.identifier),
               sequence: index + 1,
               defaultDurationMinutes: lessonDefinition.durationMinutes,
-              difficulty: "Beginner",
+              difficulty: lessonDefinition.level ?? "Beginner",
               required: lessonDefinition.required
             }
           });
           lessonIdsByIdentifier.set(lessonDefinition.identifier, lesson.id);
 
           await this.upsertApprovedSeedVersion(lesson.id, input.authorId, input.reviewerId, lessonDefinition);
+        }
+
+        const expectedSequences = moduleDefinition.lessons.map((_, index) => index + 1);
+        const extraLessons = await this.prisma.lesson.findMany({
+          where: {
+            moduleId: moduleRecord.id,
+            ...(expectedSequences.length === 0
+              ? {}
+              : {
+                  sequence: {
+                    notIn: expectedSequences
+                  }
+                })
+          },
+          select: {
+            id: true
+          }
+        });
+
+        if (extraLessons.length > 0) {
+          await this.prisma.lessonVersion.updateMany({
+            where: {
+              lessonId: {
+                in: extraLessons.map((lesson) => lesson.id)
+              },
+              status: PrismaContentStatus.APPROVED
+            },
+            data: {
+              status: PrismaContentStatus.ARCHIVED,
+              archivedAt: new Date()
+            }
+          });
         }
       }
 
@@ -833,9 +869,9 @@ const adminVersionInclude = {
   }
 } as const;
 
-function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord | null {
+function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord {
   const modules = track.modules
-    .map((moduleRecord): ModuleRecord | null => {
+    .map((moduleRecord): ModuleRecord => {
       const lessons = moduleRecord.lessons
         .map((lesson) => {
           const approvedVersion = lesson.versions[0];
@@ -859,10 +895,6 @@ function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord | null {
         })
         .filter((lesson): lesson is NonNullable<typeof lesson> => lesson !== null);
 
-      if (lessons.length === 0) {
-        return null;
-      }
-
       return {
         id: moduleRecord.id,
         sequence: moduleRecord.sequence,
@@ -870,8 +902,7 @@ function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord | null {
         summary: moduleRecord.summary,
         lessons
       };
-    })
-    .filter((moduleRecord): moduleRecord is ModuleRecord => moduleRecord !== null);
+    });
 
   return {
     id: track.id,
@@ -887,10 +918,6 @@ function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord | null {
 function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): EnrollmentRecord | null {
   const track = mapTrack(enrollment.track);
 
-  if (track === null) {
-    return null;
-  }
-
   return {
     id: enrollment.id,
     userId: enrollment.userId,
@@ -898,8 +925,89 @@ function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): EnrollmentRecord 
     track,
     startDate: enrollment.startDate,
     targetOutcome: enrollment.targetOutcome,
-    experienceLevel: enrollment.experienceLevel
+    experienceLevel: enrollment.experienceLevel,
+    ...germanEnrollmentFields(enrollment.learningPreferences)
   };
+}
+
+function enrollmentPreferencesForTrack(
+  trackType: PrismaTrackType,
+  input: SelectLearningTrackInput
+): Prisma.InputJsonObject | null {
+  if (trackType !== PrismaTrackType.GERMAN) {
+    return null;
+  }
+
+  if (
+    input.germanStartLevel === null ||
+    input.germanTargetLevel === null ||
+    input.germanSessionDurationMinutes === null
+  ) {
+    throw validationError("germanStartLevel");
+  }
+
+  return {
+    german: {
+      startLevel: input.germanStartLevel,
+      targetLevel: input.germanTargetLevel,
+      sessionDurationMinutes: input.germanSessionDurationMinutes
+    }
+  };
+}
+
+function germanEnrollmentFields(value: Prisma.JsonValue | null): Pick<
+  EnrollmentRecord,
+  "germanStartLevel" | "germanTargetLevel" | "germanSessionDurationMinutes"
+> {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value) ||
+    !("german" in value) ||
+    typeof value["german"] !== "object" ||
+    value["german"] === null ||
+    Array.isArray(value["german"])
+  ) {
+    return {
+      germanStartLevel: null,
+      germanTargetLevel: null,
+      germanSessionDurationMinutes: null
+    };
+  }
+
+  const german = value["german"];
+  const startLevel = german["startLevel"];
+  const targetLevel = german["targetLevel"];
+  const sessionDurationMinutes = german["sessionDurationMinutes"];
+
+  return {
+    germanStartLevel: isGermanLevel(startLevel) ? startLevel : null,
+    germanTargetLevel: isGermanTargetLevel(targetLevel) ? targetLevel : null,
+    germanSessionDurationMinutes:
+      isGermanSessionDuration(sessionDurationMinutes) ? sessionDurationMinutes : null
+  };
+}
+
+function isGermanLevel(value: unknown): value is GermanLevel {
+  return (
+    value === "COMPLETE_BEGINNER" ||
+    value === "A1.1" ||
+    value === "A1.2" ||
+    value === "A2.1" ||
+    value === "A2.2" ||
+    value === "B1.1" ||
+    value === "B1.2" ||
+    value === "B2.1" ||
+    value === "B2.2"
+  );
+}
+
+function isGermanTargetLevel(value: unknown): value is Exclude<GermanLevel, "COMPLETE_BEGINNER"> {
+  return isGermanLevel(value) && value !== "COMPLETE_BEGINNER";
+}
+
+function isGermanSessionDuration(value: unknown): value is 30 | 45 | 60 | 90 {
+  return value === 30 || value === 45 || value === 60 || value === 90;
 }
 
 function mapAdminVersion(version: PrismaAdminVersion): AdminLessonVersionRecord {
@@ -934,8 +1042,13 @@ function mapResource(resource: PrismaResource): ResourceRecord {
   return {
     id: resource.id,
     title: resource.title,
+    provider: resource.provider,
     url: resource.url,
     resourceType: resource.resourceType,
+    difficulty: resource.difficulty,
+    estimatedMinutes: resource.estimatedMinutes,
+    description: resource.description,
+    verificationStatus: resource.verificationStatus,
     required: resource.required,
     approved: resource.approved,
     citation: resource.citation
@@ -964,8 +1077,13 @@ function mapKnowledgeCheck(knowledgeCheck: PrismaKnowledgeCheck): KnowledgeCheck
 function toResourceCreateInput(resource: Omit<ResourceRecord, "id">) {
   return {
     title: resource.title,
+    provider: resource.provider,
     url: resource.url,
     resourceType: resource.resourceType,
+    difficulty: resource.difficulty,
+    estimatedMinutes: resource.estimatedMinutes,
+    description: resource.description,
+    verificationStatus: resource.verificationStatus,
     required: resource.required,
     approved: resource.approved,
     citation: resource.citation
@@ -1018,6 +1136,15 @@ function conflictError(): Error {
     code: "CONFLICT",
     message: apiErrorMessages.CONFLICT,
     retryable: true
+  });
+}
+
+function validationError(field: string): Error {
+  return createApiGraphqlError({
+    code: "VALIDATION_FAILED",
+    message: apiErrorMessages.VALIDATION_FAILED,
+    retryable: false,
+    field
   });
 }
 

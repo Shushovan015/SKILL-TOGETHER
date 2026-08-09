@@ -55,6 +55,15 @@ export class OnboardingInputDto {
   @Field()
   public targetOutcome!: string;
 
+  @Field(() => String, { nullable: true })
+  public germanStartLevel!: string | null;
+
+  @Field(() => String, { nullable: true })
+  public germanTargetLevel!: string | null;
+
+  @Field(() => Int, { nullable: true })
+  public germanSessionDurationMinutes!: number | null;
+
   @Field(() => Int)
   public assessmentDay!: number;
 
@@ -120,6 +129,9 @@ export class ScheduledLessonDto {
 
   @Field()
   public trackTitle!: string;
+
+  @Field()
+  public difficulty!: string;
 
   @Field()
   public learningObjective!: string;
@@ -234,6 +246,9 @@ export class PartnerProgressSummaryDto {
 export class TodayDashboardDto {
   @Field(() => DateValue)
   public date!: Date;
+
+  @Field(() => [DailyTaskDto])
+  public tasks!: readonly DailyTaskDto[];
 
   @Field(() => DailyTaskDto, { nullable: true })
   public mainTask!: DailyTaskDto | null;

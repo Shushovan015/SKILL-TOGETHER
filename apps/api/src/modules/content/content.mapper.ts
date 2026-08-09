@@ -50,7 +50,10 @@ export function toEnrollmentDto(enrollment: EnrollmentRecord): EnrollmentDto {
     track: toLearningTrackDto(enrollment.track),
     startDate: enrollment.startDate,
     targetOutcome: enrollment.targetOutcome,
-    experienceLevel: enrollment.experienceLevel
+    experienceLevel: enrollment.experienceLevel,
+    germanStartLevel: enrollment.germanStartLevel,
+    germanTargetLevel: enrollment.germanTargetLevel,
+    germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes
   };
 }
 

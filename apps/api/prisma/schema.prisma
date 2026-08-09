@@ -268,8 +268,13 @@ model Resource {
   id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   lessonVersionId String        @map("lesson_version_id") @db.Uuid
   title           String
+  provider        String        @default("Unknown")
   url             String
   resourceType    String        @map("resource_type")
+  difficulty      String        @default("Foundational")
+  estimatedMinutes Int          @default(15) @map("estimated_minutes")
+  description     String        @default("")
+  verificationStatus String     @default("VERIFIED") @map("verification_status")
   required        Boolean       @default(false)
   approved        Boolean       @default(false)
   citation        String
@@ -312,6 +317,7 @@ model Enrollment {
   startDate       DateTime         @map("start_date") @db.Date
   targetOutcome   String           @map("target_outcome")
   experienceLevel String           @map("experience_level")
+  learningPreferences Json?        @map("learning_preferences") @db.JsonB
   createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)

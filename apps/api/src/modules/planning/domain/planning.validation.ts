@@ -12,6 +12,25 @@ import type {
 const daySchema = z.number().int().min(0).max(6);
 const minutesSchema = z.number().int().min(15).max(480);
 const dateSchema = z.union([z.date(), z.string().transform(parseDateOnly)]);
+const learnerLevelSchema = z.enum([
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+  "JavaScript Frontend Developer - TypeScript New"
+]);
+const germanLevelSchema = z.enum([
+  "COMPLETE_BEGINNER",
+  "A1.1",
+  "A1.2",
+  "A2.1",
+  "A2.2",
+  "B1.1",
+  "B1.2",
+  "B2.1",
+  "B2.2"
+]);
+const germanTargetLevelSchema = germanLevelSchema.exclude(["COMPLETE_BEGINNER"]);
+const germanSessionDurationSchema = z.union([z.literal(30), z.literal(45), z.literal(60), z.literal(90)]);
 const timeSchema = z
   .string()
   .regex(/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/u)
@@ -35,8 +54,11 @@ const onboardingSchema = z
     studyDays: z.array(daySchema).min(1).max(7),
     availableMinutesByDay: z.record(z.string(), minutesSchema),
     preferredSessionTime: timeSchema.optional(),
-    experienceLevel: z.string().trim().min(1).max(200),
+    experienceLevel: z.union([learnerLevelSchema, germanLevelSchema]),
     targetOutcome: z.string().trim().min(1).max(4_000),
+    germanStartLevel: germanLevelSchema.nullable().optional(),
+    germanTargetLevel: germanTargetLevelSchema.nullable().optional(),
+    germanSessionDurationMinutes: germanSessionDurationSchema.nullable().optional(),
     assessmentDay: daySchema,
     recoveryDay: daySchema,
     pausePeriods: z.array(pausePeriodSchema).max(12).optional()
@@ -60,6 +82,20 @@ const onboardingSchema = z
           path: ["availableMinutesByDay"]
         });
       }
+    }
+
+    if (
+      value.germanStartLevel !== undefined &&
+      value.germanStartLevel !== null &&
+      value.germanTargetLevel !== undefined &&
+      value.germanTargetLevel !== null &&
+      compareGermanLevels(value.germanTargetLevel, normalizedGermanStartLevel(value.germanStartLevel)) <= 0
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "German target level must be above the starting level.",
+        path: ["germanTargetLevel"]
+      });
     }
   });
 
@@ -117,12 +153,28 @@ export function validateOnboardingInput(input: unknown): OnboardingInput {
       Object.entries(result.data.availableMinutesByDay).map(([day, minutes]) => [Number(day), minutes])
     ),
     preferredSessionTime: result.data.preferredSessionTime ?? null,
+    germanStartLevel: result.data.germanStartLevel ?? null,
+    germanTargetLevel: result.data.germanTargetLevel ?? null,
+    germanSessionDurationMinutes: result.data.germanSessionDurationMinutes ?? null,
     pausePeriods: (result.data.pausePeriods ?? []).map((pausePeriod) => ({
       startsOn: pausePeriod.startsOn,
       endsOn: pausePeriod.endsOn,
       reason: pausePeriod.reason ?? null
     }))
   };
+}
+
+const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;
+
+function normalizedGermanStartLevel(level: z.infer<typeof germanLevelSchema>): Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER"> {
+  return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
+}
+
+function compareGermanLevels(
+  left: Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER">,
+  right: Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER">
+): number {
+  return germanLevelOrder.indexOf(left) - germanLevelOrder.indexOf(right);
 }
 
 export function validateRescheduleTaskInput(input: unknown): RescheduleTaskInput {

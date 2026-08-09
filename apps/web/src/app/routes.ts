@@ -58,6 +58,16 @@ export const appRoutes = [
     scope: "authenticated"
   },
   {
+    path: "/roadmap",
+    label: "Roadmap",
+    scope: "authenticated"
+  },
+  {
+    path: "/progress",
+    label: "Progress",
+    scope: "authenticated"
+  },
+  {
     path: "/lessons/:dailyTaskId",
     label: "Lesson",
     scope: "authenticated"

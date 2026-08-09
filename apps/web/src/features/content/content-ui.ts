@@ -51,8 +51,13 @@ export function cloneLessonVersionInput(version: AdminLessonVersion): LessonVers
     assessmentTags: [...version.assessmentTags],
     resources: version.resources.map((resource) => ({
       title: resource.title,
+      provider: resource.provider,
       url: resource.url,
       resourceType: resource.resourceType,
+      difficulty: resource.difficulty,
+      estimatedMinutes: resource.estimatedMinutes,
+      description: resource.description,
+      verificationStatus: resource.verificationStatus,
       required: resource.required,
       approved: resource.approved,
       citation: resource.citation
