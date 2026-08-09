@@ -14,7 +14,8 @@ loadEnvironment({
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   configureApplication(app);
-  await app.listen(app.get(ApiConfigService).value.apiPort);
+  const config = app.get(ApiConfigService).value;
+  await app.listen(config.apiPort, config.apiHost);
 }
 
 void bootstrap();

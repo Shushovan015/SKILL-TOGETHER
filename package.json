@@ -11,8 +11,11 @@
   "scripts": {
     "db:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
     "db:validate": "prisma validate --schema apps/api/prisma/schema.prisma",
+    "db:migrate:deploy": "prisma migrate deploy --schema apps/api/prisma/schema.prisma",
+    "db:seed": "pnpm --filter @skilltogether/api seed",
     "dev:api": "pnpm --filter @skilltogether/api dev",
     "dev:web": "pnpm --filter @skilltogether/web dev",
+    "start:api": "pnpm --filter @skilltogether/api start:prod",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "pnpm db:generate && tsc -b --noEmit",
     "test": "pnpm db:generate && vitest run",

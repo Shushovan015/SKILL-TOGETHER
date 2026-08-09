@@ -1,5 +1,6 @@
 import { Inject, Injectable, type OnModuleInit } from "@nestjs/common";
 
+import { shouldSeedOnStartup } from "../../common/config/seed-config.js";
 import { apiErrorMessages, createApiGraphqlError } from "../../common/errors/graphql-errors.js";
 import type { AuthenticatedUser } from "../auth/domain/auth.types.js";
 import {
@@ -28,6 +29,10 @@ export class ContentService implements OnModuleInit {
   ) {}
 
   public async onModuleInit(): Promise<void> {
+    if (!shouldSeedOnStartup()) {
+      return;
+    }
+
     await this.repository.seedContent({
       authorId: phase3SeedUsers.contentAdmin.id,
       reviewerId: phase3SeedUsers.contentAdmin.id

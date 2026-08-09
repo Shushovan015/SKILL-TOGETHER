@@ -9,11 +9,12 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
   public constructor() {
     const config = resolveApiConfig();
 
+    if (config.databaseUrl === undefined) {
+      throw new Error("DATABASE_URL is required when Prisma persistence is enabled");
+    }
+
     super({
-      adapter: new PrismaPg(
-        config.databaseUrl ??
-          "postgresql://skilltogether:unused@localhost:5432/skilltogether_unused"
-      )
+      adapter: new PrismaPg(config.databaseUrl)
     });
   }
 

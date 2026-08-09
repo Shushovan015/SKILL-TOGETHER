@@ -9,6 +9,7 @@ export type ContentPersistence = "prisma" | "memory";
 export interface ApiConfig {
   readonly nodeEnv: NodeEnvironment;
   readonly apiPort: number;
+  readonly apiHost: string;
   readonly databaseUrl: string | undefined;
   readonly authPersistence: AuthPersistence;
   readonly contentPersistence: ContentPersistence;
@@ -67,6 +68,28 @@ function splitOrigins(value: string): readonly string[] {
     .filter((origin) => origin.length > 0);
 }
 
+function firstNonEmpty(...values: Array<string | undefined>): string | undefined {
+  return values.find((value) => value !== undefined && value.trim().length > 0);
+}
+
+function assertProductionOrigin(name: string, value: string): void {
+  let parsed: URL;
+
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(`${name} must be a valid URL`);
+  }
+
+  if (parsed.protocol !== "https:") {
+    throw new Error(`${name} must use https in production`);
+  }
+
+  if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+    throw new Error(`${name} must not point to localhost in production`);
+  }
+}
+
 function readOptionalEnum<TValue extends string>(
   name: string,
   values: readonly TValue[],
@@ -105,6 +128,15 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     source["CONTENT_PERSISTENCE"],
     "prisma"
   );
+  const defaultFrontendUrl =
+    firstNonEmpty(source["FRONTEND_URL"], source["WEB_ORIGIN"]) ?? "http://localhost:5173";
+  const defaultCorsAllowedOrigins =
+    firstNonEmpty(source["CORS_ALLOWED_ORIGINS"], source["FRONTEND_URL"], source["WEB_ORIGIN"]) ??
+    "http://localhost:5173";
+  const defaultApiPort = firstNonEmpty(source["PORT"], source["API_PORT"]) ?? "4000";
+  const defaultApiHost =
+    firstNonEmpty(source["API_HOST"]) ?? (nodeEnv === "production" ? "0.0.0.0" : "127.0.0.1");
+  const defaultSessionSameSite = nodeEnv === "production" ? "none" : "lax";
 
   const validation = validateEnvironment(source, [
     {
@@ -127,7 +159,7 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     {
       name: "SESSION_COOKIE_SAME_SITE",
       required: false,
-      defaultValue: "lax",
+      defaultValue: defaultSessionSameSite,
       allowedValues: sameSiteValues
     },
     {
@@ -146,19 +178,34 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
       defaultValue: "x-csrf-token"
     },
     {
+      name: "FRONTEND_URL",
+      required: false,
+      defaultValue: defaultFrontendUrl
+    },
+    {
       name: "WEB_ORIGIN",
       required: false,
-      defaultValue: "http://localhost:5173"
+      defaultValue: defaultFrontendUrl
     },
     {
       name: "CORS_ALLOWED_ORIGINS",
       required: false,
-      defaultValue: source["WEB_ORIGIN"] ?? "http://localhost:5173"
+      defaultValue: defaultCorsAllowedOrigins
+    },
+    {
+      name: "PORT",
+      required: false,
+      defaultValue: defaultApiPort
     },
     {
       name: "API_PORT",
       required: false,
-      defaultValue: "4000"
+      defaultValue: defaultApiPort
+    },
+    {
+      name: "API_HOST",
+      required: false,
+      defaultValue: defaultApiHost
     },
     {
       name: "SESSION_COOKIE_SECURE",
@@ -194,6 +241,9 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
   const corsAllowedOrigins = splitOrigins(
     validation.values["CORS_ALLOWED_ORIGINS"] ?? "http://localhost:5173"
   );
+  const webOrigin =
+    firstNonEmpty(validation.values["FRONTEND_URL"], validation.values["WEB_ORIGIN"]) ??
+    "http://localhost:5173";
 
   if (sameSite === "none" && !secure) {
     throw new Error("SESSION_COOKIE_SECURE must be true when SameSite=None");
@@ -215,9 +265,22 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     throw new Error("CORS_ALLOWED_ORIGINS must not include * when credentials are enabled");
   }
 
+  if (corsAllowedOrigins.length === 0) {
+    throw new Error("CORS_ALLOWED_ORIGINS must include at least one origin");
+  }
+
+  if (nodeEnv === "production") {
+    assertProductionOrigin("FRONTEND_URL", webOrigin);
+
+    for (const origin of corsAllowedOrigins) {
+      assertProductionOrigin("CORS_ALLOWED_ORIGINS", origin);
+    }
+  }
+
   return {
     nodeEnv,
-    apiPort: parseInteger("API_PORT", validation.values["API_PORT"] ?? "4000", 1, 65_535),
+    apiPort: parseInteger("PORT", validation.values["PORT"] ?? "4000", 1, 65_535),
+    apiHost: validation.values["API_HOST"] ?? defaultApiHost,
     databaseUrl: validation.values["DATABASE_URL"],
     authPersistence,
     contentPersistence,
@@ -234,7 +297,7 @@ export function resolveApiConfig(source: EnvSource = process.env): ApiConfig {
     csrfCookieName: validation.values["CSRF_COOKIE_NAME"] ?? "skilltogether.csrf",
     csrfHeaderName: validation.values["CSRF_HEADER_NAME"] ?? "x-csrf-token",
     csrfSecret,
-    webOrigin: validation.values["WEB_ORIGIN"] ?? "http://localhost:5173",
+    webOrigin,
     corsAllowedOrigins
   };
 }

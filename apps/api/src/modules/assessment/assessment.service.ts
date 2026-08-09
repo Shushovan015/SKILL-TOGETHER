@@ -1,5 +1,6 @@
 import { Inject, Injectable, type OnModuleInit } from "@nestjs/common";
 
+import { shouldSeedOnStartup } from "../../common/config/seed-config.js";
 import type { AuthenticatedUser } from "../auth/domain/auth.types.js";
 import {
   validateAssessmentId,
@@ -21,6 +22,10 @@ export class AssessmentService implements OnModuleInit {
   ) {}
 
   public async onModuleInit(): Promise<void> {
+    if (!shouldSeedOnStartup()) {
+      return;
+    }
+
     await this.repository.seedReviewedQuestions();
   }
 

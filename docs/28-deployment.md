@@ -1,16 +1,22 @@
 # Deployment
 
+This repository is prepared for a free public deployment using:
+
+- Frontend: Vercel Hobby.
+- Backend/API: Render free Web Service.
+- Database: Neon free PostgreSQL.
+
+The application remains a pnpm monorepo. Deploy from the repository root.
+
 ## Local Development
 
-Current Phase 1 local services:
+Start the local PostgreSQL database:
 
-- frontend Vite dev server;
-- backend NestJS dev server;
-- PostgreSQL through Docker Compose;
-- optional local mail catcher later;
-- optional disabled AI provider later.
+```bash
+docker compose up -d postgres
+```
 
-Install dependencies and run validation from the repository root:
+Run local validation:
 
 ```bash
 pnpm install
@@ -20,138 +26,169 @@ pnpm test
 pnpm build
 ```
 
-Start the local database:
+The frontend can use `VITE_GRAPHQL_URL`; if it is unset locally, the app falls back to `http://localhost:4000/graphql`.
+
+## Production Commands
+
+Frontend build command:
 
 ```bash
-docker compose up -d postgres
+pnpm --filter @skilltogether/web build
 ```
 
-## Docker Compose
+Backend build command:
 
-Docker Compose currently defines:
+```bash
+pnpm --filter @skilltogether/api build
+```
 
-- PostgreSQL database;
-- named `postgres_data` volume;
-- health check using `pg_isready`;
-- environment-variable overrides for database name, user, password, and host port.
+Backend start command:
 
-Docker Compose may later add:
+```bash
+pnpm --filter @skilltogether/api start:prod
+```
 
-- API service once deployment containerization is scoped;
-- web service once useful for local orchestration;
-- local mail service if password reset or verification is enabled.
+Migration command:
 
-## CI
+```bash
+pnpm db:migrate:deploy
+```
 
-GitHub Actions should run:
+Seed command:
+
+```bash
+pnpm db:seed
+```
+
+The seed command uses existing upsert-based content and assessment seed paths. It is intended to be safe to rerun.
+
+## A. Create Neon Database
+
+1. Create a Neon project on the free plan.
+2. Create or use the default PostgreSQL database for SkillTogether.
+3. Copy the Neon PostgreSQL connection string from the Neon dashboard.
+4. Use the direct connection string for `DATABASE_URL`. Do not commit it.
+5. Ensure the URL includes the SSL settings Neon provides.
+
+Neon's API documentation describes connection URI retrieval and notes that connection strings can be generated with a pooled option when needed: https://api-docs.neon.tech/reference/getconnectionuri
+
+## B. Deploy API To Render
+
+Create a Render Web Service from the repository.
+
+Recommended settings:
+
+| Setting | Value |
+| --- | --- |
+| Root directory | repository root |
+| Runtime | Node |
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter @skilltogether/api build` |
+| Start command | `pnpm --filter @skilltogether/api start:prod` |
+| Health check path | `/health/ready` |
+
+Render sets a `PORT` value for web services. The API reads `PORT` and binds to `0.0.0.0` in production.
+
+Render documents that web services must bind to a host and port, with `0.0.0.0` required for public traffic and `PORT` provided by the platform: https://render.com/docs/web-services
+
+## C. Render Environment Variables
+
+Set these in Render:
+
+```bash
+NODE_ENV=production
+DATABASE_URL=<Neon connection string>
+SESSION_SECRET=<long random secret>
+CSRF_SECRET=<long random secret>
+FRONTEND_URL=https://skill-together.vercel.app
+CORS_ALLOWED_ORIGINS=https://skill-together.vercel.app
+SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_SAME_SITE=none
+AUTH_PERSISTENCE=prisma
+CONTENT_PERSISTENCE=prisma
+SEED_ON_STARTUP=false
+```
+
+`PORT` is normally provided by Render. Set it manually only if Render requires it for the service.
+
+Use a placeholder `FRONTEND_URL` until the Vercel URL exists, then update it and redeploy the API.
+
+## D. Run Migrations
+
+After Render has the Neon `DATABASE_URL`, run migrations against Neon from a trusted local terminal or deployment job:
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm db:migrate:deploy
 ```
 
-Add database-backed integration tests when Prisma and Docker services exist.
+Do not use `prisma migrate dev` in production.
 
-## Preview Environments
+## E. Run Seed Data
 
-Preview deployments should:
+After migrations succeed, seed the predefined tracks, lessons, content versions, and reviewed assessment questions:
 
-- use isolated environment variables;
-- use preview database or safe seeded ephemeral database;
-- disable production email sending unless explicitly configured;
-- disable or rate-limit AI;
-- not contain production user data.
+```bash
+pnpm db:seed
+```
 
-## Staging
+Keep `DATABASE_URL` pointed at the Neon database while running this command.
 
-Staging should mirror production configuration:
+## F. Deploy Frontend To Vercel
 
-- managed PostgreSQL;
-- secure cookies;
-- production-like CORS;
-- migrations applied through CI;
-- error monitoring enabled;
-- non-production secrets.
+Create a Vercel project from the repository root.
 
-## Production
+The repository includes `vercel.json` with:
 
-Vendor-neutral recommended options:
+- install command: `pnpm install --frozen-lockfile`;
+- build command: `pnpm --filter @skilltogether/web build`;
+- output directory: `apps/web/dist`;
+- rewrite from all routes to `/index.html` for React Router direct navigation.
 
-| Component | Options |
-| --- | --- |
-| Frontend | Vercel, Netlify, Cloudflare Pages, equivalent. |
-| Backend | Railway, Render, Fly.io, container platform, equivalent. |
-| Database | Managed PostgreSQL provider. |
-| Error monitoring | Sentry or equivalent. |
-| Logs and metrics | Hosting provider plus external monitoring if needed. |
+Vercel documents SPA rewrites through `vercel.json`: https://vercel.com/docs/project-configuration/vercel-json
 
-Do not lock to a vendor until deployment constraints are known.
+## G. Vercel Environment Variables
 
-## Environment Variables
+Set this in Vercel:
 
-Categories:
+```bash
+VITE_GRAPHQL_URL=https://skill-together-api.onrender.com/graphql
+```
 
-- database URLs;
-- session and CSRF secrets;
-- frontend and API origins;
-- CORS allow list;
-- email provider configuration;
-- optional AI provider settings;
-- observability DSNs and log level.
+Replace the hostname with the actual Render service URL.
 
-See `.env.example`.
+## H. Update API Frontend Origin
 
-## Database Migrations
+After the Vercel deployment URL is known, update Render:
 
-- Migrations are generated only during implementation.
-- Review generated SQL before production.
-- Apply migrations through CI/CD.
-- Back up production before risky migrations.
-- Use reversible or forward-fix migration plans.
+```bash
+FRONTEND_URL=https://skill-together.vercel.app
+CORS_ALLOWED_ORIGINS=https://skill-together.vercel.app
+```
 
-## Backups
+Redeploy the API after changing these values. Never use `*` for CORS while credentials are enabled.
 
-- Enable daily managed PostgreSQL backups.
-- Retain backups according to provider plan and policy.
-- Test restore before production launch.
-- Restrict backup access.
+## I. Verify Authentication
 
-## Rollback
+1. Open the Vercel frontend URL.
+2. Register a new account.
+3. Confirm the GraphQL request goes to the Render `/graphql` endpoint.
+4. Confirm session cookies are `HttpOnly`, `Secure`, and `SameSite=None`.
+5. Refresh a protected page and confirm the session persists.
+6. Log out and confirm protected data is no longer available.
 
-Application rollback:
+## J. Share URL
 
-- redeploy previous frontend and backend artifact;
-- verify health checks;
-- monitor error rate.
+After authentication and core MVP flows work, share the Vercel URL with your friend.
 
-Database rollback:
+## Free-Tier Constraints
 
-- prefer forward fixes;
-- restore backup only for severe data corruption;
-- preserve audit trail.
+- Render free web services can sleep while idle, so the first request after idle can be slow. Render documents free service spin-down behavior here: https://render.com/docs/free
+- Neon free databases are suitable for development and small personal use, but have usage limits. Check current limits in the Neon dashboard before sharing widely.
+- Vercel Hobby is intended for personal, non-commercial use. Vercel documents Hobby plan usage here: https://vercel.com/docs/plans/hobby
 
 ## Health Checks
 
 - `/health/live`: process is running.
-- `/health/ready`: database reachable and migrations compatible.
-- `/version`: build metadata when available.
+- `/health/ready`: database is reachable.
 
-## Deployment Verification
-
-After deployment:
-
-1. Health checks pass.
-2. Registration works in target environment.
-3. Login and logout work with secure cookies.
-4. Onboarding creates Study Plan.
-5. Daily Task can be completed.
-6. Assessment can be opened for seeded eligible week.
-7. Partner invitation flow works in non-production.
-8. Error monitoring receives test event.
-
-## Production Readiness Gate
-
-Do not launch production until authentication, authorization, CSRF, backups, logging, health checks, and critical tests are complete.
+Do not expose secrets or database details from health endpoints.
