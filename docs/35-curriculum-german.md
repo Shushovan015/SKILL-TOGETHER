@@ -1,97 +1,65 @@
 # Curriculum: German
 
-## Important Content Note
+The German curriculum is now organized as a professional CEFR-aligned internal language program from A1.1 through C2.2. It is not affiliated with, approved by, or certified by Goethe-Institut, VHS, telc, OeSD, or another institution.
 
-This initial four-week German programme is suitable for MVP seed data and habit design. Detailed language content, translations, pronunciation guidance, and grammar explanations should be reviewed by a qualified German-language reviewer before being treated as authoritative production curriculum.
+## Entry Points
 
-## Goal
+- [Program framework](curriculum/german/00-program-framework.md)
+- [CEFR competency map](curriculum/german/01-cefr-competency-map.md)
+- [Grammar progression](curriculum/german/02-grammar-progression.md)
+- [Vocabulary progression](curriculum/german/03-vocabulary-progression.md)
+- [Speaking progression](curriculum/german/04-speaking-progression.md)
+- [Listening progression](curriculum/german/05-listening-progression.md)
+- [Reading progression](curriculum/german/06-reading-progression.md)
+- [Writing progression](curriculum/german/07-writing-progression.md)
+- [Pronunciation progression](curriculum/german/08-pronunciation-progression.md)
+- [Mediation progression](curriculum/german/09-mediation-progression.md)
+- [Cultural/pragmatic competence](curriculum/german/10-cultural-competence.md)
+- [Assessment framework](curriculum/german/11-assessment-framework.md)
+- [Resource framework](curriculum/german/12-resource-framework.md)
+- [Session authoring standard](curriculum/german/13-session-authoring-standard.md)
 
-Support 30 to 60 minutes of German study on five days per week with vocabulary, grammar, listening, speaking, reading, pronunciation, review, and short weekly assessments.
+## Level Files
 
-## Structure
+- [A1.1](curriculum/german/levels/A1.1.md)
+- [A1.2](curriculum/german/levels/A1.2.md)
+- [A2.1](curriculum/german/levels/A2.1.md)
+- [A2.2](curriculum/german/levels/A2.2.md)
+- [B1.1](curriculum/german/levels/B1.1.md)
+- [B1.2](curriculum/german/levels/B1.2.md)
+- [B2.1](curriculum/german/levels/B2.1.md)
+- [B2.2](curriculum/german/levels/B2.2.md)
+- [C1.1](curriculum/german/levels/C1.1.md)
+- [C1.2](curriculum/german/levels/C1.2.md)
+- [C2.1](curriculum/german/levels/C2.1.md)
+- [C2.2](curriculum/german/levels/C2.2.md)
 
-- One German Learning Track contains CEFR sublevels `A1.1`, `A1.2`, `A2.1`, `A2.2`, `B1.1`, `B1.2`, `B2.1`, and `B2.2`.
-- `COMPLETE_BEGINNER` starts at `A1.1`.
-- German Enrollment stores starting level, target level, and preferred session duration in enrollment preferences.
-- Five sessions per week.
-- 30, 45, 60, or 90 minutes per session.
-- Friday combines review and short assessment.
-- Can be studied alongside a main Learning Track.
+## Architecture Summary
 
-## Session Composition
+The pedagogical hierarchy is:
 
-German Daily Tasks are learning sessions, not tiny standalone topics. Sessions combine review, vocabulary, pronunciation, grammar, reading or listening, guided practice, speaking or writing production, and knowledge checks. Session duration controls how much activity is scheduled, with deterministic review of recent prior material in later sessions.
+German -> CEFR sublevel -> module -> learning unit -> activity -> daily session.
 
-## CEFR Outline
+Learning units represent teachable content. Activities represent concrete study actions with estimated duration, priority, skill tags, and review status. Daily sessions are composed deterministically for 30, 45, 60, or 90 minutes without cutting activities halfway.
 
-| Level | Focus | Prerequisite | Completion |
-| --- | --- | --- | --- |
-| A1.1 | Introductions, spelling, numbers, countries, personal information, basic verbs, articles, time, food, shopping, negation, practical dialogues. | None | A1.1 practical assessment |
-| A1.2 | Daily communication, routine, places, needs, plans, modal verbs, separable verbs, accusative/dative foundations. | A1.1 | A1.2 assessment |
-| A2.1 | Travel, appointments, health, housing, services, perfect tense, dative verbs, two-way prepositions. | A1.2 | A2.1 scenario assessment |
-| A2.2 | Connected speech, stories, problems, preferences, adjective endings introduction, indirect questions. | A2.1 | A2.2 communication assessment |
-| B1.1 | Experiences, plans, opinions, work, study, subordinate clauses, relative clauses, passive introduction. | A2.2 | B1.1 integrated assessment |
-| B1.2 | Sustained conversations, summaries, coherent texts, polite requests, passive, relative clauses. | B1.1 | B1.2 readiness assessment |
-| B2.1 | Complex topics, discussions, structured arguments, advanced connectors, formal correspondence. | B1.2 | B2.1 assessment |
-| B2.2 | Professional and academic fluency, media comprehension, debate, reports, interviews. | B2.1 | B2.2 assessment |
+## Current Implementation Boundary
 
-## Week 1: Greetings, Introductions, and Pronunciation
+The application currently stores the proof slice in the existing Learning Track, Module, Lesson, Lesson Version, Exercise, Resource, Enrollment, Study Plan, Study Week, and Daily Task model.
 
-| Lesson ID | Lesson | Objective | Duration | Required | Exercise | Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| DE-W01-D01 | Greetings and Alphabet Sounds | Use common greetings and recognize German alphabet sounds. | 45 | Yes | Practice greetings and record pronunciation notes. | Short written dialogue and pronunciation self-check. | `greetings`, `pronunciation` |
-| DE-W01-D02 | Introducing Yourself | Say name, origin, and basic personal details. | 45 | Yes | Write and speak five self-introduction sentences. | Sentences and speaking checklist. | `introductions`, `sentence-patterns` |
-| DE-W01-D03 | Numbers 0 to 100 and Spelling | Use numbers and spell names aloud. | 45 | Yes | Complete number dictation and spelling exercise. | Answer sheet. | `numbers`, `listening` |
-| DE-W01-D04 | Formal and Informal Address | Choose `du` or `Sie` in basic situations. | 45 | Yes | Categorize scenarios and rewrite greetings. | Scenario answers. | `du-sie`, `culture` |
-| DE-W01-D05 | Week 1 Review and Assessment | Review greetings, introductions, numbers, and address. | 45 | Yes | Short vocabulary, listening metadata, and written response assessment. | Assessment answers and reflection. | `weekly-assessment`, `review` |
+Implemented in seed data for this architecture phase:
 
-## Week 2: Basic Grammar and Daily Routine
+- German roadmap modules for A1.1 through C2.2.
+- German enrollment current/target level support through C2.2.
+- Duration configuration for 30, 45, 60, and 90 minutes.
+- Fully authored prior A1.1 Module 1 proof-slice Sessions 1-3.
+- Fully authored A2.1 Modules 1-2 production benchmark sessions.
+- Complete learner-facing A2.1 through C2.2 seed implementation: 10 sublevels x 10 modules x 5 learning-unit sessions, stored as approved Lesson Versions with resources, exercises, knowledge checks, evidence prompts, and sublevel final integrated assessment sessions.
+- CEFR-aware German assessment seed items for approved lesson tags, including objective knowledge checks, multiple-select skill checks, productive scenarios, and reflection prompts.
 
-| Lesson ID | Lesson | Objective | Duration | Required | Exercise | Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| DE-W02-D01 | Present Tense of Common Verbs | Conjugate common regular verbs in simple sentences. | 45 | Yes | Build sentences with `lernen`, `machen`, `kommen`, `wohnen`. | Conjugation table and sentences. | `present-tense`, `verbs` |
-| DE-W02-D02 | Word Order in Main Clauses | Place the finite verb in second position. | 45 | Yes | Rearrange sentence cards into correct order. | Corrected sentence list. | `word-order` |
-| DE-W02-D03 | Days, Time, and Study Schedule | Talk about study days and times. | 45 | Yes | Describe weekly study schedule in German. | Schedule sentences. | `time`, `days` |
-| DE-W02-D04 | Listening: Daily Routine | Extract key details from short routine audio. | 45 | Yes | Listen to approved external audio and answer metadata-based questions. | Listening answers. | `listening`, `routine` |
-| DE-W02-D05 | Week 2 Review and Assessment | Review verbs, word order, and routine vocabulary. | 45 | Yes | Short grammar and writing assessment. | Assessment answers. | `weekly-assessment`, `grammar` |
+Not implemented in this phase:
 
-## Week 3: Nouns, Articles, and Objects
-
-| Lesson ID | Lesson | Objective | Duration | Required | Exercise | Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| DE-W03-D01 | Noun Gender and Definite Articles | Recognize `der`, `die`, and `das` with common nouns. | 45 | Yes | Build vocabulary set with article and plural. | Vocabulary table. | `articles`, `nouns` |
-| DE-W03-D02 | Indefinite Articles and Negation | Use `ein`, `eine`, and `kein` in simple sentences. | 45 | Yes | Convert positive sentences to negative. | Sentence transformations. | `negation`, `articles` |
-| DE-W03-D03 | Accusative Case Basics | Use direct objects with common verbs. | 45 | Yes | Identify subject, verb, and object in sentences. | Annotated sentences. | `accusative` |
-| DE-W03-D04 | Reading: Simple Profiles | Read short profiles and answer factual questions. | 45 | Yes | Read approved short text and answer questions. | Reading answers. | `reading`, `profiles` |
-| DE-W03-D05 | Week 3 Review and Assessment | Review articles, negation, accusative, and reading. | 45 | Yes | Short mixed assessment. | Assessment answers. | `weekly-assessment`, `articles` |
-
-## Week 4: Practical Conversation and Review
-
-| Lesson ID | Lesson | Objective | Duration | Required | Exercise | Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| DE-W04-D01 | Ordering Food and Drinks | Use polite phrases for ordering. | 45 | Yes | Write a cafe dialogue. | Dialogue script. | `food`, `speaking` |
-| DE-W04-D02 | Directions and Places | Ask for and understand simple directions. | 45 | Yes | Match direction phrases to map prompts. | Direction answers. | `directions`, `places` |
-| DE-W04-D03 | Modal Verbs: Can and Want | Use `koennen` and `wollen` in simple requests. | 45 | Yes | Write request sentences. | Sentence list. | `modal-verbs` |
-| DE-W04-D04 | Pronunciation Review | Practice difficult sounds and sentence rhythm. | 45 | Yes | Compare pronunciation notes and repeat sample phrases. | Self-assessment checklist. | `pronunciation`, `review` |
-| DE-W04-D05 | Week 4 Review and Assessment | Demonstrate practical beginner conversation. | 45 | Yes | Mixed vocabulary, grammar, reading, and short writing assessment. | Assessment answers and reflection. | `weekly-assessment`, `conversation` |
-
-## Resource Guidance
-
-Approved resources should include:
-
-- short beginner audio with stable URL and transcript where possible;
-- vocabulary list with articles and plural forms;
-- grammar explanation reviewed by a language reviewer;
-- pronunciation notes with accessibility alternatives.
-
-## Assessment Approach
-
-Weekly German assessments include:
-
-- vocabulary matching;
-- grammar completion;
-- short reading;
-- listening question metadata or external audio reference;
-- short written response.
-
-Speaking practice can use self-check evidence in MVP. Production speech scoring is future scope.
+- Detailed A1.1/A1.2 expansion beyond the existing proof slice.
+- A human-reviewed official-exam-style assessment item bank beyond the internal seed questions.
+- Speech recognition.
+- AI tutoring.
+- Official exam certification.

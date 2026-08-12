@@ -32,3 +32,4 @@ Each page must define loading, empty, error, and permission states during implem
 - Mutations must prevent duplicate submissions.
 - Error messages must use safe user-facing language from [37 API Error Catalogue](37-api-error-catalogue.md).
 - Each page must include automated accessibility coverage before MVP exit.
+- German Roadmap must display A1.1 through C2.2 grouped under A1, A2, B1, B2, C1, and C2, with completed, current, and upcoming markers, plus current level, target level, current module, session duration, and evidence-based review status.

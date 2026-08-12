@@ -10,7 +10,11 @@ export type GermanLevel =
   | "B1.1"
   | "B1.2"
   | "B2.1"
-  | "B2.2";
+  | "B2.2"
+  | "C1.1"
+  | "C1.2"
+  | "C2.1"
+  | "C2.2";
 
 export interface GermanEnrollmentPreferences {
   readonly startLevel: GermanLevel;

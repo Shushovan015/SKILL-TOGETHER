@@ -120,6 +120,7 @@ export interface ScheduledLessonRecord {
   readonly lessonVersionId: string;
   readonly title: string;
   readonly moduleTitle: string;
+  readonly trackSlug: string;
   readonly trackTitle: string;
   readonly trackType: TrackType;
   readonly difficulty: string;

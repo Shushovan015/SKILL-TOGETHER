@@ -8,6 +8,9 @@
 | Module | Ordered group of Lessons inside a Learning Track. |
 | Lesson | Reusable learning unit. |
 | Lesson Version | Immutable content version used for scheduling and completion snapshots. |
+| German Learning Unit | Pedagogical German content unit inside a CEFR module, such as introducing yourself, accusative case, or argumentative writing. |
+| German Activity | Concrete German study action with skill, duration, priority, review status, and learner-facing material. |
+| German Daily Session | Duration-aware composition of German Activities materialized as a scheduled Daily Task in the MVP. |
 | Enrollment | A learner's participation in one Learning Track. |
 | Study Plan | Configured schedule for an Enrollment. |
 | Study Week | Calendar-bounded planning unit containing Daily Tasks and one Weekly Assessment opportunity. |
@@ -67,6 +70,11 @@
 - AssessmentSnapshot: assessment and question fields copied into AssessmentAttempt and Answer.
 - Score: earned points, possible points, percentage, pass flag.
 - AssessmentTag: stable topic identifier such as `ts-generics` or `risk-register`.
+- CEFRSublevel: A1.1 through C2.2; Complete Beginner normalizes to A1.1.
+- ActivityPriority: CORE, RECOMMENDED, EXTENSION.
+- ReviewStatus: NEW, REVIEW, CONSOLIDATION, EXPANSION.
+- GermanCompetencyTag: listening, speaking, reading, writing, vocabulary, grammar, pronunciation, interaction, mediation, pragmatic, strategy, real-world-task.
+- LexicalItem: lemma, meaning, part of speech, gender/plural or verb forms, example, collocations, register, pronunciation reference, domain, and active/passive expectation.
 
 ## State Models
 

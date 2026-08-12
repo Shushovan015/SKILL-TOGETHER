@@ -67,7 +67,9 @@ MVP selection is deterministic:
 - Manual questions store rubric and grader.
 - AI-assisted feedback may suggest formative comments but cannot finalize production grades without review controls.
 
-Phase 6 implements predefined reviewed objective questions seeded from approved lesson assessment tags. Multiple choice, multiple select, and true/false questions are auto-scored; manual question types enter `NEEDS_MANUAL_GRADING` with nullable score outcome fields until a later review workflow exists.
+Phase 6 initially implemented predefined reviewed objective questions seeded from approved lesson assessment tags. The current Software Engineering seed also creates manual professional items for coding, debugging, architecture/design, interview answers, and revision reflection. Multiple choice, multiple select, and true/false questions are auto-scored; manual question types enter `NEEDS_MANUAL_GRADING` with nullable score outcome fields until a later review workflow exists.
+
+Software Engineering weekly assessments are structured as professional checkpoints rather than simple quizzes: knowledge, concept explanation/application, coding challenge, debugging challenge, architecture/design case study, interview answer, and feedback/reflection. Assessment selection prefers an available mix of question types before filling the weekly question limit.
 
 ## Retakes
 
@@ -99,6 +101,14 @@ Assessment result shows:
 - weak topics;
 - revision recommendations linked to lessons or tasks;
 - manual grading pending states if applicable.
+
+## German CEFR Assessment Rules
+
+German assessments evaluate language performance across CEFR sublevels, not internal curriculum metadata. Weekly assessments should combine listening, reading, vocabulary, grammar in context, writing, speaking or speaking self-check evidence, and an integrated practical task where appropriate.
+
+Every German sublevel from A1.1 through C2.2 ends with an internal integrated assessment. Results should report competency areas such as listening, reading, writing, speaking, interaction, mediation where relevant, and language control, with strong areas, needs review, and recommended next actions. These internal results must not be presented as official Goethe, telc, OeSD, VHS, or other external certification.
+
+Every German assessment item maps to CEFR sublevel, module, competency, learning objective, difficulty, and content previously taught. Untaught content appears only when the item is explicitly measuring transfer or inference.
 
 ## Weak-Topic Detection
 

@@ -26,7 +26,11 @@ const germanLevels = [
   { value: "B1.1", label: "B1.1" },
   { value: "B1.2", label: "B1.2" },
   { value: "B2.1", label: "B2.1" },
-  { value: "B2.2", label: "B2.2" }
+  { value: "B2.2", label: "B2.2" },
+  { value: "C1.1", label: "C1.1" },
+  { value: "C1.2", label: "C1.2" },
+  { value: "C2.1", label: "C2.1" },
+  { value: "C2.2", label: "C2.2" }
 ] as const;
 const germanTargetLevels = germanLevels.filter((level) => level.value !== "COMPLETE_BEGINNER");
 const germanSessionDurations = [30, 45, 60, 90] as const;
@@ -395,7 +399,20 @@ function normalizedGermanStartLevel(level: string): string {
 }
 
 function compareGermanLevelValues(left: string, right: string): number {
-  const order = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"];
+  const order = [
+    "A1.1",
+    "A1.2",
+    "A2.1",
+    "A2.2",
+    "B1.1",
+    "B1.2",
+    "B2.1",
+    "B2.2",
+    "C1.1",
+    "C1.2",
+    "C2.1",
+    "C2.2"
+  ];
   return order.indexOf(left) - order.indexOf(right);
 }
 

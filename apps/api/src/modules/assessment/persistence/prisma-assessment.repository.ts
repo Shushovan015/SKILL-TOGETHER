@@ -112,6 +112,18 @@ const assessmentType = "WEEKLY";
 const defaultMaxRetakes = 1;
 const defaultPassingPercentage = 70;
 const maxQuestionCount = 18;
+const assessmentTypeOrder: readonly PrismaQuestionType[] = [
+  PrismaQuestionType.MULTIPLE_CHOICE,
+  PrismaQuestionType.MULTIPLE_SELECT,
+  PrismaQuestionType.CODE_CHALLENGE,
+  PrismaQuestionType.DEBUGGING_CHALLENGE,
+  PrismaQuestionType.CASE_STUDY,
+  PrismaQuestionType.SCENARIO,
+  PrismaQuestionType.PRACTICAL_ASSIGNMENT,
+  PrismaQuestionType.SHORT_ANSWER,
+  PrismaQuestionType.TRUE_FALSE,
+  PrismaQuestionType.REFLECTION
+];
 const objectiveSeedSource = "phase-06-reviewed-seed";
 
 export class PrismaAssessmentRepository implements AssessmentRepository {
@@ -794,20 +806,14 @@ function selectQuestions(
   const taggedQuestions = questions.filter((question) =>
     question.assessmentTags.some((tag) => completedTagSet.has(tag))
   );
-  const selected = taggedQuestions.length === 0 ? questions : taggedQuestions;
+  const candidateQuestions = taggedQuestions.length === 0 ? questions : taggedQuestions;
+  const selectedTags = [...new Set(completedTags)].sort((left, right) => left.localeCompare(right));
   const selectedById = new Map<string, PrismaQuestion>();
 
-  for (const tag of [...completedTags].sort((left, right) => left.localeCompare(right))) {
-    const question = [...selected]
-      .filter((candidate) => candidate.assessmentTags.includes(tag))
-      .sort(compareAssessmentQuestions)[0];
+  selectInitialQuestionTypeMix(candidateQuestions, selectedTags, selectedById);
+  fillQuestionSelection(candidateQuestions, selectedTags, selectedById);
 
-    if (question !== undefined) {
-      selectedById.set(question.id, question);
-    }
-  }
-
-  for (const question of [...selected].sort(compareAssessmentQuestions)) {
+  for (const question of [...candidateQuestions].sort(compareAssessmentQuestions)) {
     if (selectedById.size >= maxQuestionCount) {
       break;
     }
@@ -816,6 +822,75 @@ function selectQuestions(
   }
 
   return [...selectedById.values()];
+}
+
+function selectInitialQuestionTypeMix(
+  questions: readonly PrismaQuestion[],
+  selectedTags: readonly string[],
+  selectedById: Map<string, PrismaQuestion>
+): void {
+  for (const [index, type] of assessmentTypeOrder.entries()) {
+    if (selectedById.size >= maxQuestionCount) {
+      return;
+    }
+
+    const preferredTag = selectedTags.length === 0 ? undefined : selectedTags[index % selectedTags.length];
+    const question = findSelectableQuestion(questions, type, preferredTag, selectedById);
+
+    if (question !== undefined) {
+      selectedById.set(question.id, question);
+    }
+  }
+}
+
+function fillQuestionSelection(
+  questions: readonly PrismaQuestion[],
+  selectedTags: readonly string[],
+  selectedById: Map<string, PrismaQuestion>
+): void {
+  for (const type of assessmentTypeOrder) {
+    const tags = selectedTags.length === 0 ? [undefined] : selectedTags;
+
+    for (const tag of tags) {
+      if (selectedById.size >= maxQuestionCount) {
+        return;
+      }
+
+      const question = findSelectableQuestion(questions, type, tag, selectedById);
+
+      if (question !== undefined) {
+        selectedById.set(question.id, question);
+      }
+    }
+  }
+}
+
+function findSelectableQuestion(
+  questions: readonly PrismaQuestion[],
+  type: PrismaQuestionType,
+  tag: string | undefined,
+  selectedById: ReadonlyMap<string, PrismaQuestion>
+): PrismaQuestion | undefined {
+  const matchingTagQuestion = [...questions]
+    .filter(
+      (question) =>
+        question.type === type &&
+        !selectedById.has(question.id) &&
+        (tag === undefined || question.assessmentTags.includes(tag))
+    )
+    .sort(compareAssessmentQuestions)[0];
+
+  if (matchingTagQuestion !== undefined) {
+    return matchingTagQuestion;
+  }
+
+  if (tag === undefined) {
+    return undefined;
+  }
+
+  return [...questions]
+    .filter((question) => question.type === type && !selectedById.has(question.id))
+    .sort(compareAssessmentQuestions)[0];
 }
 
 function questionsForAttempt(attempt: PrismaAttemptWithRelations): readonly PrismaQuestion[] {
@@ -897,14 +972,9 @@ interface QuestionSeed {
   readonly gradingMode: string;
 }
 
-function questionSeeds(trackType: PrismaLearningTrack["type"], tag: string): readonly QuestionSeed[] {
+export function questionSeeds(trackType: PrismaLearningTrack["type"], tag: string): readonly QuestionSeed[] {
   if (trackType === "SOFTWARE_ENGINEERING") {
-    return professionalQuestionSeeds("Software Engineering", tag, [
-      "It names a production decision and the TypeScript, frontend, backend, data, or architecture tradeoff behind it.",
-      "It is an internal metadata label that should be memorized.",
-      "It is only useful for syntax recall.",
-      "It should be skipped unless a library requires it."
-    ]);
+    return softwareEngineeringQuestionSeeds(tag);
   }
 
   if (trackType === "PROJECT_MANAGEMENT") {
@@ -916,22 +986,273 @@ function questionSeeds(trackType: PrismaLearningTrack["type"], tag: string): rea
     ]);
   }
 
+  if (trackType === "GERMAN") {
+    return isGermanAssessableTag(tag) ? germanQuestionSeeds(tag) : [];
+  }
+
+  return [];
+}
+
+function softwareEngineeringQuestionSeeds(tag: string): readonly QuestionSeed[] {
+  const topic = humanizeTag(tag);
+  const metadata = questionMetadata("Software Engineering", topic, tag);
+
   return [
     {
       type: PrismaQuestionType.MULTIPLE_CHOICE,
-      promptMd: `Part A - Knowledge: Which completed German topic does "${humanizeTag(tag)}" represent?`,
+      promptMd: `Part A - Knowledge: In Software Engineering, what is the professional value of ${topic}?`,
       options: choiceOptions([
-        humanizeTag(tag),
-        "Unrelated review topic",
-        "Future grammar topic",
-        "Internal scheduling setting"
+        "It names a production decision and the TypeScript, frontend, backend, data, security, testing, or architecture tradeoff behind it.",
+        "It is an internal metadata label that should be memorized.",
+        "It is only useful for syntax recall.",
+        "It should be skipped unless a library requires it."
       ]),
       answerKey: "target",
       points: 1,
       assessmentTags: [tag],
       gradingMode: "AUTO"
+    },
+    {
+      type: PrismaQuestionType.MULTIPLE_SELECT,
+      promptMd: `Part B - Explain concepts: Which actions show professional use of ${topic}?`,
+      options: choiceOptions([
+        "Connect the concept to a realistic production scenario and name the decision it supports.",
+        "Create or review evidence that can be checked by tests, typechecking, query plans, accessibility checks, logs, or diagrams.",
+        "Ignore tradeoffs until the final capstone.",
+        "Use the term without explaining the implementation or verification."
+      ]),
+      answerKey: ["target", "supporting"],
+      points: 2,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
+    },
+    {
+      type: PrismaQuestionType.CODE_CHALLENGE,
+      promptMd: `Part C - Coding: Write a compact TypeScript, React, GraphQL, FastAPI, SQL, or pseudocode solution that applies ${topic}. Include requirements, constraints, expected behavior, and one verification step.`,
+      options: {
+        ...metadata,
+        expectedSections: ["requirements", "solution", "verification", "tradeoff"]
+      },
+      answerKey: {
+        expectedAnswer:
+          "Provides a realistic implementation or pseudocode artifact, names assumptions, handles at least one failure case, and explains how the result is verified.",
+        scoringGuidance:
+          "Award credit for correctness, boundary safety, readability, testability, and direct connection to studied lesson objectives."
+      },
+      points: 5,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.DEBUGGING_CHALLENGE,
+      promptMd: `Part D - Debugging: A feature involving ${topic} fails in review or production. Diagnose the likely root cause, write the smallest safe fix, and name the regression test.`,
+      options: {
+        ...metadata,
+        expectedSections: ["symptom", "hypothesis", "fix", "regressionTest"]
+      },
+      answerKey: {
+        expectedAnswer:
+          "Reproduces the symptom, connects it to the studied concept, proposes a minimal fix, and defines a regression test or production check.",
+        scoringGuidance:
+          "Award credit for evidence-driven diagnosis, root-cause focus, safe fix scope, and prevention."
+      },
+      points: 5,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.CASE_STUDY,
+      promptMd: `Part E - Architecture/design: A production feature touched ${topic}. Explain the design decision, implementation evidence, tests, operational or security concerns, and review risks.`,
+      options: {
+        ...metadata,
+        expectedSections: ["decision", "evidence", "tests", "risks", "tradeoffs"]
+      },
+      answerKey: {
+        expectedAnswer:
+          "Names the situation, applies the topic, explains tradeoffs, identifies evidence, covers tests or operational checks, and states follow-up work.",
+        scoringGuidance:
+          "Award credit for scenario fit, concrete action, tradeoff reasoning, evidence quality, risk awareness, and communication clarity."
+      },
+      points: 5,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.SHORT_ANSWER,
+      promptMd: `Part F - Interview 1: Explain ${topic} to an interviewer using a real example, one tradeoff, and one verification method.`,
+      options: {
+        ...metadata,
+        interviewRelevance: true
+      },
+      answerKey: {
+        expectedAnswer:
+          "Uses concise terminology, gives a realistic example, explains a tradeoff, and describes how success would be checked."
+      },
+      points: 3,
+      assessmentTags: [tag, "interview-prep"],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.REFLECTION,
+      promptMd: `Part F - Interview 2 and feedback: Name one strong area and one weak area in your answer about ${topic}. What should you revise before an interview or capstone review?`,
+      options: {
+        ...metadata,
+        interviewRelevance: true,
+        feedbackSections: ["strongAreas", "weakAreas", "revision"]
+      },
+      answerKey: {
+        expectedAnswer:
+          "Names a concrete strength, a concrete weakness, the studied concept requiring review, and the next revision task."
+      },
+      points: 2,
+      assessmentTags: [tag, "interview-prep"],
+      gradingMode: "MANUAL"
     }
   ];
+}
+
+function isGermanAssessableTag(tag: string): boolean {
+  return /^[abc]\d-\d-[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(tag);
+}
+
+function germanQuestionSeeds(tag: string): readonly QuestionSeed[] {
+  const topic = humanizeTag(tag);
+  const profile = germanAssessmentProfile(tag);
+  const metadata = germanQuestionMetadata(topic, tag, profile);
+
+  return [
+    {
+      type: PrismaQuestionType.MULTIPLE_CHOICE,
+      promptMd: `Part A - German CEFR knowledge: What should a learner demonstrate for ${topic}?`,
+      options: choiceOptions([
+        "Understand the taught input, use the relevant grammar and vocabulary, and produce usable evidence.",
+        "Memorize a label without creating a response.",
+        "Skip pronunciation and mediation because they are only future features.",
+        "Answer only with isolated vocabulary even when the task asks for discourse."
+      ]),
+      answerKey: "target",
+      points: 1,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
+    },
+    {
+      type: PrismaQuestionType.MULTIPLE_SELECT,
+      promptMd: `Part B - German skill check: Which actions show successful work on ${topic}?`,
+      options: choiceOptions([
+        `Extract key information from ${profile.receptiveDemand}.`,
+        `Produce a response that is ${profile.productiveDemand}.`,
+        "Ignore the grammar focus if the main idea is understandable.",
+        "Use one memorized phrase without adapting it to the situation."
+      ]),
+      answerKey: ["target", "supporting"],
+      points: 2,
+      assessmentTags: [tag],
+      gradingMode: "AUTO"
+    },
+    {
+      type: PrismaQuestionType.SCENARIO,
+      promptMd: `Part C - German performance scenario: Create a response for ${topic}. Include situation, key facts, a reason or stance, a next step, and one follow-up question.`,
+      options: metadata,
+      answerKey: {
+        expectedAnswer:
+          "Produces a German response that fits the task, preserves meaning, uses taught grammar and vocabulary, and includes a concrete next step.",
+        scoringGuidance:
+          "Award credit for task fit, CEFR-appropriate accuracy, vocabulary range, grammar control, mediation quality, pronunciation or delivery planning, and evidence completeness."
+      },
+      points: 5,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    },
+    {
+      type: PrismaQuestionType.REFLECTION,
+      promptMd: `Part D - German reflection: Explain how your answer for ${topic} proves progress at ${profile.cefrLabel}. Name one correction you would make before submitting final evidence.`,
+      options: metadata,
+      answerKey: {
+        expectedAnswer:
+          "Names the language goal, cites a concrete sentence or phrase, identifies one correction, and explains how the response meets the evidence task."
+      },
+      points: 3,
+      assessmentTags: [tag],
+      gradingMode: "MANUAL"
+    }
+  ];
+}
+
+interface GermanAssessmentProfile {
+  readonly cefrLabel: string;
+  readonly receptiveDemand: string;
+  readonly productiveDemand: string;
+  readonly difficulty: string;
+}
+
+function germanAssessmentProfile(tag: string): GermanAssessmentProfile {
+  if (tag.includes("c2-")) {
+    return {
+      cefrLabel: "C2",
+      receptiveDemand: "dense speech or writing with implication, register shifts, and possible ambiguity",
+      productiveDemand: "nuanced, rhetorically controlled, and genre-sensitive",
+      difficulty: "Mastery"
+    };
+  }
+
+  if (tag.includes("c1-")) {
+    return {
+      cefrLabel: "C1",
+      receptiveDemand: "complex professional, academic, or public discourse",
+      productiveDemand: "precise, cohesive, and adapted to audience and genre",
+      difficulty: "Advanced"
+    };
+  }
+
+  if (tag.includes("b2-")) {
+    return {
+      cefrLabel: "B2",
+      receptiveDemand: "structured authentic input with stance, evidence, and limitation",
+      productiveDemand: "structured, register-aware, and supported with reasons",
+      difficulty: "Upper intermediate"
+    };
+  }
+
+  if (tag.includes("b1-")) {
+    return {
+      cefrLabel: "B1",
+      receptiveDemand: "connected familiar input with main points and useful details",
+      productiveDemand: "clear, connected, and supported with simple examples",
+      difficulty: "Independent"
+    };
+  }
+
+  if (tag.includes("a2-")) {
+    return {
+      cefrLabel: "A2",
+      receptiveDemand: "clear everyday input with practical facts",
+      productiveDemand: "short, accurate, and understandable",
+      difficulty: "Elementary"
+    };
+  }
+
+  return {
+    cefrLabel: "mixed CEFR review",
+    receptiveDemand: "the completed German lesson input",
+    productiveDemand: "accurate for the completed lesson and clear enough to act on",
+    difficulty: "Mixed"
+  };
+}
+
+function germanQuestionMetadata(
+  topic: string,
+  tag: string,
+  profile: GermanAssessmentProfile
+): Prisma.InputJsonObject {
+  return {
+    topic,
+    cefrLabel: profile.cefrLabel,
+    difficulty: profile.difficulty,
+    receptiveDemand: profile.receptiveDemand,
+    productiveDemand: profile.productiveDemand,
+    expectedEvidence:
+      "Learner answer includes listening or reading comprehension, grammar/vocabulary control, production, mediation where relevant, and a correction note."
+  };
 }
 
 function professionalQuestionSeeds(
@@ -1108,6 +1429,7 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
       lessonVersionId: version.id,
       title: version.title,
       moduleTitle: version.lesson.module.title,
+      trackSlug: version.lesson.module.track.slug,
       trackTitle: version.lesson.module.track.title,
       trackType: version.lesson.module.track.type,
       difficulty: version.lesson.difficulty,

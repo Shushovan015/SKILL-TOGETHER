@@ -2,135 +2,124 @@
 
 ## Goal
 
-Build advanced practical software-engineering capability, portfolio evidence, and employment readiness across a four-to-six-month Learning Track.
+Build strong practical full-stack software-engineering capability, portfolio evidence, and interview readiness across a serious five-to-six-month Learning Track. The track is for a learner who already knows JavaScript, has frontend and React experience, understands HTML/CSS and basic APIs, has basic Git experience, and is nearly new to TypeScript.
 
-## Structure
+The programme must not promise employment. It provides structured knowledge, practical evidence, professional judgment practice, and interview preparation expected from a job-oriented engineering course.
 
-- Five study days per week.
-- Default duration: 120 minutes per session.
-- Weekly Assessment on Friday.
-- Recovery day on Saturday.
-- First four weeks are detailed for MVP seed data.
-- Later months are module-level outlines.
+## Current Implementation Status
 
-## Professional Phase Overview
+The seed now implements the complete Software Engineering career programme as approved learner-facing Lesson Versions in the existing SkillTogether content system. It does not introduce a second curriculum architecture.
 
-| Phase | Focus | Outcome |
-| --- | --- | --- |
-| Phase 1 | TypeScript Professional Foundation | Strict TypeScript, inference, nullability, object/function typing, unions, narrowing, validation, and error modeling for JavaScript-experienced frontend developers. |
-| Phase 2 | Advanced TypeScript | Generics, constraints, keyof, mapped types, conditional types, infer, utility types, branded types, satisfies, const assertions, and type-safe architecture. |
-| Phase 3 | Professional React and Frontend Architecture | Feature organization, composition, state ownership, forms, server state, accessibility, testing, and performance. |
-| Phase 4 | Testing, Accessibility and Performance | Unit, integration, E2E, accessibility, profiling, code splitting, and quality gates. |
-| Phase 5 | GraphQL Professional Development | Schema design, resolvers, authorization, pagination, DataLoader, caching, security, Apollo Client, and GraphQL testing. |
-| Phase 6 | Backend Engineering with FastAPI | Python typing, FastAPI, Pydantic, services, repositories, SQLAlchemy, transactions, async work, errors, logging, and tests. |
-| Phase 7 | Databases and Data Modeling | PostgreSQL, schema design, constraints, indexes, joins, query planning, transactions, concurrency, migrations, and SQL interview practice. |
-| Phase 8 | Authentication, Authorization and Security | Sessions, cookies, JWT tradeoffs, object authorization, CSRF, CORS, secrets, GraphQL security, and threat modeling. |
-| Phase 9 | Full-Stack Architecture | Modular monoliths, layered design, API contracts, domain services, transactions, errors, and ADRs. |
-| Phase 10 | Data Structures and Algorithms | DSA patterns for interviews and practical problem solving. |
-| Phase 11 | System Design | Scalability, caching, queues, consistency, rate limiting, observability, failure handling, and design cases. |
-| Phase 12 | Production Engineering | Docker, CI/CD, environments, logging, monitoring, debugging, incidents, dependencies, and release readiness. |
-| Phase 13 | Interview Preparation | CV, GitHub, portfolio, DSA, system design, technical, debugging, code-review, and behavioral interviews. |
-| Phase 14 | Capstone Project | Production-grade collaborative workflow platform with React, TypeScript, GraphQL, FastAPI, PostgreSQL, Docker, CI, tests, docs, deployment notes, demo, and retrospective. |
+Implemented seed coverage:
 
-The current seed fully authors the first 15 professional sessions and stores the remaining phases as structured roadmap/session outlines. Detailed later-phase sessions should be authored in reviewed batches.
+- 14 professional phases.
+- 24 weekly modules.
+- 120 daily learning units.
+- 5 study days per week.
+- 120-minute default sessions with 60, 90, and 120-minute completion guidance in every lesson.
+- 24 weekly professional assessments.
+- 360 embedded interview questions.
+- 24 portfolio or capstone project milestones.
+- 8 DSA problem-pattern sessions.
+- 8 system-design case sessions.
+- 5-session final capstone.
+- Verified supplemental resources from official or reputable providers.
 
-## Detailed MVP Seed Curriculum
+Canonical implementation file:
 
-### Week 1: Advanced TypeScript Foundations
+- `apps/api/src/modules/content/seed/software-engineering-career-program.ts`
 
-| Lesson ID | Lesson | Objective | Prerequisites | Duration | Required | Practical Exercise | Completion Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SE-W01-D01 | TypeScript Strict Mode and Mental Model | Explain how TypeScript catches errors before runtime and configure strictness. | None | 120 | Yes | Convert loose JavaScript examples to strict TypeScript. | Type-safe snippet and written explanation. | `ts-strict`, `type-safety` |
-| SE-W01-D02 | Primitive, Object, Union, and Narrowing Patterns | Use unions and narrowing to model real UI and API states. | SE-W01-D01 | 120 | Yes | Model loading, success, empty, and error states. | Discriminated union and state handling notes. | `ts-unions`, `narrowing` |
-| SE-W01-D03 | Generics for Reusable Functions and Components | Build safe reusable helpers with generics. | SE-W01-D02 | 120 | Yes | Write generic list and API result helpers. | Generic helper code and examples. | `ts-generics` |
-| SE-W01-D04 | Runtime Validation with Zod | Validate unknown external input before trusting it. | SE-W01-D02 | 120 | Yes | Create schemas for registration and schedule preferences. | Zod schema and invalid-case notes. | `validation`, `zod` |
-| SE-W01-D05 | Weekly Assessment and Reflection | Demonstrate TypeScript modeling and validation understanding. | SE-W01-D01 to SE-W01-D04 | 90 | Yes | Complete quiz and refactor a typed form model. | Assessment answers and reflection. | `weekly-assessment`, `ts-review` |
+## Learning Architecture
 
-### Week 2: React Architecture
+The implemented hierarchy is:
 
-| Lesson ID | Lesson | Objective | Prerequisites | Duration | Required | Practical Exercise | Completion Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SE-W02-D01 | React Component Boundaries | Split UI into focused, testable components. | SE-W01-D05 | 120 | Yes | Refactor a dashboard into page, section, and item components. | Component tree diagram and code. | `react-components` |
-| SE-W02-D02 | Props, Composition, and Controlled State | Use composition instead of prop-heavy components. | SE-W02-D01 | 120 | Yes | Build reusable status card and action area. | Component code and prop rationale. | `react-composition` |
-| SE-W02-D03 | Forms with React Hook Form and Zod | Build accessible validated forms. | SE-W01-D04 | 120 | Yes | Implement onboarding schedule form model. | Form schema, validation cases, UI notes. | `forms`, `zod`, `a11y` |
-| SE-W02-D04 | Server State with Apollo Client | Separate server state from local UI state. | SE-W02-D01 | 120 | Yes | Design query and mutation usage for Today dashboard. | Query plan and cache update notes. | `apollo`, `server-state` |
-| SE-W02-D05 | React Testing Basics | Test user-visible behavior and states. | SE-W02-D01 to SE-W02-D04 | 120 | Yes | Write tests for loading, empty, success, and error states. | Test cases and coverage notes. | `rtl`, `testing` |
+Software Engineering programme -> Phase -> Weekly Module -> Learning Unit -> Activity Plan -> Daily Session.
 
-### Week 3: GraphQL and Backend Foundations
+Each daily session includes:
 
-| Lesson ID | Lesson | Objective | Prerequisites | Duration | Required | Practical Exercise | Completion Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SE-W03-D01 | GraphQL Schema Design | Design clear object, input, query, and mutation types. | SE-W02-D04 | 120 | Yes | Draft schema for Daily Task completion. | Schema excerpt and validation notes. | `graphql-schema` |
-| SE-W03-D02 | NestJS Module Architecture | Explain NestJS modules, providers, resolvers, and services. | SE-W03-D01 | 120 | Yes | Map SkillTogether modules to NestJS structure. | Module diagram and responsibility table. | `nestjs`, `backend-architecture` |
-| SE-W03-D03 | Thin Resolvers and Application Services | Keep business logic out of resolvers. | SE-W03-D02 | 120 | Yes | Refactor resolver pseudocode into service methods. | Before/after pseudocode. | `resolvers`, `services` |
-| SE-W03-D04 | Prisma and Repository Boundaries | Model persistence without leaking database access everywhere. | SE-W03-D02 | 120 | Yes | Design repository methods for Daily Tasks. | Repository interface and transaction notes. | `prisma`, `repositories` |
-| SE-W03-D05 | Backend Testing | Test services, GraphQL operations, and database integration. | SE-W03-D01 to SE-W03-D04 | 120 | Yes | Define tests for task completion and authorization. | Test plan and sample assertions. | `backend-testing`, `authorization` |
+- learner-facing objective;
+- prerequisites through sequential Lesson links;
+- difficulty;
+- priority-style activity plan;
+- skill and assessment tags;
+- progression state;
+- 60/90/120-minute duration guidance;
+- explanation and conceptual model;
+- realistic engineering scenario;
+- guided exercise with answer notes;
+- independent transfer exercise with answer notes;
+- knowledge checks;
+- common mistakes;
+- professional relevance;
+- resources;
+- interview questions;
+- project or capstone connection.
 
-### Week 4: Database, Auth, and Security Basics
+## Phase and Module Map
 
-| Lesson ID | Lesson | Objective | Prerequisites | Duration | Required | Practical Exercise | Completion Evidence | Tags |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SE-W04-D01 | Relational Modeling for Learning Data | Design normalized tables and relationships. | SE-W03-D04 | 120 | Yes | Model Enrollment, Study Week, Daily Task, Task Attempt. | ER sketch and constraint list. | `postgresql`, `data-modeling` |
-| SE-W04-D02 | Transactions and Historical Snapshots | Preserve completed work through transactional writes. | SE-W04-D01 | 120 | Yes | Write transaction pseudocode for task completion. | Pseudocode and snapshot field list. | `transactions`, `snapshots` |
-| SE-W04-D03 | Cookie Sessions and Authorization | Explain secure sessions and object-level authorization. | SE-W03-D05 | 120 | Yes | Design auth checks for lesson and partner queries. | Threat cases and test cases. | `auth`, `authorization`, `cookies` |
-| SE-W04-D04 | Accessibility and Frontend Quality | Apply semantic HTML, focus, and state design. | SE-W02-D05 | 120 | Yes | Audit a lesson page design for accessibility. | Accessibility checklist and fixes. | `accessibility`, `quality` |
-| SE-W04-D05 | Weekly Assessment and Portfolio Checkpoint | Demonstrate full-stack design and security reasoning. | SE-W04-D01 to SE-W04-D04 | 120 | Yes | Complete scenario assessment and update portfolio notes. | Assessment result and portfolio evidence. | `weekly-assessment`, `portfolio` |
+| Week | Phase | Module Focus | Project Evidence |
+| --- | --- | --- | --- |
+| 1 | TypeScript Professional Foundation | Compiler mental model and strict JavaScript-to-TypeScript boundaries | Strict TypeScript boundary checklist |
+| 2 | TypeScript Professional Foundation | Unions, narrowing, safe unknown data, readonly values, and exhausted states | Typed UI state model |
+| 3 | Advanced TypeScript | Generics, constraints, keyof, indexed access, mapped types, utility types, and API transformations | Reusable type-safe helper library |
+| 4 | Advanced TypeScript | Template literals, overloads, declaration files, branded values, and type-safe architecture | Type-safe domain model package |
+| 5 | Professional React and Frontend Architecture | Feature boundaries, component composition, state ownership, hooks, and service extraction | Frontend feature architecture plan |
+| 6 | Professional React and Frontend Architecture | Router architecture, accessible forms, server state, Apollo cache, and resilient UI states | Data-driven frontend workflow |
+| 7 | Professional React and Frontend Architecture | Accessibility, error boundaries, performance, memoization, code splitting, and frontend security | Frontend quality gate |
+| 8 | GraphQL Professional Engineering | Schema fundamentals, nullability, queries, mutations, fragments, variables, and resolver boundaries | GraphQL schema and resolver plan |
+| 9 | GraphQL Professional Engineering | Authorization, validation, pagination, DataLoader, caching, evolution, security, and performance | Production GraphQL guardrail pack |
+| 10 | Python for Backend Engineers | Python syntax, typing, data modeling, packages, async basics, and backend conventions | Python backend readiness workbook |
+| 11 | FastAPI Professional Backend | FastAPI structure, routing, Pydantic validation, dependencies, services, repositories, and API security | FastAPI service slice |
+| 12 | FastAPI Professional Backend | Persistence, transactions, async work, configuration, observability, pytest, integration tests, and deployment | Production-ready backend service |
+| 13 | PostgreSQL and Database Engineering | Relational modeling, normalization, constraints, SQL querying, indexes, and plans | Database design and query workbook |
+| 14 | PostgreSQL and Database Engineering | Transactions, isolation, locks, concurrency, migrations, pooling, performance, and SQL security | Database incident response pack |
+| 15 | Authentication, Authorization, and Security | Sessions, cookies, CSRF, CORS, XSS, injection, object authorization, permissions, secrets, and threat modeling | Security review and threat model |
+| 16 | Testing and Software Quality | Unit, integration, frontend, backend, database, GraphQL, fixtures, fakes, mocks, and business-rule tests | Cross-layer test strategy |
+| 17 | Testing and Software Quality | E2E, accessibility checks, contract thinking, CI quality gates, flaky-test avoidance, code review, and refactoring | Release quality gate |
+| 18 | Data Structures and Algorithms | Complexity, arrays, strings, hash maps, sets, stacks, queues, linked lists, binary search, sorting, and intervals | DSA pattern workbook part 1 |
+| 19 | Data Structures and Algorithms | Recursion, trees, heaps, graphs, BFS, DFS, tries, backtracking, greedy, dynamic programming, and union-find | DSA pattern workbook part 2 |
+| 20 | System Design | Requirements, estimation, latency, throughput, scalability, load balancing, CDN, caching, storage, and data choices | System design case workbook part 1 |
+| 21 | System Design | Queues, events, rate limiting, idempotency, consistency, observability, fault tolerance, gateways, and design cases | System design case workbook part 2 |
+| 22 | Production Engineering | Docker, environments, CI/CD, migrations, observability, debugging, incidents, documentation, Git, and reviews | Production readiness packet |
+| 23 | Interview and Career Preparation | CV, GitHub, portfolio, project explanation, technical interviews, behavioral answers, debugging, and code review | Interview readiness portfolio |
+| 24 | Capstone Project | Full-stack delivery, tests, docs, deployment notes, demo, and retrospective | Capstone delivery package |
 
-## Remaining Roadmap
+## Covered Domains
 
-### Month 2: Frontend Engineering Depth
+The implemented programme covers:
 
-- React Router layouts and route guards.
-- Apollo cache normalization and invalidation.
-- Advanced form flows.
-- Component accessibility patterns.
-- Performance profiling and bundle analysis.
-- Frontend error boundaries and observability.
+- TypeScript mental model, compiler, inference, primitives, arrays, tuples, object typing, function typing, optional/default parameters, return types, interfaces, type aliases, unions, intersections, literals, narrowing, discriminated unions, unknown, never, any avoidance, enum alternatives, readonly, const assertions, satisfies, nullability, type guards, and assertion functions.
+- Advanced TypeScript generics, constraints, keyof, typeof-style boundary thinking, indexed access, mapped types, conditional types, infer, utility types, template literal types, overloads, declaration files, module typing, API typing, domain models, branded types, error modeling, architecture, inference, and public API type design.
+- Professional React architecture, component composition, feature boundaries, hooks, custom hooks, state ownership, URL state, form state, derived state, routing, React Hook Form, Zod, data fetching, caching, optimistic updates, loading/error/empty states, error boundaries, accessibility, performance, memoization, code splitting, frontend security, and testing.
+- GraphQL schema design, scalars, enums, inputs, queries, mutations, fragments, variables, nullability, relationships, resolver architecture, context, authentication, authorization, validation, pagination, filtering, sorting, errors, DataLoader, N+1, caching, schema evolution, deprecation, persisted queries, depth/complexity protection, Apollo Client, cache policies, and GraphQL architecture.
+- Python and FastAPI for backend engineers, including typed Python, dataclasses, packages, virtual environments, async, FastAPI routing, Pydantic, dependencies, services, repositories, layering, structured errors, middleware, sessions vs JWT, cookies, security, REST design, pagination, caching, logging, observability, pytest, integration tests, and deployment.
+- PostgreSQL and database engineering, including modeling, normalization, denormalization, constraints, indexes, joins, grouping, aggregation, transactions, ACID, isolation, locks, concurrency, migrations, query plans, pooling, performance, SQL security, integrity, and schema evolution.
+- Security, testing, DSA, system design, production engineering, debugging, code review, portfolio development, and interview preparation.
 
-### Month 3: Backend and Database Depth
+## Weekly Assessments
 
-- GraphQL authorization and query complexity.
-- Prisma schema implementation.
-- PostgreSQL indexes, constraints, and migrations.
-- Integration testing with test database.
-- Background jobs.
-- Audit logging.
+Every study week ends with an assessment lesson in the content sequence. The reviewed Software Engineering assessment question bank now creates these professional item types for every studied assessment tag:
 
-### Month 4: Product-Grade Features
+- Part A - Knowledge.
+- Part B - Explain concepts/application.
+- Part C - Coding challenge.
+- Part D - Debugging challenge.
+- Part E - Architecture/design case study.
+- Part F - Interview question.
+- Part F - Interview feedback and revision reflection.
 
-- Authentication hardening.
-- Scheduling and assessment domain services.
-- Partner visibility and privacy.
-- Security testing.
-- CI and deployment pipeline.
-- Error monitoring.
+Objective items are auto-scored. Coding, debugging, design, interview, and reflection items use manual grading mode under the current MVP assessment engine.
 
-### Month 5: System Design and Portfolio
+## Capstone
 
-- Caching.
-- Queues.
-- Scalability fundamentals.
-- Failure handling.
-- Architecture documentation.
-- Portfolio project hardening.
+The final capstone is a production-style collaborative workflow platform, not a basic todo application. It requires:
 
-### Month 6: Employment Preparation
+- React and TypeScript frontend;
+- routing, forms, validation, accessibility, and frontend tests;
+- GraphQL boundary where appropriate;
+- FastAPI and Python backend;
+- PostgreSQL database design and migrations;
+- authentication, authorization, security review, caching where justified, error handling, logging, Docker, CI, deployment notes, and tests;
+- README, architecture diagram, API documentation, ADRs, screenshots or demo notes, and technical retrospective.
 
-- Data structures and algorithms review.
-- Debugging practice.
-- Technical interviews.
-- Behavioral interviews.
-- CV and GitHub preparation.
-- Job application workflow.
-
-## Assessment Approach
-
-Weekly assessments include:
-
-- multiple choice and multiple select on concepts;
-- code challenges;
-- debugging challenges;
-- architecture scenarios;
-- short written tradeoff explanations.
-
-Official questions must be reviewed and tied to approved lesson assessment tags.
+The capstone is implemented as five final sessions covering architecture, frontend, backend/API/database/security, production engineering, and final demo/interview retrospective.

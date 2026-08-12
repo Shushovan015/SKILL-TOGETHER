@@ -1,5 +1,10 @@
 import type { LessonVersionEditorInput } from "../domain/content.types.js";
 import type { SeedLessonDefinition, SeedModuleDefinition } from "./phase-03-seed-data.js";
+import {
+  softwareEngineeringCareerContentForLesson,
+  softwareEngineeringCareerModules,
+  softwareEngineeringCareerProgramStats
+} from "./software-engineering-career-program.js";
 
 type LearnerSeedContent = Pick<
   LessonVersionEditorInput,
@@ -41,30 +46,10 @@ interface ResourceSeed {
   readonly required: boolean;
 }
 
-export const softwareEngineeringProfessionalModules: readonly SeedModuleDefinition[] = [
-  module(1, "TypeScript Professional Foundation", "For JavaScript frontend developers who need strong TypeScript fundamentals, strict-mode discipline, and production state modeling.", [
-    lesson("SE-P01-S01", "Strict TypeScript for JavaScript Engineers", "Configure strict TypeScript and explain how compile-time checks reduce production defects.", [], 120, "Strict tsconfig notes, before/after code, and three tradeoff observations.", ["ts-strict", "type-safety", "professional-workflow"]),
-    lesson("SE-P01-S02", "Type Inference, Explicit Types, and Nullability", "Use inference, explicit annotations, and nullability rules to model values without over-typing.", ["SE-P01-S01"], 120, "Typed API response model plus notes on inferred and explicit types.", ["type-inference", "nullability", "unknown-vs-any"]),
-    lesson("SE-P01-S03", "Objects, Functions, Tuples, and API Shapes", "Model frontend data, callback contracts, tuples, and API DTOs with precise TypeScript types.", ["SE-P01-S02"], 120, "Typed user-card props, API DTO, and function signatures.", ["object-typing", "functions", "api-typing"]),
-    lesson("SE-P01-S04", "Unions, Narrowing, and Discriminated UI States", "Design discriminated unions and narrowing logic for loading, success, empty, and error states.", ["SE-P01-S03"], 120, "Discriminated union state model and renderer with exhaustive checks.", ["ts-unions", "narrowing", "state-modeling"]),
-    lesson("SE-P01-S05", "Runtime Validation and Error Modeling", "Validate unknown inputs with Zod and model safe user-facing errors.", ["SE-P01-S04"], 120, "Zod schemas, invalid cases, and a typed error-result helper.", ["validation", "zod", "error-modeling"])
-  ]),
-  module(2, "Advanced TypeScript", "Generics, constraints, mapped types, conditional types, utility types, branded types, declaration files, and type-safe architecture.", [
-    lesson("SE-P02-S01", "Generics and Reusable Type-Safe Helpers", "Implement reusable helpers and components that preserve caller-specific type information.", ["SE-P01-S05"], 120, "Generic helper library with examples and failure cases.", ["ts-generics", "reusable-abstractions", "api-typing"]),
-    lesson("SE-P02-S02", "Generic Constraints, keyof, and Indexed Access", "Use constraints, keyof, and indexed access types to build safe property and selector utilities.", ["SE-P02-S01"], 120, "Type-safe property selector and form-field helper.", ["generic-constraints", "keyof", "indexed-access"]),
-    lesson("SE-P02-S03", "Mapped Types, Utility Types, and API Transformations", "Use mapped and utility types to transform DTOs into form, view, and update models.", ["SE-P02-S02"], 120, "DTO-to-form mapped type and update payload utility.", ["mapped-types", "utility-types", "api-typing"]),
-    lesson("SE-P02-S04", "Conditional Types, infer, and Type-Level Decisions", "Use conditional types and infer when a library or API type must branch safely.", ["SE-P02-S03"], 120, "Conditional response extractor and notes on readability limits.", ["conditional-types", "infer", "type-safe-architecture"]),
-    lesson("SE-P02-S05", "Branded Types, satisfies, const Assertions, and Boundaries", "Use branded values, satisfies, const assertions, unknown, never, and assertion functions at application boundaries.", ["SE-P02-S04"], 120, "Branded ID model, route map using satisfies, and assertion boundary.", ["branded-types", "satisfies", "assertion-functions"])
-  ]),
-  module(3, "Professional React and Frontend Architecture", "Feature organization, component boundaries, state ownership, forms, server state, accessibility, performance, and frontend testing.", [
-    lesson("SE-P03-S01", "Feature-Based React Architecture", "Organize a React codebase by feature, ownership boundary, and reusable UI surface.", ["SE-P02-S05"], 120, "Feature folder plan and component responsibility table.", ["react-architecture", "feature-organization", "frontend-system-design"]),
-    lesson("SE-P03-S02", "Component Composition and State Ownership", "Decide whether state belongs locally, in a hook, in URL state, or on the server.", ["SE-P03-S01"], 120, "State ownership decision matrix and refactored component sketch.", ["react-composition", "state-design", "url-state"]),
-    lesson("SE-P03-S03", "Forms with React Hook Form and Zod", "Build accessible forms with aligned client and server validation.", ["SE-P03-S02", "SE-P01-S05"], 120, "Validated form schema, error states, and accessibility notes.", ["forms", "react-hook-form", "zod", "a11y"]),
-    lesson("SE-P03-S04", "Server State, Apollo Client, and Cache Updates", "Separate local UI state from GraphQL server state and plan cache updates.", ["SE-P03-S03"], 120, "Query/mutation plan with cache update and error strategy.", ["apollo-client", "server-state", "graphql-client"]),
-    lesson("SE-P03-S05", "Frontend Testing, Accessibility, and Performance Review", "Test visible behavior, accessibility states, and performance-sensitive rendering decisions.", ["SE-P03-S04"], 120, "RTL test plan, accessibility checklist, and performance review notes.", ["frontend-testing", "accessibility", "performance"])
-  ]),
-  ...buildSoftwareOutlineModules()
-];
+export { softwareEngineeringCareerProgramStats };
+
+export const softwareEngineeringProfessionalModules: readonly SeedModuleDefinition[] =
+  softwareEngineeringCareerModules;
 
 export const projectManagementProfessionalModules: readonly SeedModuleDefinition[] = [
   module(1, "Project Management Fundamentals", "Beginner-friendly foundation in project work, roles, lifecycle thinking, constraints, governance, and professional terminology.", [
@@ -94,6 +79,12 @@ export const projectManagementProfessionalModules: readonly SeedModuleDefinition
 export function professionalContentForLesson(
   lessonDefinition: SeedLessonDefinition
 ): LearnerSeedContent | null {
+  const softwareCareerContent = softwareEngineeringCareerContentForLesson(lessonDefinition);
+
+  if (softwareCareerContent !== null) {
+    return softwareCareerContent;
+  }
+
   const detailed = detailedSessionById.get(lessonDefinition.identifier);
 
   if (detailed !== undefined) {
@@ -101,7 +92,7 @@ export function professionalContentForLesson(
   }
 
   if (lessonDefinition.identifier.startsWith("SE-P")) {
-    return outlineContent(lessonDefinition, "Software Engineering", softwareResourceBundle(["software"]));
+    return null;
   }
 
   if (lessonDefinition.identifier.startsWith("PM-P")) {
@@ -109,22 +100,6 @@ export function professionalContentForLesson(
   }
 
   return null;
-}
-
-function buildSoftwareOutlineModules(): readonly SeedModuleDefinition[] {
-  return [
-    outlineModule("SE", 4, "Testing, Accessibility and Performance", "Testing strategy, Vitest, React Testing Library, Playwright, accessibility audits, rendering performance, profiling, code splitting, and user-visible quality gates.", ["Test Strategy", "Component and Integration Testing", "E2E and Accessibility Checks", "Performance Profiling", "Quality Review"]),
-    outlineModule("SE", 5, "GraphQL Professional Development", "Schema design, inputs, enums, nullability, resolver architecture, auth context, pagination, filtering, DataLoader, caching, security limits, Apollo Client, and testing.", ["GraphQL Schema and Nullability", "Resolver Architecture and Authorization", "Pagination, Filtering, and N+1 Control", "Apollo Cache and Optimistic Updates", "GraphQL Security and Evolution"]),
-    outlineModule("SE", 6, "Backend Engineering with FastAPI", "Python typing, FastAPI routing, Pydantic models, dependency injection, services, repositories, SQLAlchemy, transactions, async work, errors, logging, and tests.", ["Python Backend Essentials", "FastAPI Layers and Dependency Injection", "Pydantic Validation and Error Design", "Repositories, SQLAlchemy, and Transactions", "Backend Testing and Observability"]),
-    outlineModule("SE", 7, "Databases and Data Modeling", "PostgreSQL schema design, normalization, indexes, joins, query planning, transactions, isolation, migrations, pagination, performance, and SQL interview practice.", ["Relational Modeling", "SQL Joins and Aggregation", "Indexes and Query Planning", "Transactions and Concurrency", "Migration and Performance Review"]),
-    outlineModule("SE", 8, "Authentication, Authorization and Security", "Sessions, cookies, JWT tradeoffs, authorization models, CSRF, CORS, password storage, secrets, GraphQL security, threat modeling, and secure review.", ["Session and Token Tradeoffs", "Authorization and Object Ownership", "CSRF, CORS, and Browser Security", "Secrets, Passwords, and Logging", "Security Review Scenarios"]),
-    outlineModule("SE", 9, "Full-Stack Architecture", "Modular monoliths, layered backend design, frontend-boundary decisions, API contracts, domain services, transactions, error design, and architecture documentation.", ["Layered Architecture", "Frontend and Backend Boundaries", "API Contract Evolution", "Domain Services and Transactions", "Architecture Decision Records"]),
-    outlineModule("SE", 10, "Data Structures and Algorithms", "Big O, arrays, strings, hash maps, stacks, queues, linked lists, binary search, sorting, trees, graphs, heaps, intervals, recursion, backtracking, greedy, dynamic programming, and pattern recognition.", ["Complexity and Array Patterns", "Hash Maps, Stacks, and Queues", "Binary Search, Sorting, and Intervals", "Trees, Graphs, BFS, and DFS", "Dynamic Programming and Interview Variations"]),
-    outlineModule("SE", 11, "System Design", "Scalability, latency, availability, load balancing, caching, CDNs, queues, idempotency, consistency, databases, sharding, observability, rate limiting, and design interviews.", ["Scalability and Requirements", "Storage, Caching, and Queues", "Consistency, Idempotency, and Failure Modes", "Security and Observability", "System Design Case Studies"]),
-    outlineModule("SE", 12, "Production Engineering", "Docker, CI/CD, environments, logging, monitoring, debugging, incident thinking, dependency management, release readiness, and operational quality.", ["Docker and Environment Design", "CI/CD and Release Gates", "Logging, Monitoring, and Debugging", "Incident Thinking and Rollbacks", "Production Readiness Review"]),
-    outlineModule("SE", 13, "Interview Preparation", "CV, GitHub, portfolio, JavaScript, TypeScript, React, GraphQL, backend, database, security, DSA, system design, debugging, code review, behavioral interviews, and STAR answers.", ["Portfolio and GitHub Review", "Technical Question Practice", "DSA and System Design Interviews", "Debugging and Code Review Interviews", "Behavioral Interview Practice"]),
-    outlineModule("SE", 14, "Capstone Project", "Production-grade collaborative workflow platform built incrementally with React, TypeScript, GraphQL, FastAPI, PostgreSQL, Docker, CI, tests, docs, screenshots, demo, and retrospective.", ["Capstone Requirements and Architecture", "Full-Stack Implementation Plan", "Auth, Data, and API Delivery", "Testing, CI, and Deployment Docs", "Final Demo and Technical Retrospective"])
-  ];
 }
 
 function buildProjectManagementOutlineModules(): readonly SeedModuleDefinition[] {

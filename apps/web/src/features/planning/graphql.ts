@@ -45,6 +45,7 @@ export interface ScheduledLesson {
   readonly lessonVersionId: string;
   readonly title: string;
   readonly moduleTitle: string;
+  readonly trackSlug: string;
   readonly trackTitle: string;
   readonly difficulty: string;
   readonly learningObjective: string;
@@ -234,6 +235,7 @@ export const DAILY_TASK_FIELDS = gql`
       lessonVersionId
       title
       moduleTitle
+      trackSlug
       trackTitle
       difficulty
       learningObjective

@@ -4,6 +4,14 @@
 
 Reusable Lesson content is separate from scheduled Daily Tasks. A Lesson may have many Lesson Versions. Official scheduling uses only APPROVED Lesson Versions, and completed Task Attempts store snapshots so history remains stable.
 
+For German, the pedagogical source model is richer than the current persisted Lesson shape:
+
+German Program -> CEFR sublevel -> Module -> Learning Unit -> Activity -> Daily Session.
+
+Learning Units represent teachable content such as introductions, accusative case, ordering food, or argumentative writing. Activities represent concrete study actions such as vocabulary study, pronunciation, listening, reading, guided exercise, speaking, writing, review, mediation, and knowledge check. A Daily Session is a deterministic composition of whole activities based on the learner's configured duration.
+
+In the current MVP persistence slice, approved German Daily Sessions are materialized as Lesson Versions so they can reuse existing scheduling, completion, snapshots, resources, exercises, and assessment tags. The normalized Learning Unit and Activity layer is documented in `docs/curriculum/german/` and should be introduced in schema only when authoring or composer tooling needs first-class records.
+
 ## Lesson Structure
 
 Every complete Lesson Version must include:
@@ -87,6 +95,22 @@ Resources must include:
 - citation or source notes;
 - approval state;
 - accessibility warning if the resource has limitations.
+
+German resources also classify the relevant skill, CEFR sublevel, required/optional status, estimated duration, and verification status as described in [German Resource Framework](curriculum/german/12-resource-framework.md).
+
+## German Activity Metadata
+
+German authoring must track activity metadata even when stored in current Lesson Version fields:
+
+| Field | Values |
+| --- | --- |
+| activityType | vocabulary, grammar, listening, reading, guided practice, speaking, writing, pronunciation, review, mediation, knowledge check |
+| estimatedMinutes | Whole-activity estimate |
+| priority | CORE, RECOMMENDED, EXTENSION |
+| reviewStatus | NEW, REVIEW, CONSOLIDATION, EXPANSION |
+| competencyTags | listening, speaking, reading, writing, vocabulary, grammar, pronunciation, interaction, mediation, pragmatic, strategy, real-world-task |
+
+Learner-facing sessions must show the activity material and instructions, not internal activity IDs or authoring metadata.
 
 ## Review Status
 

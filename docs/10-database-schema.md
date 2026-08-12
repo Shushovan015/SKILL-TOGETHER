@@ -63,6 +63,29 @@ Indexes:
 - `lesson_versions(lesson_id, status)`
 - GIN index on `lesson_versions(assessment_tags)`
 
+## German Curriculum Architecture Storage
+
+The German curriculum architecture introduces CEFR sublevels, Learning Units, Activities, competency tags, grammar/vocabulary progression, review status, activity priority, and duration-aware session composition.
+
+For the current MVP proof slice, no new tables are required:
+
+- CEFR sublevel is stored as Lesson difficulty and assessment tag values for approved seed sessions.
+- German start level, target level, and session duration are stored in `enrollments.learning_preferences`.
+- Activity-like learner actions are represented through Lesson Version sections, exercises, knowledge checks, resources, and assessment tags.
+- Daily Task `planned_duration_minutes` records the learner-specific composed session duration.
+
+When authoring tooling needs first-class German curriculum records, introduce normalized tables before duplicating 30/45/60/90-minute lessons:
+
+| Future table | Purpose |
+| --- | --- |
+| `curriculum_levels` | Track CEFR sublevels such as A1.1 through C2.2. |
+| `learning_units` | Pedagogical content units inside modules. |
+| `learning_activities` | Duration, priority, skill tags, review status, and learner-facing activity material. |
+| `competency_tags` | Listening, speaking, reading, writing, vocabulary, grammar, pronunciation, interaction, mediation, pragmatic, strategy, real-world-task. |
+| `grammar_concepts` | Introduce/practise/revisit/expand/integrate lifecycle metadata. |
+| `vocabulary_domains` | Domain progression and lexical item grouping. |
+| `assessment_mappings` | Trace assessment items to taught content, competency, difficulty, and transfer/inference flag. |
+
 ## Planning Tables
 
 | Table | Columns |

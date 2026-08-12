@@ -30,7 +30,7 @@ Gives learners approved curriculum content and gives administrators a safe way t
 - [x] Implement Lesson Version status transitions.
 - [x] Implement basic admin content list.
 - [x] Implement admin Lesson Version editor.
-- [x] Seed first four weeks of approved content.
+- [x] Seed first four weeks of approved content and the complete Software Engineering career programme.
 
 ## Database Tasks
 
@@ -65,7 +65,7 @@ Gives learners approved curriculum content and gives administrators a safe way t
 
 ## Documentation Tasks
 
-- [ ] Update seed-data doc with actual seed IDs.
+- [x] Update seed-data doc with actual seed IDs.
 - [ ] Update content model if implementation fields differ.
 - [x] Record decisions for content tooling changes.
 
@@ -107,5 +107,5 @@ pnpm build
 
 - [x] Implementation complete.
 - [ ] Tests complete.
-- [ ] Documentation updated.
-- [ ] Validation commands passed.
+- [x] Documentation updated.
+- [x] Validation commands passed.

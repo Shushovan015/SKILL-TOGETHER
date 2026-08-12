@@ -29,6 +29,7 @@ export function toDailyTaskDto(task: DailyTaskRecord): DailyTaskDto {
       lessonVersionId: task.lesson.lessonVersionId,
       title: task.lesson.title,
       moduleTitle: task.lesson.moduleTitle,
+      trackSlug: task.lesson.trackSlug,
       trackTitle: task.lesson.trackTitle,
       difficulty: task.lesson.difficulty,
       learningObjective: task.lesson.learningObjective,

@@ -1,5 +1,8 @@
 import type { TrackType } from "../domain/content.types.js";
 import type { LessonVersionEditorInput } from "../domain/content.types.js";
+import { germanA21ContentForLesson } from "./german-a21-content.js";
+import { germanCompleteContentForLesson } from "./german-complete-content.js";
+import { germanProgramModules } from "./german-program-seed.js";
 import {
   professionalContentForLesson,
   projectManagementProfessionalModules,
@@ -67,67 +70,9 @@ export const phase3SeedTracks: readonly SeedTrackDefinition[] = [
     type: "GERMAN",
     title: "German",
     description:
-      "A beginner German track for consistent vocabulary, grammar, pronunciation, reading, listening, writing, and weekly review.",
+      "A CEFR-aligned German programme from A1.1 through C2.2, designed around competencies, learning units, activity-based sessions, review, and integrated assessment.",
     active: true,
-    modules: [
-      module(1, "A1.1 - First Conversations", "Complete beginner sessions covering introductions, spelling, numbers, countries, pronouns, sein, heissen, formal address, and early review.", [
-        lesson("DE-A11-S01", "A1.1 Session 1: Introducing Yourself", "Introduce yourself with greetings, ich/du/Sie, sein, and heissen.", [], 60, "A spoken self-introduction checklist and a 5-6 sentence written introduction.", ["A1.1", "introductions", "pronunciation"], "A1.1"),
-        lesson("DE-A11-S02", "A1.1 Session 2: Alphabet, Spelling, and Names", "Spell names, recognize German letters, and ask someone to repeat or spell.", ["DE-A11-S01"], 60, "Spelling answers, pronunciation notes, and a short name dialogue.", ["A1.1", "alphabet", "spelling"], "A1.1"),
-        lesson("DE-A11-S03", "A1.1 Session 3: Numbers, Countries, and Languages", "Use numbers, countries, languages, and simple origin sentences.", ["DE-A11-S02"], 60, "Number practice, country-language sentences, and a short profile.", ["A1.1", "numbers", "countries"], "A1.1"),
-        lesson("DE-A11-S04", "A1.1 Session 4: Personal Information and W-Questions", "Ask and answer basic W-questions about name, origin, language, and age.", ["DE-A11-S03"], 60, "Question-answer table and a short interview dialogue.", ["A1.1", "w-questions", "personal-information"], "A1.1"),
-        lesson("DE-A11-S05", "A1.1 Session 5: Formal and Informal Introductions", "Choose du or Sie and hold a polite first-meeting conversation.", ["DE-A11-S04"], 60, "Formal/informal scenario answers and a first-meeting dialogue.", ["A1.1", "du-sie", "review"], "A1.1")
-      ]),
-      module(2, "A1.1 - Everyday Foundations", "Structured outline: haben, regular present-tense verbs, sentence structure, yes/no questions, articles der/die/das, ein/eine, plural introduction, family, professions, hobbies, days, dates, time, daily routine, food, ordering, shopping, prices, accusative, modal verbs, separable verbs, negation, prepositions, practical dialogues, revision, and A1.1 assessment.", []),
-      module(3, "A1.2 - Expanding Daily Communication", "Objectives: describe routines, needs, plans, places, simple past experiences, and everyday problems. Grammar: separable verbs, modal verbs, accusative and dative basics, possessives, more prepositions. Skills: short emails, simple announcements, everyday listening, guided conversations. Prerequisite: A1.1. Completion: A1.2 practical assessment.", germanLevelLessons("A1.2", "DE-A12", "DE-A11-S05", [
-        ["Daily Routines and Frequency", "Describe regular daily routines using time expressions and frequency words.", "A daily routine paragraph with five time expressions.", ["routines", "frequency"]],
-        ["Places, Directions, and Appointments", "Ask where places are and arrange a simple appointment.", "A short appointment dialogue and direction notes.", ["places", "appointments"]],
-        ["Modal Verbs for Needs and Plans", "Use modal verbs to express what you can, must, want, and would like to do.", "Eight modal-verb sentences about study, work, and errands.", ["modal-verbs", "plans"]],
-        ["Separable Verbs and Everyday Tasks", "Use common separable verbs in main clauses and simple questions.", "A task list rewritten with separable verbs in sentences.", ["separable-verbs", "word-order"]],
-        ["A1.2 Integrated Review and Practical Email", "Write a short practical message using A1.2 routine, place, and plan language.", "A short email plus a self-correction checklist.", ["review", "email"]]
-      ])),
-      module(4, "A2.1 - Everyday Independence", "Objectives: manage travel, appointments, health, housing, work, and services. Grammar: perfect tense, dative verbs, two-way prepositions, comparatives, subordinate clauses with weil. Skills: longer dialogues, forms, short messages, practical phone calls. Prerequisite: A1.2. Completion: A2.1 scenario assessment.", germanLevelLessons("A2.1", "DE-A21", "DE-A12-S05", [
-        ["Travel Planning and Tickets", "Plan a short trip and ask for ticket, platform, and departure information.", "A travel dialogue and itinerary summary.", ["travel", "tickets"]],
-        ["Appointments, Health, and Services", "Explain a simple problem and book or change an appointment.", "A service-call script and symptom notes.", ["health", "services"]],
-        ["Perfect Tense for Recent Experiences", "Use the perfect tense to describe recent everyday events.", "Ten perfect-tense sentences about yesterday or last week.", ["perfect-tense", "experiences"]],
-        ["Dative Verbs and Two-Way Prepositions", "Use high-frequency dative patterns and place/location phrases.", "A room or city description using dative phrases.", ["dative", "prepositions"]],
-        ["A2.1 Scenario Review", "Handle a practical travel, service, or appointment scenario from start to finish.", "A complete scenario response with vocabulary checklist.", ["review", "scenario"]]
-      ])),
-      module(5, "A2.2 - Connected Everyday Speech", "Objectives: explain preferences, tell simple stories, handle common problems, and understand slower authentic material. Grammar: past tense review, adjective endings introduction, wenn clauses, indirect questions. Skills: connected writing, short presentations, everyday listening. Prerequisite: A2.1. Completion: A2.2 communication assessment.", germanLevelLessons("A2.2", "DE-A22", "DE-A21-S05", [
-        ["Telling Short Stories in Sequence", "Tell a simple past event with connectors and clear sequence.", "A 10-sentence story using sequence markers.", ["storytelling", "connectors"]],
-        ["Preferences, Comparisons, and Reasons", "Compare options and explain preferences with simple reasons.", "A comparison paragraph about two choices.", ["comparisons", "reasons"]],
-        ["Adjective Endings for Everyday Descriptions", "Use basic adjective endings in common noun phrases.", "A description table and five corrected sentences.", ["adjective-endings", "descriptions"]],
-        ["Indirect Questions and Problem Solving", "Ask polite indirect questions while solving an everyday problem.", "A customer-service dialogue with indirect questions.", ["indirect-questions", "problem-solving"]],
-        ["A2.2 Communication Review", "Combine narration, preference, description, and problem-solving language.", "A short presentation script with review notes.", ["review", "presentation"]]
-      ])),
-      module(6, "B1.1 - Independent Foundations", "Objectives: discuss experiences, plans, opinions, work, study, and social topics. Grammar: subordinate clauses, relative clauses introduction, passive introduction, connectors. Skills: structured reading, everyday media listening, opinion speaking, personal letters. Prerequisite: A2.2. Completion: B1.1 integrated assessment.", germanLevelLessons("B1.1", "DE-B11", "DE-A22-S05", [
-        ["Work, Study, and Experience Narratives", "Describe work, study, and learning experiences with useful detail.", "A structured experience narrative with corrections.", ["work", "study", "experiences"]],
-        ["Opinions with Reasons and Connectors", "Give opinions and support them with connected reasons.", "An opinion paragraph using at least five connectors.", ["opinions", "connectors"]],
-        ["Subordinate Clauses with weil, dass, and wenn", "Use common subordinate clauses to explain causes, facts, and conditions.", "Sentence transformations with subordinate clauses.", ["subordinate-clauses", "grammar"]],
-        ["Relative Clauses Introduction", "Add short relative clauses to identify people, places, and things.", "Eight relative-clause sentences from prompts.", ["relative-clauses", "descriptions"]],
-        ["B1.1 Integrated Review", "Combine narrative, opinion, and clause control in an integrated response.", "A B1.1 integrated writing and speaking checklist.", ["review", "integrated-skills"]]
-      ])),
-      module(7, "B1.2 - Independent Communication", "Objectives: sustain conversations, explain reasons, summarize information, and write coherent texts. Grammar: Konjunktiv II for polite requests, passive, relative clauses, nominalization basics. Skills: argumentation, short reports, authentic listening. Prerequisite: B1.1. Completion: B1.2 readiness assessment.", germanLevelLessons("B1.2", "DE-B12", "DE-B11-S05", [
-        ["Sustaining Conversations and Follow-up Questions", "Keep a conversation moving with follow-up questions and reactions.", "A conversation script with follow-up moves marked.", ["conversation", "follow-up"]],
-        ["Summarizing Short Texts and Audio", "Summarize main points from a short text or listening source.", "A five-sentence summary with key vocabulary.", ["summary", "listening"]],
-        ["Polite Requests with Konjunktiv II", "Make polite requests, suggestions, and wishes with Konjunktiv II.", "Ten polite request sentences and a short dialogue.", ["konjunktiv-ii", "politeness"]],
-        ["Passive Voice and Process Descriptions", "Describe processes using passive structures where useful.", "A short process description using active and passive forms.", ["passive", "processes"]],
-        ["B1.2 Readiness Review", "Produce a coherent B1-level response across conversation, summary, and process tasks.", "A readiness checklist plus one integrated written response.", ["review", "readiness"]]
-      ])),
-      module(8, "B2.1 - Upper-Intermediate Control", "Objectives: understand complex topics, participate in discussions, and write structured arguments. Grammar: advanced connectors, passive alternatives, participle constructions introduction, style/register. Skills: article reading, presentation, formal correspondence. Prerequisite: B1.2. Completion: B2.1 assessment.", germanLevelLessons("B2.1", "DE-B21", "DE-B12-S05", [
-        ["Structured Arguments and Discussion Language", "Build a clear argument with claim, reason, example, and limitation.", "A structured argument paragraph and speaking outline.", ["argumentation", "discussion"]],
-        ["Formal Correspondence and Register", "Write formal messages with appropriate register and clear requests.", "A formal email with register notes.", ["formal-writing", "register"]],
-        ["Advanced Connectors and Text Cohesion", "Use advanced connectors to link contrast, cause, result, and concession.", "A revised text showing cohesion improvements.", ["advanced-connectors", "cohesion"]],
-        ["Presentations on Complex Topics", "Prepare and deliver a short structured presentation on a complex topic.", "A presentation outline with introduction, transitions, and conclusion.", ["presentation", "complex-topics"]],
-        ["B2.1 Assessment Preparation", "Review B2.1 argument, register, cohesion, and presentation skills.", "A B2.1 preparation response with self-assessment.", ["review", "assessment-prep"]]
-      ])),
-      module(9, "B2.2 - Professional and Academic Fluency", "Objectives: follow detailed media, defend viewpoints, write polished texts, and communicate professionally. Grammar: advanced sentence style, nuanced modality, idioms, text cohesion. Skills: debate, reports, interviews, workplace scenarios. Prerequisite: B2.1. Completion: B2.2 assessment.", germanLevelLessons("B2.2", "DE-B22", "DE-B21-S05", [
-        ["Professional Meetings and Interviews", "Participate in professional conversations with precise answers and follow-up questions.", "An interview answer bank and meeting response script.", ["interviews", "meetings"]],
-        ["Academic and Media Comprehension", "Extract arguments, evidence, and stance from advanced texts or media.", "A comprehension map with thesis, support, and open questions.", ["media", "academic-reading"]],
-        ["Debate, Nuance, and Counterarguments", "Defend a viewpoint while acknowledging tradeoffs and counterarguments.", "A debate outline with counterargument responses.", ["debate", "nuance"]],
-        ["Reports, Recommendations, and Executive Summaries", "Write a concise report or recommendation with evidence and next steps.", "A one-page report draft with revision notes.", ["reports", "recommendations"]],
-        ["B2.2 Fluency Review", "Integrate professional, academic, and debate language in a final B2.2 response.", "A final fluency portfolio entry and self-assessment.", ["review", "fluency"]]
-      ]))
-    ]
+    modules: germanProgramModules
   }
 ];
 
@@ -235,6 +180,22 @@ function softwareEngineeringContent(lessonDefinition: SeedLessonDefinition): Lea
 }
 
 function germanContent(lessonDefinition: SeedLessonDefinition): LearnerSeedContent {
+  const a21Content = germanA21ContentForLesson(lessonDefinition);
+
+  if (a21Content !== null) {
+    return a21Content;
+  }
+
+  const completeGermanContent = germanCompleteContentForLesson(lessonDefinition);
+
+  if (completeGermanContent !== null) {
+    return completeGermanContent;
+  }
+
+  if (lessonDefinition.identifier.startsWith("DE-A11-M01")) {
+    return germanArchitectureSampleContent(lessonDefinition);
+  }
+
   const topic = germanTopic(lessonDefinition);
 
   return {
@@ -310,6 +271,239 @@ function projectManagementContent(lessonDefinition: SeedLessonDefinition): Learn
       }
     ],
     knowledgeChecks: topic.knowledgeChecks
+  };
+}
+
+function germanArchitectureSampleContent(lessonDefinition: SeedLessonDefinition): LearnerSeedContent {
+  if (lessonDefinition.identifier === "DE-A11-M01-S01") {
+    return {
+      outcomes: [
+        "Choose an appropriate greeting and goodbye for a simple first meeting.",
+        "Say and write your name with `Ich hei\u00DFe ...` and `Ich bin ...`.",
+        "Ask for another person's name with informal `du` and formal `Sie`.",
+        "Notice the first-person and second-person forms of `sein` and `hei\u00DFen`.",
+        "Complete a short spoken and written introduction."
+      ],
+      explanationMarkdown: [
+        "Session path for a meaningful 60-minute study block: 5 min retrieval/orientation, 10 min greetings and pronunciation, 10 min name patterns, 10 min du/Sie grammar in context, 10 min listening/reading mini-dialogues, 10 min guided speaking/writing, 5 min check.",
+        "Greetings: `Hallo` is broadly useful. `Guten Morgen` is for the morning. `Guten Tag` is polite and neutral during the day. `Guten Abend` is for the evening. Common goodbyes are `Tsch\u00FCss` in informal contexts and `Auf Wiedersehen` in more formal contexts.",
+        "Name patterns: `Ich hei\u00DFe Anna` means my name is Anna. `Ich bin Anna` means I am Anna. Both are useful for introductions.",
+        "Questions: informal `Wie hei\u00DFt du?` is for a classmate, friend, or someone who has offered `du`. Formal `Wie hei\u00DFen Sie?` is safer with an adult stranger, official, teacher, or workplace contact.",
+        "Grammar in context: `ich bin`, `du bist`, `Sie sind`; `ich hei\u00DFe`, `du hei\u00DFt`, `Sie hei\u00DFen`. Do not mix informal and formal forms in the same short exchange.",
+        "Pronunciation focus: say the first syllable clearly in `Hallo`; keep `ie` in `Sie` long; practise the h sound in `hei\u00DFe`."
+      ].join("\n\n"),
+      relevanceMarkdown:
+        "A first meeting is a real communication task. The goal is not to memorize greeting lists, but to start, continue, and close a short exchange politely and accurately.",
+      examples: [
+        "Informal:\nA: Hallo. Ich hei\u00DFe Anna. Wie hei\u00DFt du?\nB: Ich hei\u00DFe Nico.\nA: Sch\u00F6n. Tsch\u00FCss!\nB: Tsch\u00FCss!",
+        "Formal:\nA: Guten Tag. Ich bin Frau Berger. Wie hei\u00DFen Sie?\nB: Ich hei\u00DFe Omar Khan.\nA: Danke. Auf Wiedersehen.",
+        "Mini contrast:\nInformal: Wie hei\u00DFt du? Du bist Anna.\nFormal: Wie hei\u00DFen Sie? Sie sind Herr Khan."
+      ],
+      commonMistakes: [
+        "Using `du` automatically with an adult stranger.",
+        "Mixing `du bist` and formal `Sie` in one sentence.",
+        "Reading silently and skipping pronunciation.",
+        "Stretching greetings into a whole session without using them in a real exchange."
+      ],
+      resources: [
+        verifiedResource({
+          title: "Practise German for free",
+          provider: "Goethe-Institut",
+          url: "https://www.goethe.de/en/spr/ueb.html",
+          resourceType: "EXTRA_PRACTICE",
+          difficulty: "A1.1",
+          estimatedMinutes: 10,
+          description: "Optional beginner practice to reinforce first German phrases.",
+          required: false
+        })
+      ],
+      exercises: [
+        {
+          kind: "guided",
+          promptMarkdown:
+            "Complete the dialogue, then say it aloud twice.\n\nA: Hallo. Ich ______ Anna. Wie ______ du?\nB: Ich ______ Ben.\nA: Sch\u00F6n. ______!\n\nNow make it formal:\nA: Guten Tag. Ich ______ Frau Bauer. Wie ______ Sie?\nB: Ich ______ Ahmed Khan.\nA: Danke. Auf Wiedersehen.",
+          expectedEvidence: "Completed informal and formal dialogues plus one pronunciation note.",
+          solutionNotesMarkdown: "Use `hei\u00DFe`, `hei\u00DFt`, `hei\u00DFe`, `Tsch\u00FCss`, then `bin`, `hei\u00DFen`, `hei\u00DFe`."
+        },
+        {
+          kind: "independent",
+          promptMarkdown:
+            "Write your own first-meeting exchange. Include one greeting, your name with `Ich hei\u00DFe ...`, one informal name question, one formal name question, one thank-you, and one goodbye. Then speak it aloud.",
+          expectedEvidence: lessonDefinition.evidence,
+          solutionNotesMarkdown: null
+        }
+      ],
+      knowledgeChecks: [
+        {
+          question: "Which question is formal: `Wie hei\u00DFt du?` or `Wie hei\u00DFen Sie?`",
+          answerKey: ["Wie hei\u00DFen Sie?"],
+          explanation: "`Sie` is the formal form of you."
+        },
+        {
+          question: "Complete: `Ich ____ Anna.`",
+          answerKey: ["hei\u00DFe", "bin"],
+          explanation: "Both `Ich hei\u00DFe Anna` and `Ich bin Anna` can introduce your name."
+        },
+        {
+          question: "When is `Guten Morgen` appropriate?",
+          answerKey: ["In the morning."],
+          explanation: "`Guten Morgen` is the morning greeting."
+        }
+      ]
+    };
+  }
+
+  if (lessonDefinition.identifier === "DE-A11-M01-S02") {
+    return {
+      outcomes: [
+        "Recognize and practise German alphabet letter names.",
+        "Spell a first name and surname slowly.",
+        "Ask someone to spell or repeat information politely.",
+        "Distinguish common beginner sound contrasts such as `ei` and `ie`.",
+        "Write a short spelling-and-repair dialogue."
+      ],
+      explanationMarkdown: [
+        "Session path: 5 min retrieval of greetings, 10 min alphabet and sound contrasts, 10 min spelling names, 10 min repair phrases, 10 min listening/reading mini-dialogues, 10 min guided practice, 5 min check.",
+        "Alphabet work matters because names, streets, email addresses, and usernames are often spelled. Practise in chunks: first your own name, then common names, then short words.",
+        "Useful repair phrases: `Noch einmal, bitte` means one more time, please. `Langsam, bitte` means slowly, please. `Wie schreibt man das?` means how do you write that? `Buchstabieren Sie bitte` means please spell it.",
+        "Sound focus: `ei` sounds like English eye, as in `hei\u00DFe`. `ie` is a long ee sound, as in `Sie`. Keep them separate from the beginning.",
+        "Politeness: adding `bitte` makes repair requests usable in real interaction."
+      ].join("\n\n"),
+      relevanceMarkdown:
+        "Spelling and repair phrases let a beginner keep a conversation alive instead of switching immediately to English.",
+      examples: [
+        "A: Wie hei\u00DFen Sie?\nB: Ich hei\u00DFe Sara M\u00FCller.\nA: Wie schreibt man M\u00FCller?\nB: M-\u00DC-L-L-E-R.",
+        "A: Wie hei\u00DFt du?\nB: Ich hei\u00DFe Lea.\nA: Noch einmal, bitte.\nB: Lea.",
+        "Sound contrast: `Sie` has `ie`; `hei\u00DFe` has `ei`."
+      ],
+      commonMistakes: [
+        "Using English letter names when practising German spelling.",
+        "Forgetting `bitte` in repair phrases.",
+        "Confusing `ei` and `ie`.",
+        "Spelling only silently instead of speaking the letters."
+      ],
+      resources: [
+        verifiedResource({
+          title: "Practise German for free",
+          provider: "Goethe-Institut",
+          url: "https://www.goethe.de/en/spr/ueb.html",
+          resourceType: "EXTRA_PRACTICE",
+          difficulty: "A1.1",
+          estimatedMinutes: 10,
+          description: "Optional beginner practice for alphabet, words, and phrases.",
+          required: false
+        })
+      ],
+      exercises: [
+        {
+          kind: "guided",
+          promptMarkdown:
+            "Fill the gaps.\n\nA: Wie ______ man das?\nB: L-E-A.\nA: Noch einmal, ______.\nB: Lea.\nA: Buchstabieren Sie ______.\nB: M-A-R-I-A.\n\nNow spell your own first name and one surname.",
+          expectedEvidence: "Completed repair dialogue, your spelled name, and one `ei`/`ie` note.",
+          solutionNotesMarkdown: "Use `schreibt`, `bitte`, and `bitte`."
+        },
+        {
+          kind: "independent",
+          promptMarkdown:
+            "Write a short dialogue with greeting, name question, one spelling request, one repeat request, and goodbye. Use `bitte` at least twice. Say the dialogue aloud.",
+          expectedEvidence: lessonDefinition.evidence,
+          solutionNotesMarkdown: null
+        }
+      ],
+      knowledgeChecks: [
+        {
+          question: "What does `Noch einmal, bitte` mean?",
+          answerKey: ["One more time, please."],
+          explanation: "Use it when you need repetition."
+        },
+        {
+          question: "Which phrase asks `How do you write that?`",
+          answerKey: ["Wie schreibt man das?"],
+          explanation: "This is the practical spelling question."
+        },
+        {
+          question: "Which spelling pattern is in `Sie`: `ei` or `ie`?",
+          answerKey: ["ie"],
+          explanation: "`ie` is the long ee sound."
+        }
+      ]
+    };
+  }
+
+  return {
+    outcomes: [
+      "Use numbers 0-100 in short practical contexts.",
+      "Say where you come from with `Ich komme aus ...`.",
+      "Name languages with `Ich spreche ...` and `Ich lerne Deutsch`.",
+      "Ask another person where they come from informally and formally.",
+      "Write a short mini profile with name, origin, languages, and one number."
+    ],
+    explanationMarkdown: [
+      "Session path: 5 min retrieval of introduction/spelling, 10 min numbers, 10 min countries and languages, 10 min origin questions, 10 min listening/reading profiles, 10 min guided production, 5 min check.",
+      "Numbers are useful immediately for phone numbers, ages, room numbers, addresses, and prices. Practise saying digits separately first: null, eins, zwei, drei, vier, f\u00FCnf, sechs, sieben, acht, neun.",
+      "Origin pattern: `Ich komme aus Nepal` means I come from Nepal. Informal question: `Woher kommst du?` Formal question: `Woher kommen Sie?`",
+      "Language pattern: `Ich spreche Englisch` means I speak English. `Ich lerne Deutsch` means I am learning German.",
+      "Mini profile pattern: `Ich hei\u00DFe ... Ich komme aus ... Ich spreche ... Ich lerne Deutsch. Meine Nummer ist ...`"
+    ].join("\n\n"),
+    relevanceMarkdown:
+      "Numbers, countries, and languages make introductions practical. They also prepare the learner for forms, appointments, and classroom interaction.",
+    examples: [
+      "Ich hei\u00DFe Mira. Ich komme aus Indien. Ich spreche Hindi und Englisch. Ich lerne Deutsch.",
+      "A: Woher kommst du?\nB: Ich komme aus Polen. Und du?",
+      "Formal: Woher kommen Sie? - Ich komme aus Marokko.",
+      "Meine Nummer ist null-eins-sieben-sechs."
+    ],
+    commonMistakes: [
+      "Trying to memorize all numbers without using them in a real phrase.",
+      "Forgetting the verb in `Ich spreche ...`.",
+      "Using informal `kommst du` with formal `Sie`.",
+      "Writing long profiles before the short patterns are accurate."
+    ],
+    resources: [
+      verifiedResource({
+        title: "Super Easy German",
+        provider: "Easy German",
+        url: "https://www.easygerman.org/",
+        resourceType: "VIDEO",
+        difficulty: "A1.1",
+        estimatedMinutes: 10,
+        description: "Optional accessible exposure to simple German phrases and natural speakers.",
+        required: false
+      })
+    ],
+    exercises: [
+      {
+        kind: "guided",
+        promptMarkdown:
+          "Complete the profile.\n\nIch hei\u00DFe ______.\nIch komme aus ______.\nIch spreche ______.\nIch lerne Deutsch.\nMeine Nummer ist ______.\n\nNow write two questions: one informal `Woher ...?` and one formal `Woher ...?`.",
+        expectedEvidence: "Completed profile, two origin questions, and a spoken number practice note.",
+        solutionNotesMarkdown: "Use `Woher kommst du?` and `Woher kommen Sie?`."
+      },
+      {
+        kind: "independent",
+        promptMarkdown:
+          "Write a six-line mini profile. Include your name, country, language(s), German learning goal, one number, and one question for another person. Say it aloud.",
+        expectedEvidence: lessonDefinition.evidence,
+        solutionNotesMarkdown: null
+      }
+    ],
+    knowledgeChecks: [
+      {
+        question: "How do you ask informally `Where do you come from?`",
+        answerKey: ["Woher kommst du?"],
+        explanation: "`du` uses `kommst`."
+      },
+      {
+        question: "What does `Ich lerne Deutsch` mean?",
+        answerKey: ["I am learning German."],
+        explanation: "`lernen` means to learn."
+      },
+      {
+        question: "Complete: `Ich ______ Englisch.`",
+        answerKey: ["spreche"],
+        explanation: "Use `spreche` for I speak."
+      }
+    ]
   };
 }
 
@@ -512,7 +706,7 @@ function softwareResource(lessonDefinition: SeedLessonDefinition) {
 }
 
 function germanTopic(lessonDefinition: SeedLessonDefinition) {
-  if (lessonDefinition.identifier === "DE-A11-S01") {
+  if (lessonDefinition.identifier === "DE-A11-S01" || lessonDefinition.identifier === "DE-A11-M01-S01") {
     return {
       outcomes: [
         "Use common greetings and goodbye phrases.",
@@ -569,7 +763,7 @@ function germanTopic(lessonDefinition: SeedLessonDefinition) {
     };
   }
 
-  if (lessonDefinition.identifier === "DE-A11-S02") {
+  if (lessonDefinition.identifier === "DE-A11-S02" || lessonDefinition.identifier === "DE-A11-M01-S02") {
     return {
       outcomes: [
         "Review greetings and name questions from Session 1.",
@@ -623,7 +817,7 @@ function germanTopic(lessonDefinition: SeedLessonDefinition) {
     };
   }
 
-  if (lessonDefinition.identifier === "DE-A11-S03") {
+  if (lessonDefinition.identifier === "DE-A11-S03" || lessonDefinition.identifier === "DE-A11-M01-S03") {
     return {
       outcomes: [
         "Review greetings, names, and spelling.",
@@ -878,72 +1072,5 @@ function projectManagementTopic(lessonDefinition: SeedLessonDefinition) {
         explanation: "Shared tradeoff awareness prevents surprises."
       }
     ]
-  };
-}
-
-function module(
-  sequence: number,
-  title: string,
-  summary: string,
-  lessons: readonly SeedLessonDefinition[]
-): SeedModuleDefinition {
-  return {
-    sequence,
-    title,
-    summary,
-    lessons
-  };
-}
-
-function germanLevelLessons(
-  level: string,
-  identifierPrefix: string,
-  firstPrerequisite: string,
-  definitions: readonly [
-    title: string,
-    objective: string,
-    evidence: string,
-    tags: readonly string[]
-  ][]
-): readonly SeedLessonDefinition[] {
-  return definitions.map(([title, objective, evidence, tags], index) => {
-    const identifier = `${identifierPrefix}-S${String(index + 1).padStart(2, "0")}`;
-    const prerequisite = index === 0
-      ? firstPrerequisite
-      : `${identifierPrefix}-S${String(index).padStart(2, "0")}`;
-
-    return lesson(
-      identifier,
-      `${level} Session ${index + 1}: ${title}`,
-      objective,
-      [prerequisite],
-      60,
-      evidence,
-      [level, ...tags],
-      level
-    );
-  });
-}
-
-function lesson(
-  identifier: string,
-  title: string,
-  objective: string,
-  prerequisites: readonly string[],
-  durationMinutes: number,
-  evidence: string,
-  tags: readonly string[],
-  level?: string
-): SeedLessonDefinition {
-  return {
-    identifier,
-    title,
-    objective,
-    prerequisites,
-    durationMinutes,
-    required: true,
-    evidence,
-    tags,
-    ...(level === undefined ? {} : { level })
   };
 }

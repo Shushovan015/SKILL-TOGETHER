@@ -134,6 +134,9 @@ export class ScheduledLessonDto {
   public moduleTitle!: string;
 
   @Field()
+  public trackSlug!: string;
+
+  @Field()
   public trackTitle!: string;
 
   @Field()

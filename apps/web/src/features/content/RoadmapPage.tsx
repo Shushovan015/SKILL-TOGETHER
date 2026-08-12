@@ -138,7 +138,9 @@ const cefrGroups = [
   { group: "A1", levels: ["A1.1", "A1.2"] },
   { group: "A2", levels: ["A2.1", "A2.2"] },
   { group: "B1", levels: ["B1.1", "B1.2"] },
-  { group: "B2", levels: ["B2.1", "B2.2"] }
+  { group: "B2", levels: ["B2.1", "B2.2"] },
+  { group: "C1", levels: ["C1.1", "C1.2"] },
+  { group: "C2", levels: ["C2.1", "C2.2"] }
 ] as const;
 
 function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX.Element {
@@ -146,6 +148,11 @@ function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): Rea
   const targetLevel = enrollment.germanTargetLevel ?? "A1.2";
   const currentIndex = germanLevelIndex(currentLevel);
   const targetIndex = germanLevelIndex(targetLevel);
+  const currentModule = enrollment.track.modules.find((moduleRecord) => moduleRecord.title.includes(currentLevel));
+  const pathStartIndex = Math.min(currentIndex, targetIndex);
+  const pathEndIndex = Math.max(currentIndex, targetIndex);
+  const pathLength = pathEndIndex - pathStartIndex + 1;
+  const completedInPath = Math.max(0, currentIndex - pathStartIndex);
 
   return (
     <section className="roadmap roadmap--learner" aria-label="German CEFR roadmap">
@@ -158,6 +165,11 @@ function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): Rea
           Current level: {currentLevel}. Target level: {targetLevel}. Session length:{" "}
           {enrollment.germanSessionDurationMinutes ?? 60} minutes.
         </p>
+        <p>
+          Current module: {currentModule?.title ?? currentLevel}. Path progress: {completedInPath} of{" "}
+          {pathLength} selected sublevels completed before the current level.
+        </p>
+        <p>Skills requiring review: shown after completed assessments provide evidence.</p>
       </div>
       {cefrGroups.map((group) => (
         <article className="module-panel" key={group.group}>
@@ -174,7 +186,7 @@ function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): Rea
 
               return (
                 <li className={`roadmap-list__item roadmap-list__item--${state}`} key={level}>
-                  <span aria-hidden="true">{state === "completed" ? "✓" : state === "current" ? "->" : "o"}</span>
+                  <span aria-hidden="true">{stateMarker(state)}</span>
                   <span>
                     <strong>
                       {level}
@@ -190,7 +202,7 @@ function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): Rea
       ))}
       <section className="module-panel">
         <h3>Current modules</h3>
-        <p>{enrollment.track.modules.find((moduleRecord) => moduleRecord.title.includes(currentLevel))?.summary ?? "Detailed sessions for this level are being prepared."}</p>
+        <p>{currentModule?.summary ?? "Detailed sessions for this level are being prepared."}</p>
       </section>
     </section>
   );
@@ -201,5 +213,26 @@ function normalizedGermanStartLevel(level: string): string {
 }
 
 function germanLevelIndex(level: string): number {
-  return ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"].indexOf(level);
+  return [
+    "A1.1",
+    "A1.2",
+    "A2.1",
+    "A2.2",
+    "B1.1",
+    "B1.2",
+    "B2.1",
+    "B2.2",
+    "C1.1",
+    "C1.2",
+    "C2.1",
+    "C2.2"
+  ].indexOf(level);
+}
+
+function stateMarker(state: "completed" | "current" | "upcoming"): string {
+  if (state === "completed") {
+    return "\u2713";
+  }
+
+  return state === "current" ? "\u2192" : "\u25CB";
 }

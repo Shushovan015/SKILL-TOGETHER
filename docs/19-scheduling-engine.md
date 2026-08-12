@@ -184,3 +184,20 @@ Given a learner pauses for one week, future incomplete tasks shift after the pau
 - Assessment day is not a study day: allowed, but assessment duration must fit configured availability or separate assessment capacity.
 - Multiple tracks: main track and German track are scheduled independently, then combined dashboard capacity is checked.
 - User changes time zone: future date calculations use new time zone; historical snapshots remain unchanged.
+
+## German Duration-Aware Session Composition
+
+German scheduling must not treat one topic as one fixed study day. The German curriculum source hierarchy is CEFR sublevel -> Module -> Learning Unit -> Activity -> Daily Session. The session composer chooses whole activities for the learner's configured duration.
+
+Initial deterministic composition rules:
+
+1. Normalize Complete Beginner to A1.1.
+2. Include only German content at or above the start sublevel and at or below the target sublevel.
+3. Select required CORE activities first.
+4. Add deterministic review activities when due.
+5. Add RECOMMENDED activities while capacity remains.
+6. Add EXTENSION activities only when the duration supports them.
+7. Never split an activity halfway to fit time.
+8. Preserve skill balance across the week: listening, speaking, reading, writing, vocabulary, grammar, pronunciation, interaction, mediation where appropriate, and pragmatic competence.
+
+Supported German durations are 30, 45, 60, and 90 minutes. Current MVP persistence materializes proof-slice German sessions as approved Lesson Versions with the scheduled Daily Task carrying the selected duration. Future normalized composer work should output a Daily Task session plan from Learning Unit and Activity records rather than duplicating complete lessons for every duration.

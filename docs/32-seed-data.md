@@ -35,7 +35,7 @@ Safe approach:
 | Project Management | `project-management` | PROJECT_MANAGEMENT |
 | German | `german` | GERMAN |
 
-## Four-Week Representative Curriculum
+## Seeded Curriculum Coverage
 
 Detailed lesson definitions live in:
 
@@ -43,7 +43,19 @@ Detailed lesson definitions live in:
 - [34 Curriculum: Project Management](34-curriculum-project-management.md)
 - [35 Curriculum: German](35-curriculum-german.md)
 
-Seed all first-four-week lessons as APPROVED Lesson Versions and seed reviewed assessment questions for each week.
+Software Engineering seed coverage:
+
+- Complete five-to-six-month career programme.
+- 14 professional phases, 24 weekly modules, and 120 approved learner-facing Lesson Versions.
+- Each Software Engineering lesson includes 60/90/120-minute duration guidance, explanation, scenario, guided exercise, independent exercise, answer notes, knowledge checks, common mistakes, resources, interview questions, and portfolio or capstone linkage.
+- The final phase is a five-session capstone for a production-style collaborative workflow platform with React, TypeScript, GraphQL boundary work, FastAPI, PostgreSQL, auth, authorization, security, tests, Docker, CI, deployment notes, ADRs, README, screenshots/demo notes, and retrospective.
+
+Project Management seed coverage:
+
+- First 15 beginner-to-junior PM sessions are fully authored.
+- Later PM modules remain structured roadmap/session outlines for future detailed authoring.
+
+For German, the seed now stores the prior A1.1 Module 1 proof slice plus complete learner-facing A2.1 through C2.2 learning-unit sessions as APPROVED Lesson Versions. These German sessions use the existing Lesson Version, Resource, Exercise, and Knowledge Check tables; no separate Learning Unit or Activity tables are required for the MVP seed.
 
 ## Sample Schedule
 
@@ -53,12 +65,18 @@ Main track schedule:
 - Main session duration: 120 minutes.
 - Assessment day: Friday.
 - Recovery day: Saturday.
+- Software Engineering now materializes 24 study weeks of approved career-program sessions.
 
 German schedule:
 
 - Study days: Monday through Friday.
-- Session duration: 30 to 60 minutes.
-- Weekly review and short assessment on Friday.
+- Session duration: 30, 45, 60, or 90 minutes.
+- Complete Beginner maps to A1.1.
+- Current and target levels support A1.1 through C2.2.
+- Current architecture seed includes CEFR roadmap modules for A1.1 through C2.2.
+- Detailed learner-facing German content includes the prior A1.1 Module 1 proof slice and 500 A2.1 through C2.2 sessions: 10 sublevels x 10 modules x 5 learning-unit sessions.
+- Each implemented A2.1-C2.2 German session includes duration guidance for 30, 45, 60, and 90 minutes, in-app explanation, examples, guided and independent evidence tasks, a verified supplemental Goethe-Institut resource, and knowledge checks.
+- Weekly review and short assessment remain the intended pattern for the later A1.1/A1.2 detailed expansion.
 
 ## Sample Completed and Missed Tasks
 
@@ -66,7 +84,7 @@ Seed for test/demo:
 
 - Software learner: week 1 day 1 completed, week 1 day 2 completed, week 1 day 3 missed, future tasks planned.
 - Project learner: week 1 day 1 completed, week 1 day 2 planned.
-- German learner: week 1 day 1 completed, week 1 day 2 missed.
+- German learner: week 1 day 1 completed, week 1 day 2 missed, using the available German detailed seed sessions for the configured start level. Detailed generated identifiers follow `DE-{level-code}-M{module}-S{session}`, for example `DE-A21-M01-S01` through `DE-C22-M10-S05`.
 
 ## Sample Assessment
 
@@ -79,6 +97,20 @@ For each track week:
 - track-specific practical question.
 
 Assessment Versions should be REVIEWED or APPROVED and linked to assessment tags from lessons.
+
+Software Engineering assessment seed behavior:
+
+- Reviewed question seeds are generated from approved Software Engineering lesson assessment tags.
+- Every studied tag receives a professional assessment set: knowledge, explain/application, coding challenge, debugging challenge, architecture/design case study, interview answer, and interview feedback/reflection.
+- Coding, debugging, design, interview, and reflection items use manual grading mode in the current MVP assessment engine.
+- Assessment selection prefers a mix of available question types before filling the remaining weekly question limit.
+
+German assessment seed behavior:
+
+- German reviewed question seeds are generated from approved module-level German curriculum assessment tags.
+- Internal structural tags such as CEFR labels, module numbers, and generic unit competency labels are not treated as examinable topics.
+- Each assessable German tag receives CEFR-aware multiple-choice, multiple-select, scenario, and reflection items.
+- Final sublevel assessment lessons use the same tag path and can therefore surface in weekly/periodic assessment selection after completion.
 
 ## Partner Connection
 

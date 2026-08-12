@@ -998,7 +998,11 @@ function isGermanLevel(value: unknown): value is GermanLevel {
     value === "B1.1" ||
     value === "B1.2" ||
     value === "B2.1" ||
-    value === "B2.2"
+    value === "B2.2" ||
+    value === "C1.1" ||
+    value === "C1.2" ||
+    value === "C2.1" ||
+    value === "C2.2"
   );
 }
 

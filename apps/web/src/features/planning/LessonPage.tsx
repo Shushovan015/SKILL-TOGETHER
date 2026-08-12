@@ -25,7 +25,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
   const { dailyTaskId } = useParams();
   const client = useApolloClient();
   const navigate = useNavigate();
-  const [durationMinutes, setDurationMinutes] = useState(60);
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [guidedEvidence, setGuidedEvidence] = useState("");
   const [independentEvidence, setIndependentEvidence] = useState("");
   const [knowledgeCheckEvidence, setKnowledgeCheckEvidence] = useState("");
@@ -48,6 +48,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
     CompleteDailyTaskMutationData,
     CompleteDailyTaskMutationVariables
   >(COMPLETE_DAILY_TASK_MUTATION);
+  const task = query.data?.dailyTask;
 
   if (dailyTaskId === undefined) {
     return (
@@ -73,8 +74,6 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
     );
   }
 
-  const task = query.data?.dailyTask;
-
   if (task === undefined) {
     return (
       <main className="status-page" role="alert">
@@ -84,6 +83,8 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
   }
 
   const taskId = task.id;
+  const selectedDurationMinutes = durationMinutes ?? task.plannedDurationMinutes;
+  const roadmapUrl = `/roadmap?track=${encodeURIComponent(task.lesson.trackSlug)}`;
 
   async function runWithCsrf(action: (csrfToken: string) => Promise<void>): Promise<void> {
     setActionError(undefined);
@@ -127,7 +128,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
         variables: {
           input: {
             dailyTaskId: taskId,
-            durationMinutes,
+            durationMinutes: selectedDurationMinutes,
             completionEvidence: {
               guidedExercise: guidedEvidence,
               independentExercise: independentEvidence,
@@ -166,7 +167,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
           <Link className="button-link button-link--secondary" to={`/plan/week/${task.studyWeekNumber}`}>
             This Week
           </Link>
-          <Link className="button-link button-link--secondary" to={`/roadmap`}>
+          <Link className="button-link button-link--secondary" to={roadmapUrl}>
             Roadmap
           </Link>
         </div>
@@ -186,7 +187,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
       {exerciseOnly ? (
         <LessonCompletionForm
           completeLoading={completeState.loading}
-          durationMinutes={durationMinutes}
+          durationMinutes={selectedDurationMinutes}
           guidedEvidence={guidedEvidence}
           independentEvidence={independentEvidence}
           knowledgeCheckEvidence={knowledgeCheckEvidence}
@@ -255,18 +256,29 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
       <ExerciseSection
         evidence={task.lesson.guidedExercise.expectedEvidence}
         prompt={task.lesson.guidedExercise.promptMarkdown}
+        solutionNotes={task.lesson.guidedExercise.solutionNotesMarkdown ?? null}
         title="Try It With Me"
       />
       <ExerciseSection
         evidence={task.lesson.independentExercise.expectedEvidence}
         prompt={task.lesson.independentExercise.promptMarkdown}
+        solutionNotes={task.lesson.independentExercise.solutionNotesMarkdown ?? null}
         title="Practice By Yourself"
       />
       <section>
         <h2>Check Your Understanding</h2>
         <ol>
           {task.lesson.knowledgeChecks.map((check) => (
-            <li key={check.id}>{check.question}</li>
+            <li key={check.id}>
+              <p>{check.question}</p>
+              <details>
+                <summary>Show answer and feedback</summary>
+                <p>
+                  <strong>Answer:</strong> {(check.answerKey ?? ["No answer key available."]).join(" / ")}
+                </p>
+                <p>{check.explanation ?? "No explanation available."}</p>
+              </details>
+            </li>
           ))}
         </ol>
       </section>
@@ -307,10 +319,12 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
 function ExerciseSection({
   evidence,
   prompt,
+  solutionNotes,
   title
 }: {
   readonly evidence: string;
   readonly prompt: string;
+  readonly solutionNotes: string | null;
   readonly title: string;
 }): React.JSX.Element {
   return (
@@ -320,6 +334,12 @@ function ExerciseSection({
       <p>
         <strong>What to write down:</strong> {evidence}
       </p>
+      {solutionNotes === null ? null : (
+        <details>
+          <summary>Show answer notes</summary>
+          <p className="preserve-lines">{solutionNotes}</p>
+        </details>
+      )}
     </section>
   );
 }
@@ -360,13 +380,32 @@ function LessonCompletionForm({
   return (
     <section className="lesson-layout">
       <article className="lesson-content">
-        <ExerciseSection title="Try It With Me" prompt={task.lesson.guidedExercise.promptMarkdown} evidence={task.lesson.guidedExercise.expectedEvidence} />
-        <ExerciseSection title="Practice By Yourself" prompt={task.lesson.independentExercise.promptMarkdown} evidence={task.lesson.independentExercise.expectedEvidence} />
+        <ExerciseSection
+          title="Try It With Me"
+          prompt={task.lesson.guidedExercise.promptMarkdown}
+          evidence={task.lesson.guidedExercise.expectedEvidence}
+          solutionNotes={task.lesson.guidedExercise.solutionNotesMarkdown ?? null}
+        />
+        <ExerciseSection
+          title="Practice By Yourself"
+          prompt={task.lesson.independentExercise.promptMarkdown}
+          evidence={task.lesson.independentExercise.expectedEvidence}
+          solutionNotes={task.lesson.independentExercise.solutionNotesMarkdown ?? null}
+        />
         <section>
           <h2>Check Your Understanding</h2>
           <ol>
             {task.lesson.knowledgeChecks.map((check) => (
-              <li key={check.id}>{check.question}</li>
+              <li key={check.id}>
+                <p>{check.question}</p>
+                <details>
+                  <summary>Show answer and feedback</summary>
+                  <p>
+                    <strong>Answer:</strong> {(check.answerKey ?? ["No answer key available."]).join(" / ")}
+                  </p>
+                  <p>{check.explanation ?? "No explanation available."}</p>
+                </details>
+              </li>
             ))}
           </ol>
         </section>

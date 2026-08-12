@@ -148,3 +148,17 @@ This document records initial architecture decision records. Status values: Prop
 - Context: Phase 3 GraphQL and browser tests need seeded Learning Track content without requiring a local PostgreSQL process in sandboxed runs.
 - Decision: Add `CONTENT_PERSISTENCE=memory` for tests and E2E only. Normal runtime defaults to Prisma/PostgreSQL and uses the idempotent seed script for development data.
 - Consequences: Content tests can validate authorization, ordering, status filtering, and enrollment behavior without a database process. Production remains backed by PostgreSQL migrations and Prisma repositories.
+
+## ADR-022: Model German as CEFR Learning Units and Duration-Composed Sessions
+
+- Status: Accepted
+- Context: The initial German seed was a short lesson list capped at B2.2. The curriculum now needs a complete A1.1-C2.2 pedagogical architecture, and the learner-facing seed has been expanded from the A1.1 proof slice and A2.1 benchmark into complete A2.1-C2.2 implementation coverage.
+- Decision: Document German as CEFR sublevels containing communicative modules, learning units, activities, and duration-aware daily sessions. Use the existing Lesson Version and Daily Task model for the MVP, expand German enrollment validation through C2.2, preserve the authored A1.1 proof slice and A2.1 benchmark, and seed A2.1 through C2.2 as approved learner-facing Lesson Versions.
+- Consequences: No Prisma migration is required for this architecture phase. A2.1-C2.2 sessions include duration guidance for 30/45/60/90-minute planning rather than duplicating lesson rows per duration. Future German authoring/composer tooling can introduce normalized Learning Unit and Activity records, and A1.1/A1.2 detailed expansion remains separate work.
+
+## ADR-023: Implement Software Engineering as a Complete Career Programme Seed
+
+- Status: Accepted
+- Context: The Software Engineering track previously mixed detailed early sessions with later roadmap outlines. The programme now needs complete learner-facing content for a JavaScript-experienced learner becoming a professional full-stack engineer.
+- Decision: Seed the Software Engineering track as 24 weekly modules and 120 approved Lesson Versions inside the existing content model. Each session includes duration guidance for 60/90/120 minutes, learner-facing explanation, realistic engineering scenario, guided and independent exercises, answer notes, knowledge checks, resources, interview questions, and portfolio or capstone linkage. Weekly assessment seeds now include coding, debugging, architecture/design, interview, and reflection items in addition to objective checks.
+- Consequences: No Prisma migration or parallel curriculum architecture is required. Scheduling, roadmap, lesson rendering, snapshots, and assessment eligibility continue to use the existing Lesson Version model. Future authoring tools can add first-class activity records, but the MVP seed now exposes the full Software Engineering career path without placeholder roadmap copy.

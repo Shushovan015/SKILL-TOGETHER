@@ -188,6 +188,10 @@ extend type Mutation {
 }
 ```
 
+German level fields accept `COMPLETE_BEGINNER`, `A1.1`, `A1.2`, `A2.1`, `A2.2`, `B1.1`, `B1.2`, `B2.1`, `B2.2`, `C1.1`, `C1.2`, `C2.1`, and `C2.2`. `COMPLETE_BEGINNER` is valid only as a start level and normalizes to `A1.1`. German target level must be above the normalized start level. German session duration accepts 30, 45, 60, or 90 minutes.
+
+For German, the API continues to expose scheduled Daily Tasks as lessons in the MVP. The curriculum source architecture is CEFR sublevel -> Module -> Learning Unit -> Activity -> Daily Session, and the current implementation materializes approved session proofs as Lesson Versions.
+
 Phase 3 implementation notes:
 
 - The authenticated catalogue and roadmap use `learningTracks`, `learningTrack`, `myEnrollments`, and `selectLearningTrack`.

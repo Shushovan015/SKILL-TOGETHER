@@ -21,7 +21,11 @@ const germanLevelSchema = z.enum([
   "B1.1",
   "B1.2",
   "B2.1",
-  "B2.2"
+  "B2.2",
+  "C1.1",
+  "C1.2",
+  "C2.1",
+  "C2.2"
 ]);
 const germanTargetLevelSchema = germanLevelSchema.exclude(["COMPLETE_BEGINNER"]);
 const germanSessionDurationSchema = z.union([z.literal(30), z.literal(45), z.literal(60), z.literal(90)]);
@@ -144,7 +148,20 @@ export function assertLessonVersionIsApprovable(input: LessonVersionEditorInput)
   }
 }
 
-const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;
+const germanLevelOrder = [
+  "A1.1",
+  "A1.2",
+  "A2.1",
+  "A2.2",
+  "B1.1",
+  "B1.2",
+  "B2.1",
+  "B2.2",
+  "C1.1",
+  "C1.2",
+  "C2.1",
+  "C2.2"
+] as const;
 
 function normalizedGermanStartLevel(level: z.infer<typeof germanLevelSchema>): Exclude<z.infer<typeof germanLevelSchema>, "COMPLETE_BEGINNER"> {
   return level === "COMPLETE_BEGINNER" ? "A1.1" : level;

@@ -1129,6 +1129,7 @@ function mapDailyTask(task: PrismaDailyTaskWithLesson): DailyTaskRecord {
       lessonVersionId: version.id,
       title: version.title,
       moduleTitle: version.lesson.module.title,
+      trackSlug: version.lesson.module.track.slug,
       trackTitle: version.lesson.module.track.title,
       trackType: version.lesson.module.track.type,
       difficulty: version.lesson.difficulty,
@@ -1274,7 +1275,20 @@ function germanEnrollmentFields(value: Prisma.JsonValue | null): Pick<
   };
 }
 
-const germanLevelOrder = ["A1.1", "A1.2", "A2.1", "A2.2", "B1.1", "B1.2", "B2.1", "B2.2"] as const;
+const germanLevelOrder = [
+  "A1.1",
+  "A1.2",
+  "A2.1",
+  "A2.2",
+  "B1.1",
+  "B1.2",
+  "B2.1",
+  "B2.2",
+  "C1.1",
+  "C1.2",
+  "C2.1",
+  "C2.2"
+] as const;
 
 function normalizedGermanStartLevel(level: GermanLevel): Exclude<GermanLevel, "COMPLETE_BEGINNER"> {
   return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
@@ -1305,7 +1319,11 @@ function isGermanLevel(value: unknown): value is GermanLevel {
     value === "B1.1" ||
     value === "B1.2" ||
     value === "B2.1" ||
-    value === "B2.2"
+    value === "B2.2" ||
+    value === "C1.1" ||
+    value === "C1.2" ||
+    value === "C2.1" ||
+    value === "C2.2"
   );
 }
 
@@ -1430,6 +1448,7 @@ function createLessonSnapshot(
   const lessonVersion = task.lessonVersion;
 
   return {
+    trackSlug: lessonVersion.lesson.module.track.slug,
     trackTitle: lessonVersion.lesson.module.track.title,
     trackType: lessonVersion.lesson.module.track.type,
     moduleTitle: lessonVersion.lesson.module.title,

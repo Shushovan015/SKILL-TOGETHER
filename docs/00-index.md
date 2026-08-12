@@ -57,6 +57,32 @@ This index is the starting point for product, engineering, security, curriculum,
 - [33 Curriculum: Software Engineering](33-curriculum-software-engineering.md)
 - [34 Curriculum: Project Management](34-curriculum-project-management.md)
 - [35 Curriculum: German](35-curriculum-german.md)
+- [German Program Framework](curriculum/german/00-program-framework.md)
+- [German CEFR Competency Map](curriculum/german/01-cefr-competency-map.md)
+- [German Grammar Progression](curriculum/german/02-grammar-progression.md)
+- [German Vocabulary Progression](curriculum/german/03-vocabulary-progression.md)
+- [German Speaking Progression](curriculum/german/04-speaking-progression.md)
+- [German Listening Progression](curriculum/german/05-listening-progression.md)
+- [German Reading Progression](curriculum/german/06-reading-progression.md)
+- [German Writing Progression](curriculum/german/07-writing-progression.md)
+- [German Pronunciation Progression](curriculum/german/08-pronunciation-progression.md)
+- [German Mediation Progression](curriculum/german/09-mediation-progression.md)
+- [German Cultural Competence](curriculum/german/10-cultural-competence.md)
+- [German Assessment Framework](curriculum/german/11-assessment-framework.md)
+- [German Resource Framework](curriculum/german/12-resource-framework.md)
+- [German Session Authoring Standard](curriculum/german/13-session-authoring-standard.md)
+- [German Level: A1.1](curriculum/german/levels/A1.1.md)
+- [German Level: A1.2](curriculum/german/levels/A1.2.md)
+- [German Level: A2.1](curriculum/german/levels/A2.1.md)
+- [German Level: A2.2](curriculum/german/levels/A2.2.md)
+- [German Level: B1.1](curriculum/german/levels/B1.1.md)
+- [German Level: B1.2](curriculum/german/levels/B1.2.md)
+- [German Level: B2.1](curriculum/german/levels/B2.1.md)
+- [German Level: B2.2](curriculum/german/levels/B2.2.md)
+- [German Level: C1.1](curriculum/german/levels/C1.1.md)
+- [German Level: C1.2](curriculum/german/levels/C1.2.md)
+- [German Level: C2.1](curriculum/german/levels/C2.1.md)
+- [German Level: C2.2](curriculum/german/levels/C2.2.md)
 - [36 Content Authoring Guide](36-content-authoring-guide.md)
 
 ## Delivery
@@ -71,4 +97,4 @@ This index is the starting point for product, engineering, security, curriculum,
 
 ## Documentation Status
 
-All expected documentation files are present. The current repository is specification-only and does not yet contain application source code, package scripts, framework scaffolding, Prisma migrations, or generated database artifacts.
+All expected baseline documentation files are present. The repository now contains implementation code, package scripts, Prisma migrations, seed data, and expanded German curriculum architecture documentation.

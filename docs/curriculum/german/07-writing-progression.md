@@ -1,0 +1,16 @@
+# German Writing Progression Matrix
+
+| Sublevel | Text types | Length range | Organization | Grammar control | Lexical control | Register | Cohesion and editing |
+|---|---|---:|---|---|---|---|---|
+| A1.1 | forms, captions, micro-messages | 10-40 words | Field or sentence-level | Memorized chunks, present tense | Names, numbers, routine nouns | Basic polite formulae | Check spelling and required details. |
+| A1.2 | short messages, invitations, simple descriptions | 40-80 words | Simple sequence | Present tense, modals, connectors und/aber/denn | Everyday domains | Informal/formal openings | Check word order and completeness. |
+| A2.1 | practical emails, short narratives, summaries | 80-120 words | Beginning-middle-end or task steps | Perfekt, weil, comparison | Travel, services, work/study | Polite practical tone | Revise for reason, action, and clarity. |
+| A2.2 | practical email, review, instructions | 100-160 words | Paragraphs with purpose | Subordinate clauses, connectors, imperatives | Recommendations, problems, media, events | Formal email basics | Revise connectors and recipient fit. |
+| B1.1 | formal request, opinion text, experience narrative | 150-220 words | Clear paragraphs | Relative clauses, tense contrast, wenn/weil/obwohl | Familiar abstract vocabulary | Formal/informal distinction | Use checklist for task coverage and repair. |
+| B1.2 | complaint, application, local issue response | 180-260 words | Introduction, support, conclusion | Passive recognition, Konjunktiv II chunks, cohesive pronouns | Civic/workplace/argument vocabulary | Formal Sie control | Revise for paragraph logic and tone. |
+| B2.1 | formal email, memo, report summary, chart description | 250-350 words | Structured professional text | Passive, nominal phrases, concessive/causal clauses | Evidence and professional collocations | Register-adapted formal style | Edit for precision, cohesion, and evidence. |
+| B2.2 | argument essay, synthesis, negotiation follow-up | 300-450 words | Multi-part argument with counterpoint | Hedging, reported speech, conditionals | Source verbs, stance, specialized terms | Audience-sensitive tone | Edit for synthesis and claim qualification. |
+| C1.1 | critical response, briefing, mediation text | 450-700 words | Genre-specific architecture | Nominal style, embedded clauses, advanced connectors | Abstract, academic, professional vocabulary | Genre control | Revise for argument density and reader path. |
+| C1.2 | proposal, discourse analysis, portfolio text | 600-900 words | Advanced genre and rhetorical structure | Participial attributes, cohesion chains, stylistic variation | Idiom, precision verbs, register labels | Strategic style shifts | Multi-pass editing for clarity, style, and effect. |
+| C2.1 | executive synthesis, expert critique, institutional response | 800+ words when task requires | Purpose-built expert structure | Full grammar under constraint | Specialized and nuanced vocabulary | High-stakes professional style | Edit for risk, implication, and precision. |
+| C2.2 | publishable portfolio, expert essay, editorial work | Variable | Publishable genre architecture | Full grammar with rhetorical control | Full lexical and stylistic range | Mastery across audiences | Editorial standard: consistency, voice, economy, and effect. |

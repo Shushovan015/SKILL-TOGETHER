@@ -12,7 +12,7 @@ Learners struggle to remain consistent when they repeatedly need to choose topic
 
 ## Background
 
-The first release is designed for two learners: one learning software engineering, one learning project management. Both may also study German. The product must eventually support four-to-six-month curricula, but the MVP needs only detailed seed content for an initial four-week programme.
+The first release is designed for two learners: one learning software engineering, one learning project management. Both may also study German. The MVP baseline requires detailed seed content for an initial four-week programme, and the current seed expands that baseline with a complete Software Engineering career programme plus extended German coverage.
 
 ## Target Users
 
@@ -45,7 +45,7 @@ MVP exclusions are authoritative in [07 MVP Scope](07-mvp-scope.md) and include 
 | --- | --- | --- |
 | A-001 | MVP learners use email/password login. | Enables cookie sessions without external identity providers. |
 | A-002 | Main learning sessions default to two hours. | Scheduling uses duration capacity. |
-| A-003 | German sessions take 30 to 60 minutes. | German can be scheduled alongside a main track. |
+| A-003 | German sessions take 30, 45, 60, or 90 minutes. | German can be scheduled alongside a main track while preserving learner-specific duration. |
 | A-004 | Weekly assessments use predefined reviewed questions first. | Reduces AI and quality risk. |
 | A-005 | Initial deployment can use vendor-neutral managed hosting. | Avoids premature vendor lock-in. |
 

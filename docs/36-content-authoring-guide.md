@@ -9,6 +9,8 @@
 - Tie exercises directly to the learning objective.
 - Include completion evidence that can be checked later.
 
+German authoring must follow [German Session Authoring Standard](curriculum/german/13-session-authoring-standard.md). Author Learning Units and Activities first, then compose Daily Sessions by duration. Do not duplicate full 30/45/60/90-minute lessons when whole activities with CORE, RECOMMENDED, and EXTENSION priority can represent the variation.
+
 ## Objective-Writing Rules
 
 Objectives must be:
