@@ -31,8 +31,17 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
 
+      - name: Prepare temporary seed configuration
+        shell: bash
+        run: |
+          echo "SESSION_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "CSRF_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
       - name: Seed updated curriculum
         run: pnpm db:seed
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
           NODE_ENV: production
+          FRONTEND_URL: https://seed.invalid
+          WEB_ORIGIN: https://seed.invalid
+          CORS_ALLOWED_ORIGINS: https://seed.invalid
