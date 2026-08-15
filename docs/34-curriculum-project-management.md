@@ -7,7 +7,7 @@ Build practical project-management capability, artifact fluency, and employment 
 ## Structure
 
 - Five study days per week.
-- Default duration: 120 minutes per session.
+- Canonical content supports 30, 60, 90, and 120-minute paths without changing curriculum order.
 - Weekly Assessment on Friday.
 - Recovery day on Saturday.
 - First four weeks are detailed for MVP seed data.
@@ -31,7 +31,7 @@ Build practical project-management capability, artifact fluency, and employment 
 | Phase 13 | Project Management Capstone | Simulated SaaS launch with charter, business case, stakeholders, requirements, scope, WBS, schedule, budget, risks, RAID, communications, changes, sprint plan, retrospective, and closure. |
 | Phase 14 | Final Professional Review | Fundamentals, planning, risk, stakeholders, Agile, reporting, tools, artifact portfolio, capstone, and mock PM interview. |
 
-The current seed fully authors the first 15 beginner-to-junior PM sessions and stores the remaining phases as structured roadmap/session outlines. Detailed later-phase sessions should be authored in reviewed batches.
+The current seed materializes 14 modules and 70 approved learner-facing sessions. The first 15 sessions contain individually authored foundation, scope, and planning instruction. Later phases contain phase-specific mental models, professional frameworks, ambiguous delivery scenarios, artifact requirements, communication practice, complication handling, solution rubrics, interview transfer, and duration paths. Fifth sessions are tagged as weekly professional assessments.
 
 ## Detailed MVP Seed Curriculum
 

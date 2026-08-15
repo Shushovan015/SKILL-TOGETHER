@@ -160,6 +160,66 @@ describe("phase 3 Software Engineering career seed data", () => {
   });
 });
 
+describe("phase 3 Project Management career seed data", () => {
+  const projectTrack = phase3SeedTracks.find((track) => track.slug === "project-management");
+  const projectLessons = projectTrack?.modules.flatMap((moduleRecord) => moduleRecord.lessons) ?? [];
+  const forbiddenOutlineCopy = [
+    "roadmap session outline",
+    "future detailed authoring",
+    "Detailed lesson authoring should add",
+    "at outline fidelity",
+    "Draft a session outline"
+  ] as const;
+
+  it("materializes a coherent fourteen-week professional pathway", () => {
+    expect(projectTrack?.modules).toHaveLength(14);
+    expect(projectLessons).toHaveLength(70);
+    expect(projectLessons.filter((lesson) => lesson.tags.includes("weekly-assessment"))).toHaveLength(14);
+  });
+
+  it("ships learner-facing content and real duration paths for every PM session", () => {
+    for (const lesson of projectLessons) {
+      const content = buildApprovedSeedVersionInput(lesson);
+      const text = searchableContentText(content);
+
+      expect(() => validateLessonVersionEditorInput(content)).not.toThrow();
+      expect(content.explanationMarkdown).toContain("30 minutes:");
+      expect(content.explanationMarkdown).toContain("60 minutes:");
+      expect(content.explanationMarkdown).toContain("90 minutes:");
+      expect(content.explanationMarkdown).toContain("120 minutes:");
+      expect(content.exercises).toHaveLength(2);
+      expect(content.knowledgeChecks.length).toBeGreaterThanOrEqual(2);
+
+      for (const phrase of forbiddenOutlineCopy) {
+        expect(text).not.toContain(phrase);
+      }
+    }
+  });
+
+  it("covers professional artifacts, judgment, communication, risk, stakeholders, Agile, and capstone delivery", () => {
+    const text = projectLessons
+      .map((lesson) => searchableContentText(buildApprovedSeedVersionInput(lesson)))
+      .join("\n");
+
+    for (const requiredTerm of [
+      "charter",
+      "scope",
+      "WBS",
+      "risk register",
+      "stakeholder",
+      "status",
+      "Scrum",
+      "Kanban",
+      "change",
+      "budget",
+      "capstone",
+      "interview"
+    ]) {
+      expect(text.toLowerCase()).toContain(requiredTerm.toLowerCase());
+    }
+  });
+});
+
 describe("phase 3 German seed data", () => {
   const germanTrack = phase3SeedTracks.find((track) => track.slug === "german");
   const germanLessons = germanTrack?.modules.flatMap((moduleRecord) => moduleRecord.lessons) ?? [];

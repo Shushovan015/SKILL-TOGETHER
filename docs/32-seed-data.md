@@ -52,8 +52,9 @@ Software Engineering seed coverage:
 
 Project Management seed coverage:
 
-- First 15 beginner-to-junior PM sessions are fully authored.
-- Later PM modules remain structured roadmap/session outlines for future detailed authoring.
+- 14 modules and 70 approved learner-facing sessions across foundations, initiation/scope, planning, resources/cost, risk/issues, stakeholders, communication, Agile delivery, quality/change, monitoring, professional workflows, career preparation, capstone, and final review.
+- Every session exposes 30/60/90/120-minute paths; later phases include phase-specific mental models, decision frameworks, scenarios, complications, artifact fields, communication examples, review rubrics, and interview transfer.
+- Every fifth session is tagged as a weekly professional assessment checkpoint.
 
 For German, the seed stores complete learner-facing A1.1 through C2.2 learning-unit sessions as APPROVED Lesson Versions. These German sessions use the existing Lesson Version, Resource, Exercise, and Knowledge Check tables; no separate Learning Unit or Activity tables are required for the MVP seed.
 

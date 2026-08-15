@@ -111,7 +111,10 @@ export function plannedDurationFor(
   lesson: ApprovedLessonForScheduling,
   preferences: PlanPreferences
 ): number {
-  if (lesson.trackType !== "SOFTWARE_ENGINEERING") {
+  if (
+    lesson.trackType !== "SOFTWARE_ENGINEERING" &&
+    lesson.trackType !== "PROJECT_MANAGEMENT"
+  ) {
     return lesson.durationMinutes;
   }
 

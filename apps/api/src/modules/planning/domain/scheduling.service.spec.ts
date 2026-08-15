@@ -47,7 +47,11 @@ describe("professional session duration scheduling", () => {
       .toMatchObject({ plannedDurationMinutes: 30 });
   });
 
-  it("does not silently shorten other track types", () => {
-    expect(plannedDurationFor(lesson("PROJECT_MANAGEMENT"), preferences)).toBe(120);
+  it("adapts Project Management sessions to the selected professional duration", () => {
+    expect(plannedDurationFor(lesson("PROJECT_MANAGEMENT"), preferences)).toBe(30);
+  });
+
+  it("does not silently shorten German sessions composed by the German duration path", () => {
+    expect(plannedDurationFor(lesson("GERMAN"), preferences)).toBe(120);
   });
 });

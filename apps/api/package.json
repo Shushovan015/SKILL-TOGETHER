@@ -12,7 +12,8 @@
     "start": "node dist/main.js",
     "start:prod": "node dist/main.js",
     "seed": "pnpm run build && node dist/seed.js",
-    "audit:german": "pnpm run build && node dist/german-content-audit.js"
+    "audit:german": "pnpm run build && node dist/german-content-audit.js",
+    "audit:project-management": "pnpm run build && node dist/project-management-content-audit.js"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
