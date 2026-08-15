@@ -51,14 +51,13 @@ Implemented in seed data for this architecture phase:
 - German roadmap modules for A1.1 through C2.2.
 - German enrollment current/target level support through C2.2.
 - Duration configuration for 30, 45, 60, and 90 minutes.
-- Fully authored prior A1.1 Module 1 proof-slice Sessions 1-3.
+- Complete A1.1 and A1.2 beginner pathways with 10 modules and 50 learning-unit sessions per sublevel.
 - Fully authored A2.1 Modules 1-2 production benchmark sessions.
 - Complete learner-facing A2.1 through C2.2 seed implementation: 10 sublevels x 10 modules x 5 learning-unit sessions, stored as approved Lesson Versions with resources, exercises, knowledge checks, evidence prompts, and sublevel final integrated assessment sessions.
 - CEFR-aware German assessment seed items for approved lesson tags, including objective knowledge checks, multiple-select skill checks, productive scenarios, and reflection prompts.
 
 Not implemented in this phase:
 
-- Detailed A1.1/A1.2 expansion beyond the existing proof slice.
 - A human-reviewed official-exam-style assessment item bank beyond the internal seed questions.
 - Speech recognition.
 - AI tutoring.

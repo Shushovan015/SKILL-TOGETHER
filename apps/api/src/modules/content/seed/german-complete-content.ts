@@ -20,7 +20,7 @@ type GermanGeneratedContent = Pick<
 >;
 
 interface LevelProfile {
-  readonly cefrBand: "A2" | "B1" | "B2" | "C1" | "C2";
+  readonly cefrBand: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
   readonly label: string;
   readonly inputStyle: string;
   readonly productionStyle: string;
@@ -81,7 +81,7 @@ export function germanCompleteContentForLesson(lesson: SeedLessonDefinition): Ge
         kind: "independent",
         promptMarkdown: independentPromptFor(definition, profile),
         expectedEvidence: lesson.evidence,
-        solutionNotesMarkdown: null
+        solutionNotesMarkdown: independentRubricFor(definition, profile)
       }
     ],
     knowledgeChecks: knowledgeChecksFor(definition, profile, unit, primaryPhrase)
@@ -141,6 +141,13 @@ function audioLinesFor(
   profile: LevelProfile
 ): readonly string[] {
   switch (profile.cefrBand) {
+    case "A1":
+      return [
+        `Person A: Guten Tag. Ich uebe heute ${definition.module.title}.`,
+        `Person B: Hallo. Wichtig sind ${definition.module.vocabularyFocus}.`,
+        `Person A: Mein Ziel ist: ${definition.module.moduleEvidence}.`,
+        "Person B: Gut. Sprechen Sie langsam. Fragen Sie nach, wenn etwas unklar ist."
+      ];
     case "A2":
       return [
         `Speaker A: Ich brauche Hilfe bei "${definition.module.title}".`,
@@ -184,6 +191,8 @@ function readingTextFor(
   profile: LevelProfile
 ): string {
   switch (profile.cefrBand) {
+    case "A1":
+      return `Hallo! Ich lerne Deutsch. Heute arbeite ich mit ${definition.module.title}. Ich lese kurze Saetze, hoere genau zu und benutze Woerter fuer ${definition.module.vocabularyFocus}. Danach kann ich ${definition.module.moduleEvidence}. Ich spreche langsam und frage: "Wie bitte?", wenn ich etwas nicht verstehe.`;
     case "A2":
       return `Im Kurs ${definition.module.level} geht es um ${definition.module.title}. Lernende sammeln Informationen, pruefen Details und bereiten ${definition.module.moduleEvidence} vor. Die Struktur ist: Situation, Fakten, Grund, naechster Schritt, Rueckfrage.`;
     case "B1":
@@ -204,12 +213,17 @@ function guidedPromptFor(
   primaryPhrase: string
 ): string {
   return [
-    `Guided ${unit.label.toLowerCase()} task for ${definition.module.title}:`,
-    `1. Copy and complete: ${primaryPhrase} ___, weil ___.`,
-    `2. Add two vocabulary items from ${definition.module.vocabularyFocus}.`,
-    `3. Add one sentence that shows ${definition.module.grammarFocus}.`,
-    `4. Answer the input question: ${unit.inputTask}.`,
-    `5. Revise so the response sounds ${profile.productionStyle}.`
+    `Guided ${unit.label.toLowerCase()} practice (about 10 minutes) for ${definition.module.title}:`,
+    `1. Retrieval: say ${primaryPhrase} from memory, then check the model.`,
+    `2. Complete: ${primaryPhrase} ___, weil ___.`,
+    `3. Write a yes/no question and a W-question for this situation.`,
+    `4. Select four usable words or chunks from: ${definition.module.vocabularyFocus}.`,
+    `5. Put each selected item into a complete German sentence.`,
+    `6. Transform one sentence so that it visibly uses ${definition.module.grammarFocus}.`,
+    `7. Answer the receptive task: ${unit.inputTask}.`,
+    `8. Read your answer aloud, focusing on ${definition.module.pronunciationFocus}.`,
+    `9. Correct one grammar error and one unclear phrase.`,
+    `10. Give the revised answer once more so it sounds ${profile.productionStyle}.`
   ].join("\n");
 }
 
@@ -232,10 +246,27 @@ function independentPromptFor(
     : "";
 
   return [
-    `${prefix}Create the session evidence for ${definition.module.moduleEvidence}.`,
-    `Partner route: speak for two minutes, ask one follow-up question, then write a corrected final version.`,
-    `Self-study route: record your answer, transcribe 6-10 lines, revise two sentences, and mark one pronunciation improvement.`,
-    `Success criteria: the answer is ${profile.productionStyle}, includes vocabulary for ${definition.module.vocabularyFocus}, shows ${definition.module.grammarFocus}, and ends with a next step or question.`
+    `${prefix}Real-world goal: ${definition.module.moduleEvidence}.`,
+    `Speaking task (8-10 minutes): Situation: you must ${definition.module.communicativePurpose}. Your role is the learner or customer; a partner, or your own recorded second voice, is the other person. Prepare the essential facts, open politely, complete at least six turns, ask two follow-up questions, repair one misunderstanding, and close with an agreed next step. Useful language: ${profile.phrases.join("; ")}.`,
+    `Writing task (8-10 minutes): Write a recipient-ready text that supports the same goal. State the audience and purpose, include the situation, two relevant details, a reason, and the requested next action. Use ${definition.module.grammarFocus}. At ${definition.module.level}, aim for the length and complexity appropriate to ${profile.productionStyle}; clarity matters more than padding.`,
+    `Mediation task (5 minutes, 60/90-minute route): Explain the important information to a person who did not see the source. ${profile.mediationStyle}. Preserve names, numbers, deadlines, conditions, and uncertainty. Do not translate sentence by sentence.`,
+    `90-minute extension: add a second response with a different register, compare both versions, and explain three changes in tone, vocabulary, or sentence structure.`,
+    `Evidence: record or rehearse the speaking response, save the written response, underline vocabulary for ${definition.module.vocabularyFocus}, and mark where you used ${definition.module.grammarFocus}.`
+  ].join("\n");
+}
+
+function independentRubricFor(
+  definition: GermanCurriculumLessonDefinition,
+  profile: LevelProfile
+): string {
+  return [
+    "Self-check rubric (0 = missing, 1 = partly, 2 = secure; target 8/10):",
+    `1. Task completion: another person can act on the result for ${definition.module.moduleEvidence}.`,
+    `2. Language control: the response visibly and accurately uses ${definition.module.grammarFocus}.`,
+    `3. Vocabulary: at least four contextualized items from ${definition.module.vocabularyFocus}.`,
+    `4. Interaction/register: the answer is ${profile.productionStyle} and includes an appropriate opening, repair, and closing.`,
+    `5. Delivery/revision: pronunciation addresses ${definition.module.pronunciationFocus}, and the final version corrects at least two weaknesses.`,
+    `Model response framework: ${profile.phrases[0]} ... . ${profile.phrases[1]} ... . ${profile.phrases[2]} ... . End with a clear next action or question. Different wording is valid when meaning, register, and task requirements are preserved.`
   ].join("\n");
 }
 
@@ -267,6 +298,8 @@ function examplesFor(
     `Core phrase: ${primaryPhrase} ${definition.module.moduleEvidence}.`,
     `Follow-up: ${secondaryPhrase} Welche Information fehlt noch?`,
     `Mini response: Ich habe die wichtigsten Punkte zu ${definition.module.title} notiert und kann den naechsten Schritt erklaeren.`,
+    `Reason model: ${primaryPhrase} einen klaren naechsten Schritt, weil die andere Person danach handeln muss.`,
+    `Repair model: Entschuldigung, das habe ich nicht ganz verstanden. Koennen Sie den letzten Punkt bitte anders formulieren?`,
     `Register model: informal answers may be shorter; formal answers need a greeting, clear request, reason, and polite closing. Aim for ${profile.productionStyle}.`
   ];
 }
@@ -309,11 +342,39 @@ function knowledgeChecksFor(
       question: `What should you check during ${unit.checkFocus}?`,
       answerKey: [definition.module.pronunciationFocus],
       explanation: `At ${profile.label}, delivery is part of the evidence, not an afterthought.`
+    },
+    {
+      question: "What must a useful mediation preserve?",
+      answerKey: ["The essential meaning, action, and important constraints for the target audience."],
+      explanation: "Mediation restructures information for another person; it is not sentence-by-sentence translation."
+    },
+    {
+      question: "How do you know the final production task is complete?",
+      answerKey: ["The rubric reaches at least 8/10 and another person can understand or act on the result."],
+      explanation: "A complete response combines task achievement, language control, vocabulary, register, and revision."
     }
   ];
 }
 
 function profileFor(level: GermanImplementedLevel): LevelProfile {
+  if (level.startsWith("A1")) {
+    return {
+      cefrBand: "A1",
+      label: `${level} supported beginner communication`,
+      inputStyle: "very clear, short, repeated, and supported by English meaning where useful",
+      productionStyle: "short, rehearsed, polite, and understandable",
+      mediationStyle: "Relay one essential name, number, time, place, or action without adding information",
+      phrases: [
+        "Ich heisse",
+        "Ich komme aus",
+        "Ich moechte",
+        "Koennen Sie das bitte wiederholen?",
+        "Danke. Auf Wiedersehen."
+      ],
+      mistakes: ["Trying to translate English word order directly instead of keeping the conjugated verb in position two."]
+    };
+  }
+
   if (level.startsWith("A2")) {
     return {
       cefrBand: "A2",

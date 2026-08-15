@@ -1,5 +1,7 @@
-export type GermanImplementedLevel = "A2.1" | "A2.2" | "B1.1" | "B1.2" | "B2.1" | "B2.2" | "C1.1" | "C1.2" | "C2.1" | "C2.2";
-export type GermanLevelCode = "A21" | "A22" | "B11" | "B12" | "B21" | "B22" | "C11" | "C12" | "C21" | "C22";
+import { germanA1CurriculumModules } from "./german-a1-curriculum-data.js";
+
+export type GermanImplementedLevel = "A1.1" | "A1.2" | "A2.1" | "A2.2" | "B1.1" | "B1.2" | "B2.1" | "B2.2" | "C1.1" | "C1.2" | "C2.1" | "C2.2";
+export type GermanLevelCode = "A11" | "A12" | "A21" | "A22" | "B11" | "B12" | "B21" | "B22" | "C11" | "C12" | "C21" | "C22";
 export type GermanUnitNumber = 1 | 2 | 3 | 4 | 5;
 
 export interface GermanCurriculumModule {
@@ -35,6 +37,8 @@ export interface GermanCurriculumLessonDefinition {
 }
 
 export const germanImplementedLevels = [
+  "A1.1",
+  "A1.2",
   "A2.1",
   "A2.2",
   "B1.1",
@@ -86,6 +90,7 @@ export const germanUnitTemplates: readonly GermanUnitTemplate[] = [
 ] as const;
 
 export const germanCurriculumModules: readonly GermanCurriculumModule[] = [
+  ...germanA1CurriculumModules,
   {
     "level": "A2.1",
     "code": "A21",

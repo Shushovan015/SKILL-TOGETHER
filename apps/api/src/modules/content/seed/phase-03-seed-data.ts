@@ -181,12 +181,11 @@ function softwareEngineeringContent(lessonDefinition: SeedLessonDefinition): Lea
 
 function germanContent(lessonDefinition: SeedLessonDefinition): LearnerSeedContent {
   const a21Content = germanA21ContentForLesson(lessonDefinition);
-
-  if (a21Content !== null) {
-    return a21Content;
-  }
-
   const completeGermanContent = germanCompleteContentForLesson(lessonDefinition);
+
+  if (a21Content !== null && completeGermanContent !== null) {
+    return enrichBenchmarkGermanContent(a21Content, completeGermanContent);
+  }
 
   if (completeGermanContent !== null) {
     return completeGermanContent;
@@ -232,6 +231,35 @@ function germanContent(lessonDefinition: SeedLessonDefinition): LearnerSeedConte
       }
     ],
     knowledgeChecks: topic.knowledgeChecks
+  };
+}
+
+function enrichBenchmarkGermanContent(
+  benchmark: LearnerSeedContent,
+  fullSession: LearnerSeedContent
+): LearnerSeedContent {
+  return {
+    ...benchmark,
+    examples: [
+      ...benchmark.examples,
+      `Reading text and task:\n${fullSession.examples[2] ?? fullSession.examples[0]}`,
+      `Listening transcript follow-up:\n${fullSession.examples[4] ?? fullSession.examples[1]}`,
+      ...fullSession.examples.slice(0, 3)
+    ].slice(0, 10),
+    exercises: benchmark.exercises.map((exercise, index) => {
+      const fullExercise = fullSession.exercises[index];
+
+      if (fullExercise === undefined) {
+        return exercise;
+      }
+
+      return {
+        ...exercise,
+        promptMarkdown: [exercise.promptMarkdown, fullExercise.promptMarkdown].join("\n\n"),
+        solutionNotesMarkdown: exercise.solutionNotesMarkdown ?? fullExercise.solutionNotesMarkdown
+      };
+    }),
+    knowledgeChecks: [...benchmark.knowledgeChecks, ...fullSession.knowledgeChecks].slice(0, 10)
   };
 }
 

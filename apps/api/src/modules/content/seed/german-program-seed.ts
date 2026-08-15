@@ -9,6 +9,8 @@ import {
 import type { SeedLessonDefinition, SeedModuleDefinition } from "./phase-03-seed-data.js";
 
 const germanLevelPredecessors: Partial<Record<GermanImplementedLevel, GermanImplementedLevel>> = {
+  "A1.2": "A1.1",
+  "A2.1": "A1.2",
   "A2.2": "A2.1",
   "B1.1": "A2.2",
   "B1.2": "B1.1",
@@ -21,61 +23,8 @@ const germanLevelPredecessors: Partial<Record<GermanImplementedLevel, GermanImpl
 };
 
 export const germanProgramModules: readonly SeedModuleDefinition[] = [
-  levelModule(
-    1,
-    "A1.1",
-    "First Contact and Personal Information",
-    "Complete beginner foundation: greetings, introductions, spelling, numbers, origin, basic sentence patterns, pronunciation habits, and short controlled exchanges.",
-    [
-      germanProofSliceLesson(
-        "DE-A11-M01-S01",
-        "A1.1 Module 1 Session 1: Greetings, Names, and First Introductions",
-        "Greet someone, give your name, ask for a name informally and formally, and notice the basic ich/du/Sie distinction.",
-        [],
-        "A short written dialogue, a personal introduction, and a pronunciation self-check.",
-        ["a1-1", "m01", "greetings", "introductions", "du-sie", "pronunciation"]
-      ),
-      germanProofSliceLesson(
-        "DE-A11-M01-S02",
-        "A1.1 Module 1 Session 2: Alphabet, Spelling, and Repair Phrases",
-        "Spell names, recognize key German letter sounds, and ask someone to repeat or spell information politely.",
-        ["DE-A11-M01-S01"],
-        "A spelling practice sheet, a short name dialogue, and repair-phrase notes.",
-        ["a1-1", "m01", "alphabet", "spelling", "repair-phrases", "pronunciation"]
-      ),
-      germanProofSliceLesson(
-        "DE-A11-M01-S03",
-        "A1.1 Module 1 Session 3: Numbers, Countries, Languages, and Mini Profiles",
-        "Use numbers, countries, languages, and simple origin patterns to create a short personal profile.",
-        ["DE-A11-M01-S02"],
-        "Number answers, country-language sentences, and a six-line profile.",
-        ["a1-1", "m01", "numbers", "countries", "languages", "personal-information"]
-      )
-    ]
-  ),
-  levelModule(
-    2,
-    "A1.2",
-    "Everyday Routines and Practical Needs",
-    "Routine, time, home, food, shopping, places, simple needs, modal verbs, separable verbs, accusative/dative foundations, short messages, and controlled practical dialogues."
-  ),
-  ...germanCurriculumModules.map((module, index) => detailedGermanModule(index + 3, module))
+  ...germanCurriculumModules.map((module, index) => detailedGermanModule(index + 1, module))
 ];
-
-function levelModule(
-  sequence: number,
-  level: string,
-  title: string,
-  summary: string,
-  lessons: readonly SeedLessonDefinition[] = []
-): SeedModuleDefinition {
-  return {
-    sequence,
-    title: `${level} - ${title}`,
-    summary,
-    lessons
-  };
-}
 
 function detailedGermanModule(sequence: number, module: GermanCurriculumModule): SeedModuleDefinition {
   return {
@@ -107,7 +56,7 @@ function detailedGermanLesson(definition: GermanCurriculumLessonDefinition): See
 }
 
 function prerequisitesFor(definition: GermanCurriculumLessonDefinition): readonly string[] {
-  if (definition.module.level === "A2.1" && definition.module.moduleNumber === 1 && definition.unit.unitNumber === 1) {
+  if (definition.module.level === "A1.1" && definition.module.moduleNumber === 1 && definition.unit.unitNumber === 1) {
     return [];
   }
 
@@ -136,25 +85,4 @@ function prerequisitesFor(definition: GermanCurriculumLessonDefinition): readonl
   );
 
   return predecessorModule === undefined ? [] : [germanLessonIdentifier(predecessorModule.code, 10, 5)];
-}
-
-function germanProofSliceLesson(
-  identifier: string,
-  title: string,
-  objective: string,
-  prerequisites: readonly string[],
-  evidence: string,
-  tags: readonly string[]
-): SeedLessonDefinition {
-  return {
-    identifier,
-    title,
-    objective,
-    prerequisites,
-    durationMinutes: 60,
-    level: title.slice(0, 4),
-    required: true,
-    evidence,
-    tags
-  };
 }

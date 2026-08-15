@@ -55,7 +55,7 @@ Project Management seed coverage:
 - First 15 beginner-to-junior PM sessions are fully authored.
 - Later PM modules remain structured roadmap/session outlines for future detailed authoring.
 
-For German, the seed now stores the prior A1.1 Module 1 proof slice plus complete learner-facing A2.1 through C2.2 learning-unit sessions as APPROVED Lesson Versions. These German sessions use the existing Lesson Version, Resource, Exercise, and Knowledge Check tables; no separate Learning Unit or Activity tables are required for the MVP seed.
+For German, the seed stores complete learner-facing A1.1 through C2.2 learning-unit sessions as APPROVED Lesson Versions. These German sessions use the existing Lesson Version, Resource, Exercise, and Knowledge Check tables; no separate Learning Unit or Activity tables are required for the MVP seed.
 
 ## Sample Schedule
 
@@ -74,7 +74,7 @@ German schedule:
 - Complete Beginner maps to A1.1.
 - Current and target levels support A1.1 through C2.2.
 - Current architecture seed includes CEFR roadmap modules for A1.1 through C2.2.
-- Detailed learner-facing German content includes the prior A1.1 Module 1 proof slice and 500 A2.1 through C2.2 sessions: 10 sublevels x 10 modules x 5 learning-unit sessions.
+- Detailed learner-facing German content includes 600 A1.1 through C2.2 sessions: 12 sublevels x 10 modules x 5 learning-unit sessions.
 - Each implemented A2.1-C2.2 German session includes duration guidance for 30, 45, 60, and 90 minutes, in-app explanation, examples, guided and independent evidence tasks, a verified supplemental Goethe-Institut resource, and knowledge checks.
 - Weekly review and short assessment remain the intended pattern for the later A1.1/A1.2 detailed expansion.
 

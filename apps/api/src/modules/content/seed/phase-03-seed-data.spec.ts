@@ -21,6 +21,8 @@ const selectableGermanLevels = [
 ] as const;
 
 const implementedGermanLevels = [
+  ["A1.1", "A11"],
+  ["A1.2", "A12"],
   ["A2.1", "A21"],
   ["A2.2", "A22"],
   ["B1.1", "B11"],
@@ -172,16 +174,13 @@ describe("phase 3 German seed data", () => {
     }
   });
 
-  it("keeps the prior A1.1 proof-slice sessions", () => {
+  it("materializes the complete A1.1 through C2.2 pathway", () => {
     expect(germanLessons.slice(0, 3).map((lesson) => lesson.identifier)).toEqual([
       "DE-A11-M01-S01",
       "DE-A11-M01-S02",
       "DE-A11-M01-S03"
     ]);
-  });
-
-  it("materializes all A2.1 through C2.2 learning-unit sessions", () => {
-    expect(implementedLessons).toHaveLength(500);
+    expect(implementedLessons).toHaveLength(600);
 
     for (const [level, code] of implementedGermanLevels) {
       const levelModules = germanTrack?.modules.filter((moduleRecord) =>
@@ -216,7 +215,9 @@ describe("phase 3 German seed data", () => {
   });
 
   it("links generated German sessions with sequential prerequisites", () => {
-    expect(findLesson("DE-A21-M01-S01").prerequisites).toEqual([]);
+    expect(findLesson("DE-A11-M01-S01").prerequisites).toEqual([]);
+    expect(findLesson("DE-A12-M01-S01").prerequisites).toEqual(["DE-A11-M10-S05"]);
+    expect(findLesson("DE-A21-M01-S01").prerequisites).toEqual(["DE-A12-M10-S05"]);
     expect(findLesson("DE-A21-M01-S02").prerequisites).toEqual(["DE-A21-M01-S01"]);
     expect(findLesson("DE-A21-M03-S01").prerequisites).toEqual(["DE-A21-M02-S05"]);
     expect(findLesson("DE-A22-M01-S01").prerequisites).toEqual(["DE-A21-M10-S05"]);
@@ -231,7 +232,7 @@ describe("phase 3 German seed data", () => {
     expect(content.explanationMarkdown).toContain("Audio script for later recording");
     expect(content.explanationMarkdown).toContain("30 minutes:");
     expect(content.exercises[0]?.solutionNotesMarkdown).toContain("Expected answers");
-    expect(content.knowledgeChecks).toHaveLength(3);
+    expect(content.knowledgeChecks.length).toBeGreaterThanOrEqual(6);
     expect(content.knowledgeChecks[0]?.explanation).not.toHaveLength(0);
     expect(content.resources.map((resource) => resource.provider)).toEqual(["Goethe-Institut"]);
   });
@@ -255,9 +256,10 @@ describe("phase 3 German seed data", () => {
       expect(() => validateLessonVersionEditorInput(content)).not.toThrow();
       expect(content.resources).toHaveLength(1);
       expect(content.exercises.length).toBeGreaterThanOrEqual(2);
-      expect(content.knowledgeChecks.length).toBeGreaterThanOrEqual(3);
-
       if (!isA21BenchmarkLesson(lesson)) {
+        expect(content.examples.length).toBeGreaterThanOrEqual(6);
+        expect(content.knowledgeChecks.length).toBeGreaterThanOrEqual(5);
+        expect(content.exercises.every((exercise) => exercise.solutionNotesMarkdown !== null)).toBe(true);
         expect(content.explanationMarkdown).toContain("Audio script for later recording");
       }
     }
