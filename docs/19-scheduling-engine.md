@@ -200,4 +200,10 @@ Initial deterministic composition rules:
 7. Never split an activity halfway to fit time.
 8. Preserve skill balance across the week: listening, speaking, reading, writing, vocabulary, grammar, pronunciation, interaction, mediation where appropriate, and pragmatic competence.
 
+The persistence query filters German Lessons by the stored Lesson `difficulty` level before scheduling. This database-level boundary ensures a plan starting at A2.2 cannot receive A1.1, A1.2, or A2.1 Daily Tasks; the application-level range check remains as defense in depth.
+
 Supported German durations are 30, 45, 60, and 90 minutes. Current MVP persistence materializes proof-slice German sessions as approved Lesson Versions with the scheduled Daily Task carrying the selected duration. Future normalized composer work should output a Daily Task session plan from Learning Unit and Activity records rather than duplicating complete lessons for every duration.
+
+## Software Engineering Duration Paths
+
+Software Engineering lesson versions retain the complete 120-minute authored session. Onboarding supports 30, 60, 90, and 120 minutes. During planning, the Daily Task duration is capped to the learner's selected study-day capacity while lesson order, prerequisites, and assessment tags remain unchanged. Learner-facing lesson content labels what belongs in each duration path; shorter paths prioritize the mental model and core guided work before independent, verification, interview, and portfolio extensions.

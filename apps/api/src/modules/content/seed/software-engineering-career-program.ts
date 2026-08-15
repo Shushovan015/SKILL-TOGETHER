@@ -599,6 +599,7 @@ function contentForSession(session: SoftwareCareerSession): LearnerSeedContent {
 function durationGuide(session: SoftwareCareerSession): string {
   return [
     "Duration architecture:",
+    `- 30 minutes: retrieve the prerequisite, learn the essential mental model for ${session.learningUnit}, inspect the worked example, and record one durable rule; defer implementation to the next session if needed.`,
     `- 60 minutes: review prerequisites, study the core model for ${session.learningUnit}, complete the smallest guided artifact, and answer one knowledge check.`,
     "- 90 minutes: add the full guided task, one debugging or review pass, and a concise explanation of the tradeoff.",
     "- 120 minutes: complete the guided task, independent challenge, verification evidence, interview prompts, and portfolio or capstone notes."

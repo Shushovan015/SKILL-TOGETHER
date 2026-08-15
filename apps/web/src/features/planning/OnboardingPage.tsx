@@ -34,7 +34,7 @@ const germanLevels = [
 ] as const;
 const germanTargetLevels = germanLevels.filter((level) => level.value !== "COMPLETE_BEGINNER");
 const germanSessionDurations = [30, 45, 60, 90] as const;
-const professionalSessionDurations = [60, 90, 120] as const;
+const professionalSessionDurations = [30, 60, 90, 120] as const;
 const softwareEngineeringExperienceLevel = "JavaScript Frontend Developer - TypeScript New";
 const dayOptions = [
   ["0", "Sun"],

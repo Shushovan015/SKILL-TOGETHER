@@ -21,24 +21,25 @@ export class SchedulingDomainService {
     const scheduledDateByLessonId = new Map<string, Date>();
 
     for (const lesson of orderedLessons) {
+      const plannedDurationMinutes = plannedDurationFor(lesson, preferences);
       const earliestDate = this.earliestDateForLesson(
         lesson,
         preferences.startDate,
         scheduledDateByLessonId
       );
-      const scheduledOn = this.findSlot(earliestDate, lesson.durationMinutes, preferences, usedMinutesByDate);
+      const scheduledOn = this.findSlot(earliestDate, plannedDurationMinutes, preferences, usedMinutesByDate);
       const week = weekForDate(preferences.startDate, scheduledOn);
       weeksByNumber.set(week.weekNumber, week);
       tasks.push({
         lessonVersionId: lesson.lessonVersionId,
         scheduledOn,
-        plannedDurationMinutes: lesson.durationMinutes,
+        plannedDurationMinutes,
         required: lesson.required,
         weekNumber: week.weekNumber
       });
       usedMinutesByDate.set(
         dateKey(scheduledOn),
-        (usedMinutesByDate.get(dateKey(scheduledOn)) ?? 0) + lesson.durationMinutes
+        (usedMinutesByDate.get(dateKey(scheduledOn)) ?? 0) + plannedDurationMinutes
       );
       scheduledDateByLessonId.set(lesson.lessonId, scheduledOn);
     }
@@ -98,6 +99,28 @@ export class SchedulingDomainService {
 
     throw capacityError();
   }
+}
+
+/**
+ * Professional curricula describe the complete 120-minute session, while the
+ * learner chooses how much of its CORE/RECOMMENDED/EXTENSION work to schedule.
+ * Keep the lesson/version stable and adapt the Daily Task duration instead of
+ * duplicating or skipping curriculum units.
+ */
+export function plannedDurationFor(
+  lesson: ApprovedLessonForScheduling,
+  preferences: PlanPreferences
+): number {
+  if (lesson.trackType !== "SOFTWARE_ENGINEERING") {
+    return lesson.durationMinutes;
+  }
+
+  const studyDayCapacities = preferences.studyDays
+    .map((day) => preferences.availableMinutesByDay[day] ?? 0)
+    .filter((minutes) => minutes > 0);
+  const selectedSessionDuration = Math.min(...studyDayCapacities);
+
+  return Math.min(lesson.durationMinutes, selectedSessionDuration);
 }
 
 export function hasCapacity(

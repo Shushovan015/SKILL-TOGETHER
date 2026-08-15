@@ -804,6 +804,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
   ): Promise<readonly ApprovedLessonForScheduling[]> {
     const lessons = await this.prisma.lesson.findMany({
       where: {
+        ...germanLessonLevelWhere(input, trackType),
         module: {
           trackId: input.trackId
         },
@@ -1289,6 +1290,36 @@ const germanLevelOrder = [
   "C2.1",
   "C2.2"
 ] as const;
+
+export function germanLevelsForRange(
+  startLevel: GermanLevel,
+  targetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER">
+): readonly Exclude<GermanLevel, "COMPLETE_BEGINNER">[] {
+  const normalizedStart = normalizedGermanStartLevel(startLevel);
+  const startIndex = germanLevelOrder.indexOf(normalizedStart);
+  const targetIndex = germanLevelOrder.indexOf(targetLevel);
+
+  return germanLevelOrder.slice(startIndex, targetIndex + 1);
+}
+
+function germanLessonLevelWhere(
+  input: OnboardingInput,
+  trackType: PrismaTrackType
+): Prisma.LessonWhereInput {
+  if (trackType !== PrismaTrackType.GERMAN) {
+    return {};
+  }
+
+  if (input.germanStartLevel === null || input.germanTargetLevel === null) {
+    throw validationError("germanStartLevel");
+  }
+
+  return {
+    difficulty: {
+      in: [...germanLevelsForRange(input.germanStartLevel, input.germanTargetLevel)]
+    }
+  };
+}
 
 function normalizedGermanStartLevel(level: GermanLevel): Exclude<GermanLevel, "COMPLETE_BEGINNER"> {
   return level === "COMPLETE_BEGINNER" ? "A1.1" : level;

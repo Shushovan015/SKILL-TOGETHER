@@ -16,7 +16,7 @@ Implemented seed coverage:
 - 24 weekly modules.
 - 120 daily learning units.
 - 5 study days per week.
-- 120-minute default sessions with 60, 90, and 120-minute completion guidance in every lesson.
+- Complete 120-minute source sessions with 30, 60, 90, and 120-minute completion paths in every lesson.
 - 24 weekly professional assessments.
 - 360 embedded interview questions.
 - 24 portfolio or capstone project milestones.
@@ -43,7 +43,7 @@ Each daily session includes:
 - priority-style activity plan;
 - skill and assessment tags;
 - progression state;
-- 60/90/120-minute duration guidance;
+- 30/60/90/120-minute duration guidance;
 - explanation and conceptual model;
 - realistic engineering scenario;
 - guided exercise with answer notes;

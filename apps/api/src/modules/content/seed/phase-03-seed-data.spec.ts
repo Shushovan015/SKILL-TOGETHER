@@ -113,6 +113,7 @@ describe("phase 3 Software Engineering career seed data", () => {
       expect(() => validateLessonVersionEditorInput(content)).not.toThrow();
       expect(content.explanationMarkdown).toContain("Duration architecture:");
       expect(content.explanationMarkdown).toContain("Activity plan:");
+      expect(content.explanationMarkdown).toContain("30 minutes:");
       expect(content.explanationMarkdown).toContain("60 minutes:");
       expect(content.explanationMarkdown).toContain("90 minutes:");
       expect(content.explanationMarkdown).toContain("120 minutes:");
