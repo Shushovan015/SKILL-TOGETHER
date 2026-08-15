@@ -1,6 +1,26 @@
-import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client/react";
+import { Link, Navigate } from "react-router-dom";
+
+import { ME_QUERY, type MeQueryData } from "./graphql.js";
 
 export function HomePage(): React.JSX.Element {
+  const { data, loading } = useQuery<MeQueryData>(ME_QUERY, {
+    fetchPolicy: "cache-and-network",
+    errorPolicy: "all"
+  });
+
+  if (data?.me !== undefined) {
+    return <Navigate to="/tracks" replace />;
+  }
+
+  if (loading) {
+    return (
+      <main className="status-page" aria-live="polite">
+        Restoring your session...
+      </main>
+    );
+  }
+
   return (
     <main className="auth-page" aria-labelledby="home-title">
       <section className="auth-panel">
