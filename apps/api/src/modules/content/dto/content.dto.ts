@@ -1,4 +1,4 @@
-import { Field, ID, InputType, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
+import { Field, Float, ID, InputType, Int, ObjectType, registerEnumType } from "@nestjs/graphql";
 
 import { DateTimeValue } from "../../../common/graphql/date-time.scalar.js";
 import { DateValue } from "../../../common/graphql/date.scalar.js";
@@ -283,6 +283,30 @@ export class EnrollmentDto {
 
   @Field(() => Int, { nullable: true })
   public germanSessionDurationMinutes!: number | null;
+
+  @Field(() => Int)
+  public totalTaskCount!: number;
+
+  @Field(() => Int)
+  public completedTaskCount!: number;
+
+  @Field(() => Float)
+  public overallProgressPercentage!: number;
+
+  @Field(() => ID, { nullable: true })
+  public currentDailyTaskId!: string | null;
+
+  @Field(() => ID, { nullable: true })
+  public currentLessonId!: string | null;
+
+  @Field(() => String, { nullable: true })
+  public currentModuleTitle!: string | null;
+
+  @Field(() => String, { nullable: true })
+  public currentLessonTitle!: string | null;
+
+  @Field(() => [ID])
+  public completedLessonIds!: readonly string[];
 }
 
 @InputType("ResourceInput")

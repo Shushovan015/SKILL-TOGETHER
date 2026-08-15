@@ -12,7 +12,11 @@ test("registers, logs out, and logs back in", async ({ page }) => {
   await page.getByRole("button", { name: "Create account" }).click();
 
   await expect(page).toHaveURL(/\/today$/);
-  await expect(page.getByText("Your session is active, Phase Two Learner.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
+
+  await page.goto("/");
+  await expect(page).not.toHaveURL(/\/login$/);
+  await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
 
   await page.getByRole("button", { name: "Log out" }).click();
   await expect(page).toHaveURL(/\/login$/);
@@ -22,5 +26,5 @@ test("registers, logs out, and logs back in", async ({ page }) => {
   await page.getByRole("button", { name: "Log in" }).click();
 
   await expect(page).toHaveURL(/\/today$/);
-  await expect(page.getByText("Your session is active, Phase Two Learner.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
 });

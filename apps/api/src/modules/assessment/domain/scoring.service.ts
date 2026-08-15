@@ -75,7 +75,9 @@ export class AssessmentScoringService {
 function objectiveResult(points: number, correct: boolean): ScoreResult {
   return {
     score: correct ? points : 0,
-    feedback: correct ? "Correct." : "Review this topic.",
+    feedback: correct
+      ? "Correct. Your response matches the reviewed answer for this question."
+      : "Incorrect. Your response does not match the reviewed answer; revisit the tagged lesson before retrying.",
     autoScored: true
   };
 }
@@ -83,7 +85,7 @@ function objectiveResult(points: number, correct: boolean): ScoreResult {
 function invalidAnswerResult(): ScoreResult {
   return {
     score: 0,
-    feedback: "Answer format was invalid.",
+    feedback: "This response could not be scored because its format did not match the question type.",
     autoScored: true
   };
 }

@@ -86,6 +86,17 @@ interface PrismaEnrollmentWithTrack {
   readonly learningPreferences: Prisma.JsonValue | null;
 }
 
+interface EnrollmentProgress {
+  readonly totalTaskCount: number;
+  readonly completedTaskCount: number;
+  readonly overallProgressPercentage: number;
+  readonly currentDailyTaskId: string | null;
+  readonly currentLessonId: string | null;
+  readonly currentModuleTitle: string | null;
+  readonly currentLessonTitle: string | null;
+  readonly completedLessonIds: readonly string[];
+}
+
 const disabledSeedPasswordHash = "disabled-seed-content-admin-no-login";
 
 export class PrismaContentRepository implements ContentRepository {
@@ -142,8 +153,10 @@ export class PrismaContentRepository implements ContentRepository {
       }
     });
 
+    const progress = await Promise.all(enrollments.map((enrollment) => this.enrollmentProgress(enrollment.id)));
+
     return enrollments
-      .map((enrollment) => mapEnrollment(enrollment))
+      .map((enrollment, index) => mapEnrollment(enrollment, progress[index]))
       .filter((enrollment): enrollment is EnrollmentRecord => enrollment !== null);
   }
 
@@ -163,7 +176,9 @@ export class PrismaContentRepository implements ContentRepository {
       }
     });
 
-    return enrollment === null ? null : mapEnrollment(enrollment);
+    return enrollment === null
+      ? null
+      : mapEnrollment(enrollment, await this.enrollmentProgress(enrollment.id));
   }
 
   public async selectLearningTrack(
@@ -243,6 +258,42 @@ export class PrismaContentRepository implements ContentRepository {
     }
 
     return mapped;
+  }
+
+  private async enrollmentProgress(enrollmentId: string): Promise<EnrollmentProgress> {
+    const tasks = await this.prisma.dailyTask.findMany({
+      where: {
+        studyWeek: { studyPlan: { enrollmentId } },
+        status: { notIn: ["CANCELLED", "RESCHEDULED", "SKIPPED"] }
+      },
+      select: {
+        id: true,
+        status: true,
+        scheduledOn: true,
+        lessonVersion: {
+          select: {
+            title: true,
+            lessonId: true,
+            lesson: { select: { module: { select: { title: true } } } }
+          }
+        }
+      },
+      orderBy: { scheduledOn: "asc" }
+    });
+    const current = tasks.find((task) => task.status === "IN_PROGRESS")
+      ?? tasks.find((task) => task.status === "PLANNED");
+    const completed = tasks.filter((task) => task.status === "COMPLETED");
+
+    return {
+      totalTaskCount: tasks.length,
+      completedTaskCount: completed.length,
+      overallProgressPercentage: tasks.length === 0 ? 0 : Math.round((completed.length / tasks.length) * 10_000) / 100,
+      currentDailyTaskId: current?.id ?? null,
+      currentLessonId: current?.lessonVersion.lessonId ?? null,
+      currentModuleTitle: current?.lessonVersion.lesson.module.title ?? null,
+      currentLessonTitle: current?.lessonVersion.title ?? null,
+      completedLessonIds: [...new Set(completed.map((task) => task.lessonVersion.lessonId))]
+    };
   }
 
   public async listAdminLessonVersions(
@@ -915,7 +966,10 @@ function mapTrack(track: PrismaTrackWithModules): LearningTrackRecord {
   };
 }
 
-function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): EnrollmentRecord | null {
+function mapEnrollment(
+  enrollment: PrismaEnrollmentWithTrack,
+  progress: EnrollmentProgress | undefined = undefined
+): EnrollmentRecord | null {
   const track = mapTrack(enrollment.track);
 
   return {
@@ -926,9 +980,21 @@ function mapEnrollment(enrollment: PrismaEnrollmentWithTrack): EnrollmentRecord 
     startDate: enrollment.startDate,
     targetOutcome: enrollment.targetOutcome,
     experienceLevel: enrollment.experienceLevel,
-    ...germanEnrollmentFields(enrollment.learningPreferences)
+    ...germanEnrollmentFields(enrollment.learningPreferences),
+    ...(progress ?? emptyEnrollmentProgress)
   };
 }
+
+const emptyEnrollmentProgress: EnrollmentProgress = {
+  totalTaskCount: 0,
+  completedTaskCount: 0,
+  overallProgressPercentage: 0,
+  currentDailyTaskId: null,
+  currentLessonId: null,
+  currentModuleTitle: null,
+  currentLessonTitle: null,
+  completedLessonIds: []
+};
 
 function enrollmentPreferencesForTrack(
   trackType: PrismaTrackType,

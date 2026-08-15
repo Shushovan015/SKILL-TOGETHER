@@ -221,8 +221,8 @@ export const PLANNING_TRACKS_QUERY = gql`
   ${TRACK_FIELDS}
 `;
 
-export const DAILY_TASK_FIELDS = gql`
-  fragment DailyTaskFields on DailyTask {
+export const DAILY_TASK_SUMMARY_FIELDS = gql`
+  fragment DailyTaskSummaryFields on DailyTask {
     id
     studyWeekId
     scheduledOn
@@ -240,6 +240,14 @@ export const DAILY_TASK_FIELDS = gql`
       difficulty
       learningObjective
       outcomes
+    }
+  }
+`;
+
+export const DAILY_TASK_DETAIL_FIELDS = gql`
+  fragment DailyTaskDetailFields on DailyTask {
+    ...DailyTaskSummaryFields
+    lesson {
       explanationMarkdown
       businessRelevanceMarkdown
       examples
@@ -249,16 +257,20 @@ export const DAILY_TASK_FIELDS = gql`
         kind
         promptMarkdown
         expectedEvidence
+        solutionNotesMarkdown
       }
       independentExercise {
         id
         kind
         promptMarkdown
         expectedEvidence
+        solutionNotesMarkdown
       }
       knowledgeChecks {
         id
         question
+        answerKey
+        explanation
       }
       resources {
         id
@@ -276,15 +288,16 @@ export const DAILY_TASK_FIELDS = gql`
       }
     }
   }
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;
 
 export const DAILY_TASK_QUERY = gql`
   query DailyTask($id: ID!) {
     dailyTask(id: $id) {
-      ...DailyTaskFields
+      ...DailyTaskDetailFields
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_DETAIL_FIELDS}
 `;
 
 export const COMPLETE_ONBOARDING_MUTATION = gql`
@@ -319,13 +332,13 @@ export const TODAY_DASHBOARD_QUERY = gql`
     todayDashboard {
       date
       tasks {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
       }
       mainTask {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
       }
       germanTask {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
       }
       estimatedStudyMinutes
       weeklyProgress {
@@ -334,38 +347,38 @@ export const TODAY_DASHBOARD_QUERY = gql`
         weeklyCompletionPercentage
       }
       missedTasks {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
       }
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;
 
 export const WEEKLY_PLAN_QUERY = gql`
   query WeeklyPlan($weekNumber: Int!) {
     weeklyPlan(weekNumber: $weekNumber) {
-      ...DailyTaskFields
+      ...DailyTaskSummaryFields
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;
 
 export const START_DAILY_TASK_MUTATION = gql`
   mutation StartDailyTask($id: ID!) {
     startDailyTask(id: $id) {
-      ...DailyTaskFields
+      ...DailyTaskDetailFields
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_DETAIL_FIELDS}
 `;
 
 export const COMPLETE_DAILY_TASK_MUTATION = gql`
   mutation CompleteDailyTask($input: CompleteDailyTaskInput!) {
     completeDailyTask(input: $input) {
-      ...DailyTaskFields
+      ...DailyTaskDetailFields
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_DETAIL_FIELDS}
 `;
 
 export const PROPOSE_RECOVERY_MUTATION = gql`
@@ -385,8 +398,8 @@ export const PROPOSE_RECOVERY_MUTATION = gql`
 export const APPLY_RECOVERY_MUTATION = gql`
   mutation ApplyRecovery($input: RescheduleTaskInput!) {
     applyRecovery(input: $input) {
-      ...DailyTaskFields
+      ...DailyTaskSummaryFields
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;

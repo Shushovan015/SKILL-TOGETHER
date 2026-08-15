@@ -106,6 +106,28 @@ export function AssessmentResultPage(): React.JSX.Element {
           )}
         </article>
       </section>
+
+      <section className="module-panel" aria-labelledby="answer-feedback-title">
+        <h2 id="answer-feedback-title">Answer feedback</h2>
+        {result.answerFeedback.length === 0 ? (
+          <p>Detailed feedback is not available yet.</p>
+        ) : (
+          <ol className="assessment-feedback-list">
+            {result.answerFeedback.map((answer) => (
+              <li key={answer.questionId}>
+                <h3>{answer.promptMarkdown}</h3>
+                <p><strong>Your answer:</strong> {formatResponse(answer.response)}</p>
+                <p><strong>Score:</strong> {answer.score === null ? "Pending" : `${answer.score}/${answer.points}`}</p>
+                <p>{answer.pendingManualReview ? "A reviewer still needs to assess this response." : answer.feedback ?? "No feedback was recorded."}</p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </main>
   );
+}
+
+function formatResponse(response: unknown): string {
+  return typeof response === "string" ? response : JSON.stringify(response);
 }

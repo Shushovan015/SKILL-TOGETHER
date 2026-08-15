@@ -154,6 +154,9 @@ function createPrismaStub(
   let nextEnrollmentId = 1;
 
   return {
+    dailyTask: {
+      findMany: async (): Promise<readonly []> => []
+    },
     learningTrack: {
       findFirst: async (args: {
         readonly where: { readonly id?: string; readonly active?: boolean };

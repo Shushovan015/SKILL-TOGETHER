@@ -1,5 +1,5 @@
 import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { fetchCsrfToken } from "../auth/graphql.js";
@@ -16,6 +16,8 @@ import {
   type TaskIdMutationVariables
 } from "./graphql.js";
 import { toSafePlanningMessage } from "./planning-ui.js";
+import { LearningContent } from "./LearningContent.js";
+import { clearLessonDraft, readLessonDraft, writeLessonDraft } from "./lesson-draft.js";
 
 interface LessonPageProps {
   readonly exerciseOnly?: boolean;
@@ -25,12 +27,13 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
   const { dailyTaskId } = useParams();
   const client = useApolloClient();
   const navigate = useNavigate();
+  const initialDraft = readLessonDraft(dailyTaskId);
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
-  const [guidedEvidence, setGuidedEvidence] = useState("");
-  const [independentEvidence, setIndependentEvidence] = useState("");
-  const [knowledgeCheckEvidence, setKnowledgeCheckEvidence] = useState("");
-  const [completionNotes, setCompletionNotes] = useState("");
-  const [reflection, setReflection] = useState("");
+  const [guidedEvidence, setGuidedEvidence] = useState(initialDraft.guidedEvidence);
+  const [independentEvidence, setIndependentEvidence] = useState(initialDraft.independentEvidence);
+  const [knowledgeCheckEvidence, setKnowledgeCheckEvidence] = useState(initialDraft.knowledgeCheckEvidence);
+  const [completionNotes, setCompletionNotes] = useState(initialDraft.notes);
+  const [reflection, setReflection] = useState(initialDraft.reflection);
   const [actionError, setActionError] = useState<string | undefined>();
   const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const query = useQuery<DailyTaskQueryData, DailyTaskQueryVariables>(DAILY_TASK_QUERY, {
@@ -49,6 +52,17 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
     CompleteDailyTaskMutationVariables
   >(COMPLETE_DAILY_TASK_MUTATION);
   const task = query.data?.dailyTask;
+
+  useEffect(() => {
+    if (dailyTaskId === undefined) return;
+    writeLessonDraft(dailyTaskId, {
+      guidedEvidence,
+      independentEvidence,
+      knowledgeCheckEvidence,
+      notes: completionNotes,
+      reflection
+    });
+  }, [completionNotes, dailyTaskId, guidedEvidence, independentEvidence, knowledgeCheckEvidence, reflection]);
 
   if (dailyTaskId === undefined) {
     return (
@@ -144,6 +158,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
           }
         }
       });
+      clearLessonDraft(taskId);
       setSuccessMessage("Lesson completed. Your practice and reflection were saved.");
     });
   }
@@ -156,12 +171,13 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
             {exerciseOnly ? "< Back to lesson" : "< Back to Today"}
           </Link>
           <p className="auth-panel__eyebrow">
-            {task.lesson.trackTitle} &gt; Week {task.studyWeekNumber}
+            {task.lesson.trackTitle} &gt; {task.lesson.moduleTitle} &gt; Week {task.studyWeekNumber}
           </p>
           <h1 id="lesson-title">{task.lesson.title}</h1>
           <p>
             {task.lesson.difficulty} - {task.plannedDurationMinutes} minutes - {formatStatus(task.status)}
           </p>
+          <p className="lesson-goal"><strong>Today&apos;s goal:</strong> {task.lesson.learningObjective}</p>
         </div>
         <div className="auth-panel__actions">
           <Link className="button-link button-link--secondary" to={`/plan/week/${task.studyWeekNumber}`}>
@@ -169,6 +185,9 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
           </Link>
           <Link className="button-link button-link--secondary" to={roadmapUrl}>
             Roadmap
+          </Link>
+          <Link className="button-link button-link--secondary" to="/tracks">
+            My Tracks
           </Link>
         </div>
       </section>
@@ -179,9 +198,13 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
         </p>
       )}
       {successMessage === undefined ? null : (
-        <p className="form-success" role="status">
-          {successMessage}
-        </p>
+        <section className="form-success" role="status">
+          <p>{successMessage}</p>
+          <div className="auth-panel__actions">
+            <Link className="button-link" to="/today">Continue on Today</Link>
+            <Link className="button-link button-link--secondary" to={roadmapUrl}>View roadmap</Link>
+          </div>
+        </section>
       )}
 
       {exerciseOnly ? (
@@ -205,6 +228,9 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
       ) : (
         <section className="lesson-layout">
           <article className="lesson-content lesson-content--learning">
+            <div className="lesson-progress" aria-label="Session progress">
+              <span>Learn</span><span>Example</span><span>Guided practice</span><span>Independent practice</span><span>Review</span>
+            </div>
             <LessonSections task={task} />
           </article>
           <aside className="lesson-action" aria-label="Lesson actions">
@@ -225,6 +251,7 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
   return (
     <>
       <section>
+        <p className="learning-section-label">Orient</p>
         <h2>What You Will Learn</h2>
         <p>By the end of this lesson you will be able to:</p>
         <ul>
@@ -234,22 +261,26 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
         </ul>
       </section>
       <section>
+        <p className="learning-section-label">Prerequisites</p>
         <h2>Before You Start</h2>
         <p>{beforeStartCopy(task)}</p>
       </section>
       <section>
-        <h2>Learn</h2>
-        <p className="preserve-lines">{task.lesson.explanationMarkdown}</p>
+        <p className="learning-section-label">Concept</p>
+        <h2>Learn the Mental Model</h2>
+        <LearningContent content={task.lesson.explanationMarkdown} />
       </section>
       <section>
+        <p className="learning-section-label">Why?</p>
         <h2>Why This Matters</h2>
-        <p className="preserve-lines">{task.lesson.businessRelevanceMarkdown}</p>
+        <LearningContent content={task.lesson.businessRelevanceMarkdown} />
       </section>
       <section>
-        <h2>Examples</h2>
+        <p className="learning-section-label">Watch</p>
+        <h2>Worked Examples</h2>
         <ul className="example-list">
           {task.lesson.examples.map((example) => (
-            <li className="preserve-lines" key={example}>{example}</li>
+            <li key={example}><LearningContent content={example} /></li>
           ))}
         </ul>
       </section>
@@ -266,6 +297,7 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
         title="Practice By Yourself"
       />
       <section>
+        <p className="learning-section-label">Retrieval</p>
         <h2>Check Your Understanding</h2>
         <ol>
           {task.lesson.knowledgeChecks.map((check) => (
@@ -282,7 +314,8 @@ function LessonSections({ task }: { readonly task: DailyTask }): React.JSX.Eleme
           ))}
         </ol>
       </section>
-      <section>
+      <section className="learning-callout learning-callout--mistake">
+        <p className="learning-section-label">Common Mistake</p>
         <h2>Common Mistakes</h2>
         <ul>
           {task.lesson.commonMistakes.map((mistake) => (
@@ -328,16 +361,17 @@ function ExerciseSection({
   readonly title: string;
 }): React.JSX.Element {
   return (
-    <section>
+    <section className={title === "Try It With Me" ? "learning-callout learning-callout--guided" : "learning-callout learning-callout--independent"}>
+      <p className="learning-section-label">{title === "Try It With Me" ? "Guided Practice" : "Try It Yourself"}</p>
       <h2>{title}</h2>
-      <p className="preserve-lines">{prompt}</p>
+      <LearningContent content={prompt} />
       <p>
         <strong>What to write down:</strong> {evidence}
       </p>
       {solutionNotes === null ? null : (
         <details>
           <summary>Show answer notes</summary>
-          <p className="preserve-lines">{solutionNotes}</p>
+          <LearningContent content={solutionNotes} />
         </details>
       )}
     </section>
@@ -412,6 +446,7 @@ function LessonCompletionForm({
       </article>
       <form className="content-form" onSubmit={(event) => event.preventDefault()}>
         <h2>Finish Lesson</h2>
+        <p className="form-help" role="status">Your unfinished answers are preserved when this tab refreshes.</p>
         <label>
           Study time in minutes
           <input type="number" min={1} max={480} value={durationMinutes} onChange={(event) => setDurationMinutes(Number(event.target.value))} />

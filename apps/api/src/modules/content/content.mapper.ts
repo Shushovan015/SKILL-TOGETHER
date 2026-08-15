@@ -53,7 +53,15 @@ export function toEnrollmentDto(enrollment: EnrollmentRecord): EnrollmentDto {
     experienceLevel: enrollment.experienceLevel,
     germanStartLevel: enrollment.germanStartLevel,
     germanTargetLevel: enrollment.germanTargetLevel,
-    germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes
+    germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes,
+    totalTaskCount: enrollment.totalTaskCount,
+    completedTaskCount: enrollment.completedTaskCount,
+    overallProgressPercentage: enrollment.overallProgressPercentage,
+    currentDailyTaskId: enrollment.currentDailyTaskId,
+    currentLessonId: enrollment.currentLessonId,
+    currentModuleTitle: enrollment.currentModuleTitle,
+    currentLessonTitle: enrollment.currentLessonTitle,
+    completedLessonIds: [...enrollment.completedLessonIds]
   };
 }
 

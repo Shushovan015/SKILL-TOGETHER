@@ -114,6 +114,14 @@ export interface EnrollmentRecord {
   readonly germanStartLevel: GermanLevel | null;
   readonly germanTargetLevel: Exclude<GermanLevel, "COMPLETE_BEGINNER"> | null;
   readonly germanSessionDurationMinutes: 30 | 45 | 60 | 90 | null;
+  readonly totalTaskCount: number;
+  readonly completedTaskCount: number;
+  readonly overallProgressPercentage: number;
+  readonly currentDailyTaskId: string | null;
+  readonly currentLessonId: string | null;
+  readonly currentModuleTitle: string | null;
+  readonly currentLessonTitle: string | null;
+  readonly completedLessonIds: readonly string[];
 }
 
 export interface LessonVersionEditorInput {

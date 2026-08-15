@@ -101,6 +101,7 @@ Assessment result shows:
 - weak topics;
 - revision recommendations linked to lessons or tasks;
 - manual grading pending states if applicable.
+- owner-only per-answer response, earned/possible points, stored grading feedback, and manual-review state.
 
 ## German CEFR Assessment Rules
 

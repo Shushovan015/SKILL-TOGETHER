@@ -1,17 +1,20 @@
-import { useApolloClient, useMutation } from "@apollo/client/react";
-import { useState } from "react";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client/react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { fetchCsrfToken } from "../auth/graphql.js";
+import { getFirstGraphqlErrorCode } from "../../shared/graphql/errors.js";
 import {
   START_WEEKLY_ASSESSMENT_MUTATION,
   SUBMIT_ASSESSMENT_MUTATION,
+  WEEKLY_ASSESSMENT_QUERY,
   type AssessmentAttempt,
   type AssessmentQuestion,
   type JsonValue,
   type StartWeeklyAssessmentMutationData,
   type SubmitAssessmentMutationData,
   type SubmitAssessmentMutationVariables,
+  type WeeklyAssessmentQueryData,
   type WeeklyAssessmentVariables
 } from "./graphql.js";
 import {
@@ -19,16 +22,29 @@ import {
   questionOptions,
   toSafeAssessmentMessage
 } from "./assessment-ui.js";
+import { clearAssessmentDraft, readAssessmentDraft, writeAssessmentDraft } from "./assessment-draft.js";
 
 type AnswersByQuestionId = Readonly<Record<string, JsonValue>>;
+interface AttemptAnswers {
+  readonly attemptId: string;
+  readonly answers: AnswersByQuestionId;
+}
 
 export function AssessmentPage(): React.JSX.Element {
   const { studyWeekId } = useParams();
   const client = useApolloClient();
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState<AssessmentAttempt | undefined>();
-  const [answers, setAnswers] = useState<AnswersByQuestionId>({});
+  const [attemptAnswers, setAttemptAnswers] = useState<AttemptAnswers | undefined>();
   const [actionError, setActionError] = useState<string | undefined>();
+  const existingAttempt = useQuery<WeeklyAssessmentQueryData, WeeklyAssessmentVariables>(
+    WEEKLY_ASSESSMENT_QUERY,
+    {
+      variables: { studyWeekId: studyWeekId ?? "" },
+      skip: studyWeekId === undefined,
+      fetchPolicy: "network-only"
+    }
+  );
   const [startWeeklyAssessment, startState] = useMutation<
     StartWeeklyAssessmentMutationData,
     WeeklyAssessmentVariables
@@ -37,6 +53,17 @@ export function AssessmentPage(): React.JSX.Element {
     SubmitAssessmentMutationData,
     SubmitAssessmentMutationVariables
   >(SUBMIT_ASSESSMENT_MUTATION);
+  const currentAttempt = attempt ?? existingAttempt.data?.weeklyAssessment;
+  const answers = currentAttempt === undefined
+    ? {}
+    : attemptAnswers?.attemptId === currentAttempt.id
+      ? attemptAnswers.answers
+      : readAssessmentDraft(currentAttempt.id);
+
+  useEffect(() => {
+    if (attemptAnswers === undefined) return;
+    writeAssessmentDraft(attemptAnswers.attemptId, attemptAnswers.answers);
+  }, [attemptAnswers]);
 
   if (studyWeekId === undefined) {
     return (
@@ -62,19 +89,27 @@ export function AssessmentPage(): React.JSX.Element {
           }
         }
       });
-      setAttempt(result.data?.startWeeklyAssessment);
-      setAnswers({});
+      const startedAttempt = result.data?.startWeeklyAssessment;
+      setAttempt(startedAttempt);
+      if (startedAttempt !== undefined) {
+        setAttemptAnswers({
+          attemptId: startedAttempt.id,
+          answers: readAssessmentDraft(startedAttempt.id)
+        });
+      }
     } catch (error) {
       setActionError(toSafeAssessmentMessage(error));
     }
   }
 
   async function submit(): Promise<void> {
-    if (attempt === undefined) {
+    const currentAttempt = attempt ?? existingAttempt.data?.weeklyAssessment;
+
+    if (currentAttempt === undefined) {
       return;
     }
 
-    if (attempt.questions.some((question) => !isAnswered(answers[question.id]))) {
+    if (currentAttempt.questions.some((question) => !isAnswered(answers[question.id]))) {
       setActionError("Answer every question before submitting.");
       return;
     }
@@ -85,8 +120,8 @@ export function AssessmentPage(): React.JSX.Element {
       const result = await submitAssessment({
         variables: {
           input: {
-            attemptId: attempt.id,
-            answers: attempt.questions.map((question) => ({
+            attemptId: currentAttempt.id,
+            answers: currentAttempt.questions.map((question) => ({
               questionId: question.id,
               response: answers[question.id] ?? null
             }))
@@ -101,6 +136,7 @@ export function AssessmentPage(): React.JSX.Element {
       const submittedAttempt = result.data?.submitAssessment;
 
       if (submittedAttempt !== undefined) {
+        clearAssessmentDraft(submittedAttempt.id);
         navigate(`/assessments/${submittedAttempt.id}/result`);
       }
     } catch (error) {
@@ -109,11 +145,19 @@ export function AssessmentPage(): React.JSX.Element {
   }
 
   function setAnswer(questionId: string, response: JsonValue): void {
-    setAnswers((current) => ({
-      ...current,
-      [questionId]: response
+    if (currentAttempt === undefined) return;
+
+    setAttemptAnswers((current) => ({
+      attemptId: currentAttempt.id,
+      answers: {
+        ...(current?.attemptId === currentAttempt.id ? current.answers : readAssessmentDraft(currentAttempt.id)),
+        [questionId]: response
+      }
     }));
   }
+
+  const restoreError = existingAttempt.error;
+  const expectedMissingAttempt = getFirstGraphqlErrorCode(restoreError) === "ASSESSMENT_NOT_ELIGIBLE";
 
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="assessment-title">
@@ -136,7 +180,13 @@ export function AssessmentPage(): React.JSX.Element {
         </p>
       )}
 
-      {attempt === undefined ? (
+      {restoreError !== undefined && !expectedMissingAttempt && currentAttempt === undefined ? (
+        <p className="form-error" role="alert">{toSafeAssessmentMessage(restoreError)}</p>
+      ) : null}
+
+      {existingAttempt.loading && currentAttempt === undefined ? (
+        <section className="module-panel" aria-live="polite">Restoring assessment...</section>
+      ) : currentAttempt === undefined && (restoreError === undefined || expectedMissingAttempt) ? (
         <section className="module-panel">
           <h2>Start assessment</h2>
           <p>Complete at least one required lesson in the week before starting.</p>
@@ -144,10 +194,10 @@ export function AssessmentPage(): React.JSX.Element {
             {startState.loading ? "Starting..." : "Start weekly assessment"}
           </button>
         </section>
-      ) : (
+      ) : currentAttempt !== undefined ? (
         <section className="lesson-layout">
           <div className="lesson-content">
-            {attempt.questions.map((question, index) => (
+            {currentAttempt.questions.map((question, index) => (
               <QuestionCard
                 answer={answers[question.id]}
                 key={question.id}
@@ -158,20 +208,20 @@ export function AssessmentPage(): React.JSX.Element {
             ))}
           </div>
           <aside className="lesson-action">
-            <h2>Attempt {attempt.attemptNumber}</h2>
-            <p>{attempt.status}</p>
-            {attempt.result === null ? (
+            <h2>Attempt {currentAttempt.attemptNumber}</h2>
+            <p>{currentAttempt.status}</p>
+            {currentAttempt.result === null ? (
               <button type="button" disabled={submitState.loading} onClick={() => void submit()}>
                 {submitState.loading ? "Submitting..." : "Submit assessment"}
               </button>
             ) : (
-              <Link className="button-link" to={`/assessments/${attempt.id}/result`}>
+              <Link className="button-link" to={`/assessments/${currentAttempt.id}/result`}>
                 View result
               </Link>
             )}
           </aside>
         </section>
-      )}
+      ) : null}
     </main>
   );
 }

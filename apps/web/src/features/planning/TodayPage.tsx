@@ -143,6 +143,8 @@ export function TodayPage(): React.JSX.Element {
     data.tasks.length > 0 ||
     data.missedTasks.length > 0 ||
     data.weeklyProgress.plannedCount > 0;
+  const currentWeekNumber = data.tasks[0]?.studyWeekNumber ?? data.missedTasks[0]?.studyWeekNumber ?? 1;
+  const weeklyPlanPath = `/plan/week/${currentWeekNumber}`;
 
   return (
     <main className="workspace-page workspace-page--wide" aria-labelledby="today-title">
@@ -160,7 +162,7 @@ export function TodayPage(): React.JSX.Element {
           <Link className="button-link button-link--secondary" to="/tracks">
             My Tracks
           </Link>
-          <Link className="button-link button-link--secondary" to="/plan/week/1">
+          <Link className="button-link button-link--secondary" to={weeklyPlanPath}>
             This Week
           </Link>
         </div>
@@ -190,7 +192,13 @@ export function TodayPage(): React.JSX.Element {
               </p>
             </div>
             {data.tasks.length === 0 ? (
-              <section className="content-empty">No lessons are scheduled for today.</section>
+              <section className="content-empty">
+                <p>No lessons are scheduled for today.</p>
+                <div className="auth-panel__actions">
+                  <Link className="button-link" to="/roadmap">View roadmap</Link>
+                  <Link className="button-link button-link--secondary" to={weeklyPlanPath}>View weekly plan</Link>
+                </div>
+              </section>
             ) : (
               <div className="today-task-list">
                 {data.tasks.map((task) => (
@@ -208,7 +216,7 @@ export function TodayPage(): React.JSX.Element {
                 {data.weeklyProgress.weeklyCompletionPercentage}%
               </p>
               <p>{formatMinutes(data.estimatedStudyMinutes)} planned today.</p>
-              <Link className="button-link button-link--secondary" to="/plan/week/1">
+              <Link className="button-link button-link--secondary" to={weeklyPlanPath}>
                 View weekly plan
               </Link>
             </article>

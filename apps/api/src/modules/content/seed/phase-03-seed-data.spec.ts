@@ -62,6 +62,21 @@ describe("phase 3 Software Engineering career seed data", () => {
   const softwareTrack = phase3SeedTracks.find((track) => track.slug === "software-engineering");
   const softwareLessons = softwareTrack?.modules.flatMap((moduleRecord) => moduleRecord.lessons) ?? [];
 
+  it("provides a gold-standard DTO boundary session that teaches before practice", () => {
+    const lesson = softwareLessons.find((candidate) => candidate.identifier === "SE-P01-M01-S03");
+
+    expect(lesson).toBeDefined();
+    if (lesson === undefined) throw new Error("Gold-standard DTO lesson is missing.");
+    const content = buildApprovedSeedVersionInput(lesson);
+
+    expect(content.explanationMarkdown).toContain("External data");
+    expect(content.explanationMarkdown).toContain("runtime validation");
+    expect(content.examples.join("\n")).toContain("ApiUserDto");
+    expect(content.exercises[0]?.promptMarkdown).toContain("Checkpoint");
+    expect(content.exercises[0]?.promptMarkdown).toContain("Success criteria");
+    expect(content.knowledgeChecks[0]?.explanation).toContain("Compile-time");
+  });
+
   it("materializes a complete five-to-six month professional career program", () => {
     expect(softwareTrack).toBeDefined();
     expect(softwareTrack?.modules).toHaveLength(24);
@@ -170,6 +185,19 @@ describe("phase 3 Project Management career seed data", () => {
     "at outline fidelity",
     "Draft a session outline"
   ] as const;
+
+  it("provides a gold-standard RAID session with a model artifact and feedback", () => {
+    const lesson = projectLessons.find((candidate) => candidate.identifier === "PM-P05-S03");
+
+    expect(lesson).toBeDefined();
+    if (lesson === undefined) throw new Error("Gold-standard RAID lesson is missing.");
+    const content = buildApprovedSeedVersionInput(lesson);
+
+    expect(content.explanationMarkdown).toContain("Could happen later");
+    expect(content.examples.join("\n")).toContain("| ID | Type | Description |");
+    expect(content.exercises[0]?.promptMarkdown).toContain("one issue, one assumption, one dependency, and one risk");
+    expect(content.exercises[1]?.solutionNotesMarkdown).toContain("correct reclassification");
+  });
 
   it("materializes a coherent fourteen-week professional pathway", () => {
     expect(projectTrack?.modules).toHaveLength(14);

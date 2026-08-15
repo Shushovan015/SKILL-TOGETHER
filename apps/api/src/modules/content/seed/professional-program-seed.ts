@@ -79,6 +79,12 @@ export const projectManagementProfessionalModules: readonly SeedModuleDefinition
 export function professionalContentForLesson(
   lessonDefinition: SeedLessonDefinition
 ): LearnerSeedContent | null {
+  const goldStandardContent = goldStandardContentForLesson(lessonDefinition);
+
+  if (goldStandardContent !== null) {
+    return goldStandardContent;
+  }
+
   const softwareCareerContent = softwareEngineeringCareerContentForLesson(lessonDefinition);
 
   if (softwareCareerContent !== null) {
@@ -100,6 +106,129 @@ export function professionalContentForLesson(
   }
 
   return null;
+}
+
+function goldStandardContentForLesson(lesson: SeedLessonDefinition): LearnerSeedContent | null {
+  if (lesson.identifier === "SE-P01-M01-S03") {
+    return dtoBoundaryGoldSession(lesson);
+  }
+
+  if (lesson.identifier === "PM-P05-S03") {
+    return raidGoldSession(lesson);
+  }
+
+  return null;
+}
+
+function dtoBoundaryGoldSession(lesson: SeedLessonDefinition): LearnerSeedContent {
+  return {
+    outcomes: [
+      "Explain DTO, domain model, and view model in plain language.",
+      "Trace data from an untrusted API response to a React component.",
+      "Validate unknown data and map it into a UI-friendly model.",
+      "Defend the boundary in a code review or interview."
+    ],
+    explanationMarkdown: [
+      "Problem",
+      "An API returns names and dates in a transport format. If a React component consumes that shape directly, an API rename, invalid date, or missing field becomes a UI bug.",
+      "Mental model",
+      "```text\nExternal data\n  -> runtime validation\n  -> API DTO\n  -> mapping function\n  -> view model\n  -> React component\n```",
+      "A DTO (Data Transfer Object) is the shape of information crossing a system boundary. It describes transport data. A domain model expresses application meaning. A view model contains exactly what a particular UI needs.",
+      "TypeScript checks code at compile time, but the network sends runtime values. Parse the response as unknown, validate it, and only then treat it as a DTO.",
+      "Duration architecture:",
+      "Activity plan:",
+      "- 30 minutes: orient, draw the data-flow model, and study the mapper.\n- 60 minutes: add guided and independent mapping practice plus retrieval.\n- 90 minutes: add runtime schema implementation, invalid cases, and mapping tests.\n- 120 minutes: add a second API variation, code-review defense, and portfolio-quality revision.",
+      "What you should remember",
+      "Validate at the external boundary. Keep transport naming out of components. Map once, then let the UI depend on a stable, useful shape."
+    ].join("\n\n"),
+    relevanceMarkdown: "Professional teams isolate external contracts so API changes are easier to review and test. This boundary also prevents unvalidated network data from silently entering trusted application code.",
+    examples: [
+      [
+        "Worked example",
+        "Problem -> the API uses snake_case and a raw date; the UI needs a display name and readable membership label.",
+        "```ts\n// src/api/users.ts\ntype ApiUserDto = {\n  readonly user_id: string;\n  readonly first_name: string;\n  readonly last_name: string;\n  readonly created_at: string;\n};\n\ntype UserCardViewModel = {\n  readonly id: string;\n  readonly displayName: string;\n  readonly memberSince: string;\n};\n\nfunction toUserCard(dto: ApiUserDto): UserCardViewModel {\n  return {\n    id: dto.user_id,\n    displayName: `${dto.first_name} ${dto.last_name}`,\n    memberSince: new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric' })\n      .format(new Date(dto.created_at))\n  };\n}\n```",
+        "Decision -> the component never knows snake_case or date formatting. Result -> mapping tests protect the UI when the transport contract changes."
+      ].join("\n\n"),
+      "Why not reuse one type everywhere? Because transport compatibility, domain rules, and display needs change for different reasons. Separate models cost a mapper but reduce coupling.",
+      "Common incorrect approach: `const response: any = await fetchUser()`. `any` disables checking. `unknown` plus runtime validation forces proof before use."
+    ],
+    commonMistakes: [
+      "Typing a fetch response with `as ApiUserDto` without runtime validation.",
+      "Formatting transport data repeatedly inside React components.",
+      "Creating multiple models with no meaningful difference or boundary.",
+      "Testing only the happy path and ignoring invalid dates or missing fields."
+    ],
+    resources: softwareResourceBundle(["typescript", "zod"]).slice(0, 3).map(verifiedResource),
+    exercises: [
+      {
+        kind: "guided",
+        promptMarkdown: "1. Start with `{ product_id, product_name, price_cents }`.\n2. Write an immutable `ApiProductDto` with three fields.\n3. Checkpoint: the UI needs only `id`, `label`, and `formattedPrice`.\n4. Write `toProductCard(dto)` and convert cents to a display price.\n5. Add a case for an invalid or absent price before mapping.\n\nSuccess criteria:\n- Transport and view types have different names.\n- Mapping occurs outside the component.\n- The boundary rejects invalid input.\n- A test covers one valid and one invalid response.",
+        expectedEvidence: "DTO, view model, mapper, validation decision, and two test cases.",
+        solutionNotesMarkdown: "Reference approach: validate the raw value before calling the mapper. A strong mapper returns `{ id: dto.product_id, label: dto.product_name, formattedPrice: formatter.format(dto.price_cents / 100) }`. The important decision is not the currency API; it is that transport conversion happens once at the boundary."
+      },
+      {
+        kind: "independent",
+        promptMarkdown: "An orders API returns `{ order_id, customer: { first_name, last_name }, total_cents, created_at }`. Design the DTO, validation boundary, and an order-row view model. Include loading, invalid-response, and success behavior. Explain one trade-off in separating the models.",
+        expectedEvidence: lesson.evidence,
+        solutionNotesMarkdown: "Score the result against: exact transport shape, runtime validation, UI-focused naming, a pure mapper, invalid-input behavior, tests, and a reasoned trade-off. More than one model design can be correct."
+      }
+    ],
+    knowledgeChecks: [
+      { question: "Why is a TypeScript DTO type alone insufficient for a network response?", answerKey: ["Network data exists at runtime and must be validated before it is trusted."], explanation: "Compile-time types do not inspect the bytes returned by an API." },
+      { question: "Where should snake_case-to-display-name conversion happen?", answerKey: ["In a boundary mapper before the data reaches the component."], explanation: "Central mapping prevents transport concerns from spreading through the UI." },
+      { question: "How would you defend separate DTO and view-model types in an interview?", answerKey: ["Name the changing boundaries, coupling avoided, validation point, test evidence, and mapping cost."], explanation: "A strong answer includes both the benefit and the extra complexity." }
+    ]
+  };
+}
+
+function raidGoldSession(lesson: SeedLessonDefinition): LearnerSeedContent {
+  return {
+    outcomes: ["Distinguish risks, assumptions, issues, and dependencies.", "Create an owned and prioritized RAID log.", "Convert a risk into an issue when facts change.", "Communicate the most important item to a sponsor."],
+    explanationMarkdown: [
+      "Problem",
+      "Projects fail quietly when uncertainty, beliefs, active problems, and external reliance are mixed into one vague list. RAID makes each item visible and actionable.",
+      "Mental model",
+      "```text\nCould happen later -> RISK\nWe believe this is true -> ASSUMPTION\nAlready happened -> ISSUE\nWe rely on something else -> DEPENDENCY\n```",
+      "Risk is uncertain future exposure. Assumption is an unverified belief used for planning. Issue is a current problem. Dependency is work or a decision that relies on something else.",
+      "A useful RAID entry has an owner and action. Risks also need probability, impact, response, and trigger. Assumptions need a validation date. Issues need a recovery action. Dependencies need a due date and escalation path.",
+      "Duration architecture:",
+      "- 30 minutes: classify items and critique the model register.\n- 60 minutes: build four guided entries, respond to a change, and write a sponsor update.\n- 90 minutes: add scoring, response options, and a facilitated review.\n- 120 minutes: add a second scenario change, executive defense, and portfolio-quality revision.",
+      "What you should remember",
+      "Risks need responses; assumptions need validation; issues need action; dependencies need monitoring. Every important entry needs an owner and review date."
+    ].join("\n\n"),
+    relevanceMarkdown: "RAID is used in planning, status reviews, steering meetings, launches, and recovery. Its value is not the spreadsheet: it is earlier decisions and explicit ownership.",
+    examples: [
+      [
+        "Worked example",
+        "A payment-provider security approval is expected by 20 September. It is a dependency because launch relies on an external approval. The uncertain possibility that it arrives late is a related risk.",
+        "| ID | Type | Description | Probability / impact | Owner | Action | Due / status |\n| --- | --- | --- | --- | --- | --- | --- |\n| D-01 | Dependency | Security approval from provider | High launch impact | Procurement | Confirm evidence and escalation contact | 20 Sep / Open |\n| R-01 | Risk | Approval may arrive after test window | Medium / High | PM | Reserve backup provider review | Trigger: no evidence by 16 Sep |\n| A-01 | Assumption | Legal review needs two days | Validate | Legal lead | Confirm capacity | 12 Sep / Open |\n| I-01 | Issue | QA environment is unavailable | Current / High | Engineering lead | Restore or provide alternate environment | Today / Active |",
+        "Reasoning -> each line uses the correct time/status distinction and names the next action."
+      ].join("\n\n"),
+      "Poor entry: `Vendor problem - high - watch it.` It lacks a precise event, impact, owner, response, trigger, and date.",
+      "Model communication: Security approval is not yet late, but the remaining test window creates high launch exposure. Procurement owns confirmation by Tuesday; if evidence is absent, I recommend activating backup-provider review."
+    ],
+    commonMistakes: ["Calling every uncertainty a risk.", "Keeping closed or stale entries without review.", "Assigning the PM as owner for every response.", "Reporting a red item without an option or decision request."],
+    resources: projectManagementResourceBundle(["project"]).slice(0, 3).map(verifiedResource),
+    exercises: [
+      {
+        kind: "guided",
+        promptMarkdown: "Classify these one at a time: (1) QA found a release-blocking defect; (2) the team believes translations need three days; (3) launch relies on app-store approval; (4) approval may arrive late.\n\nCheckpoint: you should have one issue, one assumption, one dependency, and one risk.\n\nNow add description, impact, owner, action, and review date. For the risk also add probability and trigger.\n\nSuccess criteria:\n- All four types are correctly distinguished.\n- Every entry has an accountable owner and next action.\n- Dates and triggers are testable.\n- The highest item has a stakeholder message.",
+        expectedEvidence: "Four-row RAID log and one concise stakeholder message.",
+        solutionNotesMarkdown: "Success criteria: correct classification, actionable ownership, specific dates, and a decision-ready message. Expected classification: defect = issue; translation duration = assumption; app-store approval = dependency; late approval = risk. Owners should be able to carry out the response; the PM coordinates but need not own every technical or business action."
+      },
+      {
+        kind: "independent",
+        promptMarkdown: "The app-store approval misses its date and the campaign cannot move. Update the RAID log: convert the relevant risk into an issue, keep the dependency visible, compare at least two response options, recommend one, and write the decision needed from the sponsor.",
+        expectedEvidence: lesson.evidence,
+        solutionNotesMarkdown: "Evaluate: correct reclassification, history retained, owners and deadlines, impact on scope/time/cost/quality, at least two credible options, recommendation, sponsor decision, and next review."
+      }
+    ],
+    knowledgeChecks: [
+      { question: "Payment approval was uncertain yesterday but missed its deadline today. What changed?", answerKey: ["The future risk materialized into a current issue; the dependency remains relevant."], explanation: "RAID categories change when evidence changes." },
+      { question: "What makes an assumption manageable?", answerKey: ["An owner, validation method, validation date, and response if it is false."], explanation: "An undocumented belief is hidden plan risk." },
+      { question: "How would you explain RAID in an interview?", answerKey: ["Use a real scenario to show classification, priority, ownership, response, communication, and review."], explanation: "Interviewers are testing applied judgment, not expansion of the acronym." }
+    ]
+  };
 }
 
 function buildProjectManagementOutlineModules(): readonly SeedModuleDefinition[] {
@@ -198,7 +327,7 @@ function detailedContent(session: DetailedSession): LearnerSeedContent {
         kind: "guided",
         promptMarkdown: `${session.guidedPrompt}\n\nInterview practice:\n${session.interviewQuestions.map((question) => `- ${question}`).join("\n")}`,
         expectedEvidence: "Guided notes, working artifact, and written tradeoff answer.",
-        solutionNotesMarkdown: session.guidedHint
+        solutionNotesMarkdown: `Success criteria: correct concept use, a reviewable artifact, explicit assumptions, realistic tradeoffs, verification evidence, and a clear explanation. ${session.guidedHint}`
       },
       {
         kind: "independent",

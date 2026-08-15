@@ -116,6 +116,15 @@ The dashboard must not be a five-month calendar.
 - Assessment submission confirms grading status.
 - Partner invitation success shows expiration and next step.
 
+## Professional Lesson Experience
+
+- Orient the learner with track, module, current lesson, objective, duration, status, and session stages before the lesson body.
+- Present substantial concepts as learn, worked example, guided practice, independent practice, feedback, and retrieval.
+- Keep answer keys and solution notes behind learner-controlled disclosure.
+- Use semantic code blocks and horizontally scrollable data tables at narrow widths.
+- Give every session explicit links to Today, the weekly plan, Roadmap, and My Tracks.
+- Keep the primary reading column near 48rem so long technical explanations remain readable.
+
 ## Missed-Session Experience
 
 Use language such as:

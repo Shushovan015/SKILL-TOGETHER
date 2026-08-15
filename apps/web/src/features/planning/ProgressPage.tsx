@@ -81,14 +81,15 @@ export function ProgressPage(): React.JSX.Element {
                   <dd>{weekNumber(enrollment.startDate)}</dd>
                 </div>
                 <div>
-                  <dt>Lessons</dt>
-                  <dd>{lessonCount(enrollment)}</dd>
+                  <dt>Completed</dt>
+                  <dd>{enrollment.completedTaskCount}/{enrollment.totalTaskCount}</dd>
                 </div>
                 <div>
                   <dt>Today</dt>
                   <dd>{dashboard?.tasks.filter((task) => task.lesson.trackTitle === enrollment.track.title).length ?? 0}</dd>
                 </div>
               </dl>
+              <p>{enrollment.overallProgressPercentage}% of this track completed.</p>
               {isProfessionalTrack(enrollment.track.type) ? (
                 <ul className="today-practice-list" aria-label={`${enrollment.track.title} professional progress areas`}>
                   <li>Curriculum: {lessonCount(enrollment)} planned sessions</li>

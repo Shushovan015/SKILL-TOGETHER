@@ -74,6 +74,30 @@ export class AssessmentQuestionDto {
   public assessmentTags!: readonly string[];
 }
 
+@ObjectType("AssessmentAnswerFeedback")
+export class AssessmentAnswerFeedbackDto {
+  @Field(() => ID)
+  public questionId!: string;
+
+  @Field()
+  public promptMarkdown!: string;
+
+  @Field(() => GraphqlJsonValue)
+  public response!: JsonValue;
+
+  @Field(() => Float, { nullable: true })
+  public score!: number | null;
+
+  @Field(() => Int)
+  public points!: number;
+
+  @Field(() => String, { nullable: true })
+  public feedback!: string | null;
+
+  @Field()
+  public pendingManualReview!: boolean;
+}
+
 @ObjectType("AssessmentAttemptResult")
 export class AssessmentAttemptResultDto {
   @Field(() => Float, { nullable: true })
@@ -93,6 +117,9 @@ export class AssessmentAttemptResultDto {
 
   @Field(() => [DailyTaskDto])
   public revisionRecommendations!: readonly DailyTaskDto[];
+
+  @Field(() => [AssessmentAnswerFeedbackDto])
+  public answerFeedback!: readonly AssessmentAnswerFeedbackDto[];
 }
 
 @ObjectType("AssessmentAttempt")

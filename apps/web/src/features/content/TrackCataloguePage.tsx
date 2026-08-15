@@ -47,6 +47,14 @@ export function TrackCataloguePage(): React.JSX.Element {
     );
   }
 
+  if (enrollments.error !== undefined && enrollments.data?.myEnrollments === undefined) {
+    return (
+      <main className="status-page" role="alert">
+        {toSafeContentMessage(enrollments.error)}
+      </main>
+    );
+  }
+
   const trackList = tracks.data?.learningTracks ?? [];
   const enrollmentList = enrollments.data?.myEnrollments ?? [];
   const activeEnrollments = enrollmentList.filter((enrollment) =>
@@ -185,6 +193,7 @@ function ActiveTrackCard({
   readonly onCancel: () => void;
 }): React.JSX.Element {
   const changeLabel = enrollment.track.type === "GERMAN" ? "Change level" : "Change plan";
+  const isComplete = enrollment.totalTaskCount > 0 && enrollment.completedTaskCount === enrollment.totalTaskCount;
 
   return (
     <article className="track-card">
@@ -207,9 +216,16 @@ function ActiveTrackCard({
           <dd>{formatStatus(enrollment.status)}</dd>
         </div>
       </dl>
+      <p className="track-card__position">
+        <strong>Current position:</strong>{" "}
+        {enrollment.currentLessonTitle === null
+          ? isComplete ? "Track complete." : "Open Today to see the next scheduled lesson."
+          : `${enrollment.currentModuleTitle} -> ${enrollment.currentLessonTitle}`}
+      </p>
+      <p>{enrollment.completedTaskCount} of {enrollment.totalTaskCount} sessions completed ({enrollment.overallProgressPercentage}%).</p>
       <div className="auth-panel__actions">
-        <Link className="button-link" to="/today">
-          Continue
+        <Link className="button-link" to={enrollment.currentDailyTaskId === null ? "/today" : `/lessons/${enrollment.currentDailyTaskId}`}>
+          {isComplete ? "Review Today" : "Continue"}
         </Link>
         <Link className="button-link button-link--secondary" to={`/roadmap?track=${enrollment.track.slug}`}>
           Roadmap

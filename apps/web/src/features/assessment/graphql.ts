@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { DAILY_TASK_FIELDS, type DailyTask } from "../planning/graphql.js";
+import { DAILY_TASK_SUMMARY_FIELDS, type DailyTask } from "../planning/graphql.js";
 
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | readonly JsonValue[] | { readonly [key: string]: JsonValue };
@@ -42,6 +42,17 @@ export interface AssessmentAttemptResult {
   readonly passed: boolean | null;
   readonly weakTopics: readonly string[];
   readonly revisionRecommendations: readonly DailyTask[];
+  readonly answerFeedback: readonly AssessmentAnswerFeedback[];
+}
+
+export interface AssessmentAnswerFeedback {
+  readonly questionId: string;
+  readonly promptMarkdown: string;
+  readonly response: JsonValue;
+  readonly score: number | null;
+  readonly points: number;
+  readonly feedback: string | null;
+  readonly pendingManualReview: boolean;
 }
 
 export interface AssessmentAttempt {
@@ -121,11 +132,20 @@ export const ASSESSMENT_ATTEMPT_FIELDS = gql`
       passed
       weakTopics
       revisionRecommendations {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
+      }
+      answerFeedback {
+        questionId
+        promptMarkdown
+        response
+        score
+        points
+        feedback
+        pendingManualReview
       }
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;
 
 export const WEEKLY_ASSESSMENT_QUERY = gql`
@@ -166,9 +186,18 @@ export const ASSESSMENT_RESULT_QUERY = gql`
       passed
       weakTopics
       revisionRecommendations {
-        ...DailyTaskFields
+        ...DailyTaskSummaryFields
+      }
+      answerFeedback {
+        questionId
+        promptMarkdown
+        response
+        score
+        points
+        feedback
+        pendingManualReview
       }
     }
   }
-  ${DAILY_TASK_FIELDS}
+  ${DAILY_TASK_SUMMARY_FIELDS}
 `;

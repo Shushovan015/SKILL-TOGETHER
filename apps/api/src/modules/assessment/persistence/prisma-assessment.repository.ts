@@ -687,6 +687,15 @@ export class PrismaAssessmentRepository implements AssessmentRepository {
       percentage: decimalToNumber(attempt.percentage),
       passed: attempt.passed,
       weakTopics,
+      answerFeedback: attempt.answers.map((answer) => ({
+        questionId: answer.questionId,
+        promptMarkdown: answer.question.promptMd,
+        response: toJsonValue(answer.response),
+        score: decimalToNumber(answer.score),
+        points: answer.question.points,
+        feedback: answer.feedback,
+        pendingManualReview: answer.graderType === "MANUAL" && answer.score === null
+      })),
       revisionRecommendations: await this.revisionRecommendations(
         attempt.userId,
         attempt.studyWeekId,

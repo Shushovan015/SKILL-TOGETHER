@@ -42,9 +42,16 @@ button:disabled {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 700;
 }
 
 input,
@@ -602,6 +609,7 @@ select[aria-invalid="true"] {
 
 .lesson-content--learning {
   line-height: 1.7;
+  max-width: 48rem;
 }
 
 .lesson-content section {
@@ -619,6 +627,107 @@ select[aria-invalid="true"] {
   gap: var(--space-3);
   position: sticky;
   top: var(--space-6);
+}
+
+.lesson-goal {
+  color: var(--color-text-primary);
+  max-width: 52rem;
+}
+
+.lesson-progress {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow-x: auto;
+}
+
+.lesson-progress span {
+  border-top: 0.25rem solid var(--color-action);
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  min-width: 7rem;
+  padding-top: var(--space-2);
+}
+
+.learning-section-label {
+  color: var(--color-action);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-1);
+  text-transform: uppercase;
+}
+
+.learning-copy {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.learning-copy > * {
+  margin: 0;
+}
+
+.learning-copy h3 {
+  font-size: 1rem;
+  margin-top: var(--space-2);
+}
+
+.learning-callout {
+  border-left: 0.3rem solid var(--color-action);
+  padding-left: var(--space-4);
+}
+
+.learning-callout--independent {
+  border-left-color: var(--color-text-primary);
+}
+
+.learning-callout--mistake {
+  border-left-color: #b54708;
+}
+
+.learning-code {
+  margin: 0;
+  max-width: 100%;
+}
+
+.learning-code figcaption {
+  background: #172230;
+  color: #d7e2ec;
+  font-size: 0.75rem;
+  padding: var(--space-2) var(--space-3);
+}
+
+.learning-code pre {
+  background: #0f1720;
+  color: #f4f7fa;
+  line-height: 1.55;
+  margin: 0;
+  overflow-x: auto;
+  padding: var(--space-4);
+  white-space: pre;
+}
+
+.learning-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.learning-table-scroll table {
+  border-collapse: collapse;
+  min-width: 42rem;
+  width: 100%;
+}
+
+.learning-table-scroll th,
+.learning-table-scroll td {
+  border: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  vertical-align: top;
+}
+
+.learning-table-scroll th {
+  background: var(--color-surface-panel);
 }
 
 .preserve-lines {
@@ -684,5 +793,10 @@ select[aria-invalid="true"] {
 
   .lesson-action {
     position: static;
+  }
+
+  .lesson-content,
+  .lesson-action {
+    padding: var(--space-4);
   }
 }

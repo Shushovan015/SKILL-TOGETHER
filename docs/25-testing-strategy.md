@@ -157,3 +157,6 @@ E2E may run on pull requests or protected branch depending on duration.
 - Daily capacity is respected.
 - Partner privacy is enforced.
 - AI provider failure does not block core workflows.
+- Gold-standard professional sessions include teaching, a complete example, guided checkpoints, success criteria, independent practice, and explanatory feedback.
+- Learning content preserves code and table semantics at desktop and mobile widths.
+- Run `pnpm audit:learning-experience` to flag suspicious professional sessions; manually review representative flagged and unflagged sessions because text heuristics cannot prove instructional quality.

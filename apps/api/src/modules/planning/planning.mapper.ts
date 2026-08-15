@@ -14,7 +14,17 @@ import {
 } from "./dto/planning.dto.js";
 
 export function toPlanningEnrollmentDto(enrollment: PlanningEnrollmentRecord): EnrollmentDto {
-  return toEnrollmentDto(enrollment);
+  return toEnrollmentDto({
+    ...enrollment,
+    totalTaskCount: 0,
+    completedTaskCount: 0,
+    overallProgressPercentage: 0,
+    currentDailyTaskId: null,
+    currentLessonId: null,
+    currentModuleTitle: null,
+    currentLessonTitle: null,
+    completedLessonIds: []
+  });
 }
 
 export function toDailyTaskDto(task: DailyTaskRecord): DailyTaskDto {

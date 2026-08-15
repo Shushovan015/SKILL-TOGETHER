@@ -439,7 +439,15 @@ export class InMemoryContentRepository implements ContentRepository {
       experienceLevel: enrollment.experienceLevel,
       germanStartLevel: enrollment.germanStartLevel,
       germanTargetLevel: enrollment.germanTargetLevel,
-      germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes
+      germanSessionDurationMinutes: enrollment.germanSessionDurationMinutes,
+      totalTaskCount: 0,
+      completedTaskCount: 0,
+      overallProgressPercentage: 0,
+      currentDailyTaskId: null,
+      currentLessonId: null,
+      currentModuleTitle: null,
+      currentLessonTitle: null,
+      completedLessonIds: []
     };
   }
 

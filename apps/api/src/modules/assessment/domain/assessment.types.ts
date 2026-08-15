@@ -38,6 +38,17 @@ export interface AssessmentAttemptResultRecord {
   readonly passed: boolean | null;
   readonly weakTopics: readonly string[];
   readonly revisionRecommendations: readonly DailyTaskRecord[];
+  readonly answerFeedback: readonly AssessmentAnswerFeedbackRecord[];
+}
+
+export interface AssessmentAnswerFeedbackRecord {
+  readonly questionId: string;
+  readonly promptMarkdown: string;
+  readonly response: JsonValue;
+  readonly score: number | null;
+  readonly points: number;
+  readonly feedback: string | null;
+  readonly pendingManualReview: boolean;
 }
 
 export interface AssessmentAttemptRecord {

@@ -43,7 +43,8 @@ export function toAssessmentResultDto(result: AssessmentResultRecord): Assessmen
     percentage: result.percentage,
     passed: result.passed,
     weakTopics: [...result.weakTopics],
-    revisionRecommendations: result.revisionRecommendations.map(toDailyTaskDto)
+    revisionRecommendations: result.revisionRecommendations.map(toDailyTaskDto),
+    answerFeedback: result.answerFeedback.map((answer) => ({ ...answer }))
   };
 }
 
@@ -58,6 +59,7 @@ function toAttemptResultDto(result: AssessmentAttemptRecord["result"]): Assessme
     percentage: result.percentage,
     passed: result.passed,
     weakTopics: [...result.weakTopics],
-    revisionRecommendations: result.revisionRecommendations.map(toDailyTaskDto)
+    revisionRecommendations: result.revisionRecommendations.map(toDailyTaskDto),
+    answerFeedback: result.answerFeedback.map((answer) => ({ ...answer }))
   };
 }

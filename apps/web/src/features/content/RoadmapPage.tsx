@@ -99,13 +99,14 @@ function TrackSwitcher({
 }
 
 function Roadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX.Element {
-  const firstLessonId = enrollment.track.modules.flatMap((moduleRecord) => moduleRecord.lessons)[0]?.id;
 
   return (
     <section className="roadmap roadmap--learner" aria-label={`${enrollment.track.title} roadmap`}>
       <div className="roadmap-title">
         <p className="auth-panel__eyebrow">{enrollment.experienceLevel}</p>
         <h2>{enrollment.track.title}</h2>
+        <p>{enrollment.currentLessonTitle === null ? "Your next scheduled position appears on Today." : `Current: ${enrollment.currentModuleTitle} -> ${enrollment.currentLessonTitle}`}</p>
+        <p>{enrollment.completedTaskCount} of {enrollment.totalTaskCount} sessions completed ({enrollment.overallProgressPercentage}%).</p>
       </div>
       {enrollment.track.modules.map((moduleRecord) => (
         <article className="module-panel" key={moduleRecord.id}>
@@ -113,11 +114,15 @@ function Roadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX
           <p>{moduleRecord.summary}</p>
           <ol className="roadmap-list">
             {moduleRecord.lessons.map((lesson) => {
-              const marker = lesson.id === firstLessonId ? "current" : "upcoming";
+              const marker = enrollment.completedLessonIds.includes(lesson.id)
+                ? "completed"
+                : lesson.id === enrollment.currentLessonId
+                  ? "current"
+                  : "upcoming";
 
               return (
                 <li className={`roadmap-list__item roadmap-list__item--${marker}`} key={lesson.id}>
-                  <span aria-hidden="true">{marker === "current" ? "->" : "o"}</span>
+                  <span aria-hidden="true">{marker === "completed" ? "✓" : marker === "current" ? "->" : "o"}</span>
                   <span>
                     <strong>{lesson.title}</strong>
                     <small>
@@ -144,7 +149,8 @@ const cefrGroups = [
 ] as const;
 
 function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): React.JSX.Element {
-  const currentLevel = normalizedGermanStartLevel(enrollment.germanStartLevel ?? "A1.1");
+  const startLevel = normalizedGermanStartLevel(enrollment.germanStartLevel ?? "A1.1");
+  const currentLevel = germanLevelFromModuleTitle(enrollment.currentModuleTitle) ?? startLevel;
   const targetLevel = enrollment.germanTargetLevel ?? "A1.2";
   const currentIndex = germanLevelIndex(currentLevel);
   const targetIndex = germanLevelIndex(targetLevel);
@@ -210,6 +216,12 @@ function GermanRoadmap({ enrollment }: { readonly enrollment: Enrollment }): Rea
 
 function normalizedGermanStartLevel(level: string): string {
   return level === "COMPLETE_BEGINNER" ? "A1.1" : level;
+}
+
+function germanLevelFromModuleTitle(title: string | null): string | null {
+  const match = title?.match(/\b(?:A1|A2|B1|B2|C1|C2)\.[12]\b/);
+
+  return match?.[0] ?? null;
 }
 
 function germanLevelIndex(level: string): number {

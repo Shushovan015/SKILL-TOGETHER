@@ -44,6 +44,14 @@ export interface Enrollment {
   readonly germanStartLevel: string | null;
   readonly germanTargetLevel: string | null;
   readonly germanSessionDurationMinutes: number | null;
+  readonly totalTaskCount: number;
+  readonly completedTaskCount: number;
+  readonly overallProgressPercentage: number;
+  readonly currentDailyTaskId: string | null;
+  readonly currentLessonId: string | null;
+  readonly currentModuleTitle: string | null;
+  readonly currentLessonTitle: string | null;
+  readonly completedLessonIds: readonly string[];
 }
 
 export interface Resource {
@@ -308,6 +316,14 @@ export const MY_ENROLLMENTS_QUERY = gql`
       germanStartLevel
       germanTargetLevel
       germanSessionDurationMinutes
+      totalTaskCount
+      completedTaskCount
+      overallProgressPercentage
+      currentDailyTaskId
+      currentLessonId
+      currentModuleTitle
+      currentLessonTitle
+      completedLessonIds
       track {
         ...TrackFields
       }

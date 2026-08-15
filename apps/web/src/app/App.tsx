@@ -1,26 +1,28 @@
 import { ApolloProvider } from "@apollo/client/react";
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { PartnerPage } from "../features/accountability/PartnerPage.js";
-import { HomePage } from "../features/auth/HomePage.js";
-import { LoginPage } from "../features/auth/LoginPage.js";
 import { ProtectedRoute } from "../features/auth/ProtectedRoute.js";
-import { RegisterPage } from "../features/auth/RegisterPage.js";
-import { AssessmentPage } from "../features/assessment/AssessmentPage.js";
-import { AssessmentResultPage } from "../features/assessment/AssessmentResultPage.js";
-import { AdminContentPage } from "../features/content/AdminContentPage.js";
-import { AdminLessonEditorPage } from "../features/content/AdminLessonEditorPage.js";
 import { AdminRoute } from "../features/content/AdminRoute.js";
-import { RoadmapPage } from "../features/content/RoadmapPage.js";
-import { TrackCataloguePage } from "../features/content/TrackCataloguePage.js";
-import { TrackDetailPage } from "../features/content/TrackDetailPage.js";
-import { OnboardingPage } from "../features/planning/OnboardingPage.js";
-import { LessonPage } from "../features/planning/LessonPage.js";
-import { ProgressPage } from "../features/planning/ProgressPage.js";
-import { TodayPage } from "../features/planning/TodayPage.js";
-import { WeeklyPlanPage } from "../features/planning/WeeklyPlanPage.js";
 import { createApolloClient } from "./apollo-client.js";
+
+const PartnerPage = lazy(() => import("../features/accountability/PartnerPage.js").then((module) => ({ default: module.PartnerPage })));
+const HomePage = lazy(() => import("../features/auth/HomePage.js").then((module) => ({ default: module.HomePage })));
+const LoginPage = lazy(() => import("../features/auth/LoginPage.js").then((module) => ({ default: module.LoginPage })));
+const RegisterPage = lazy(() => import("../features/auth/RegisterPage.js").then((module) => ({ default: module.RegisterPage })));
+const AssessmentPage = lazy(() => import("../features/assessment/AssessmentPage.js").then((module) => ({ default: module.AssessmentPage })));
+const AssessmentResultPage = lazy(() => import("../features/assessment/AssessmentResultPage.js").then((module) => ({ default: module.AssessmentResultPage })));
+const AdminContentPage = lazy(() => import("../features/content/AdminContentPage.js").then((module) => ({ default: module.AdminContentPage })));
+const AdminLessonEditorPage = lazy(() => import("../features/content/AdminLessonEditorPage.js").then((module) => ({ default: module.AdminLessonEditorPage })));
+const RoadmapPage = lazy(() => import("../features/content/RoadmapPage.js").then((module) => ({ default: module.RoadmapPage })));
+const TrackCataloguePage = lazy(() => import("../features/content/TrackCataloguePage.js").then((module) => ({ default: module.TrackCataloguePage })));
+const TrackDetailPage = lazy(() => import("../features/content/TrackDetailPage.js").then((module) => ({ default: module.TrackDetailPage })));
+const OnboardingPage = lazy(() => import("../features/planning/OnboardingPage.js").then((module) => ({ default: module.OnboardingPage })));
+const LessonPage = lazy(() => import("../features/planning/LessonPage.js").then((module) => ({ default: module.LessonPage })));
+const ProgressPage = lazy(() => import("../features/planning/ProgressPage.js").then((module) => ({ default: module.ProgressPage })));
+const TodayPage = lazy(() => import("../features/planning/TodayPage.js").then((module) => ({ default: module.TodayPage })));
+const WeeklyPlanPage = lazy(() => import("../features/planning/WeeklyPlanPage.js").then((module) => ({ default: module.WeeklyPlanPage })));
+const NotFoundPage = lazy(() => import("./NotFoundPage.js").then((module) => ({ default: module.NotFoundPage })));
 
 export function App(): React.JSX.Element {
   const apolloClient = useMemo(() => createApolloClient(), []);
@@ -28,6 +30,7 @@ export function App(): React.JSX.Element {
   return (
     <ApolloProvider client={apolloClient}>
       <BrowserRouter>
+        <Suspense fallback={<main className="status-page" aria-live="polite">Loading page...</main>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -148,8 +151,9 @@ export function App(): React.JSX.Element {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<HomePage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </ApolloProvider>
   );

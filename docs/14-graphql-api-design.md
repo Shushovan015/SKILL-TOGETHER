@@ -164,6 +164,14 @@ type Enrollment {
   startDate: Date!
   targetOutcome: String!
   experienceLevel: String!
+  totalTaskCount: Int!
+  completedTaskCount: Int!
+  overallProgressPercentage: Float!
+  currentDailyTaskId: ID
+  currentLessonId: ID
+  currentModuleTitle: String
+  currentLessonTitle: String
+  completedLessonIds: [ID!]!
 }
 
 input SelectLearningTrackInput {
@@ -335,6 +343,17 @@ type AssessmentAttemptResult {
   passed: Boolean
   weakTopics: [String!]!
   revisionRecommendations: [DailyTask!]!
+  answerFeedback: [AssessmentAnswerFeedback!]!
+}
+
+type AssessmentAnswerFeedback {
+  questionId: ID!
+  promptMarkdown: String!
+  response: JSON!
+  score: Float
+  points: Int!
+  feedback: String
+  pendingManualReview: Boolean!
 }
 
 type AssessmentResult {
@@ -346,6 +365,7 @@ type AssessmentResult {
   passed: Boolean
   weakTopics: [String!]!
   revisionRecommendations: [DailyTask!]!
+  answerFeedback: [AssessmentAnswerFeedback!]!
 }
 
 extend type Query {
