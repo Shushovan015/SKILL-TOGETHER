@@ -536,6 +536,146 @@ select[aria-invalid="true"] {
   width: min(100%, 72rem);
 }
 
+.weekly-plan-header,
+.weekly-plan-legend,
+.week-grid {
+  width: min(100%, 100rem);
+}
+
+.weekly-plan-header {
+  align-items: start;
+}
+
+.weekly-plan-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-5) 0 0;
+}
+
+.weekly-plan-summary div {
+  min-width: 5rem;
+}
+
+.weekly-plan-summary dt {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.weekly-plan-summary dd {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: var(--space-1) 0 0;
+}
+
+.weekly-plan-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.week-grid {
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+}
+
+.week-day-card {
+  box-shadow: 0 0.25rem 1rem rgb(20 43 67 / 7%);
+  padding: var(--space-5);
+}
+
+.week-day-card__header {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+}
+
+.week-day-card__header h2 {
+  margin: 0;
+}
+
+.week-day-card__header span {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.week-task-list {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.week-task {
+  background: #f6f8fa;
+  border-left: 0.3rem solid #98a2b3;
+  border-radius: 0.45rem;
+  padding: var(--space-3) !important;
+}
+
+.week-task--completed {
+  background: #edf9f1;
+  border-left-color: #27864b;
+}
+
+.week-task--missed {
+  background: #fff0ef;
+  border-left-color: #c9362b;
+}
+
+.week-task--in-progress {
+  background: #eef6ff;
+  border-left-color: #3478b8;
+}
+
+.week-task--skipped,
+.week-task--cancelled,
+.week-task--rescheduled {
+  opacity: 0.72;
+}
+
+.week-task__heading {
+  align-items: start;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+}
+
+.week-task__heading a {
+  font-weight: 750;
+}
+
+.task-status {
+  border: 1px solid #98a2b3;
+  border-radius: 999px;
+  color: #475467;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  text-transform: uppercase;
+}
+
+.task-status--completed {
+  background: #daf2e2;
+  border-color: #72bd8a;
+  color: #176b36;
+}
+
+.task-status--missed {
+  background: #ffe1de;
+  border-color: #e59690;
+  color: #9d241b;
+}
+
+.task-status--in-progress {
+  background: #dcecff;
+  border-color: #8bb9e5;
+  color: #245f96;
+}
+
 .today-task-list {
   display: grid;
   gap: var(--space-3);
@@ -825,6 +965,14 @@ select[aria-invalid="true"] {
   }
 
   .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .weekly-plan-header {
+    flex-direction: column;
+  }
+
+  .week-grid {
     grid-template-columns: 1fr;
   }
 

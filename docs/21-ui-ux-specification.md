@@ -128,6 +128,7 @@ The dashboard must not be a five-month calendar.
 - Present independent practice as one core task with short steps, useful language, explicit evidence, and clearly optional extension work; do not combine every duration route into one paragraph.
 - Divide substantial lesson explanations into visually distinct, named activity sections with duration, lists, and styled language examples instead of uninterrupted prose.
 - Let lesson headings, explanations, lists, and activity blocks use the full content panel on wide screens, with larger body type and section spacing to preserve readability.
+- Use the full workspace for the weekly plan. Show task status with both text and accessible color treatment: green completed, neutral planned, blue in progress, red missed, and muted skipped, cancelled, or rescheduled.
 
 ## Missed-Session Experience
 
