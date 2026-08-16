@@ -22,7 +22,7 @@ jobs:
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get update
           sudo apt-get install --yes postgresql-client-18
-          pg_dump --version
+          /usr/lib/postgresql/18/bin/pg_dump --version
 
       - name: Create backup
         env:
@@ -32,14 +32,15 @@ jobs:
           mkdir -p backups
           backup_name="skilltogether-$(date -u +'%Y-%m-%dT%H-%M-%SZ').dump"
 
-          pg_dump \
+          /usr/lib/postgresql/18/bin/pg_dump \
             --dbname="$DATABASE_URL" \
             --format=custom \
             --no-owner \
             --no-privileges \
             --file="backups/$backup_name"
 
-          pg_restore --list "backups/$backup_name" > /dev/null
+          /usr/lib/postgresql/18/bin/pg_restore \
+            --list "backups/$backup_name" > /dev/null
 
       - name: Retain backup for 30 days
         uses: actions/upload-artifact@v4
