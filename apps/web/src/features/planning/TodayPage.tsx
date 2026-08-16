@@ -187,8 +187,8 @@ export function TodayPage(): React.JSX.Element {
             <div className="section-heading">
               <h2>Your plan</h2>
               <p>
-                {data.tasks.length} {data.tasks.length === 1 ? "lesson" : "lessons"} -{" "}
-                {formatMinutes(data.estimatedStudyMinutes)} total
+                {data.tasks.length} {data.tasks.length === 1 ? "track session" : "track sessions"} -{" "}
+                {formatMinutes(data.estimatedStudyMinutes)} planned today
               </p>
             </div>
             {data.tasks.length === 0 ? (
@@ -202,7 +202,7 @@ export function TodayPage(): React.JSX.Element {
             ) : (
               <div className="today-task-list">
                 {data.tasks.map((task) => (
-                  <TaskPanel key={task.id} task={task} onStart={(taskId) => void startTask(taskId)} loading={startState.loading} />
+                  <TaskPanel key={task.id} dashboardDate={data.date} task={task} onStart={(taskId) => void startTask(taskId)} loading={startState.loading} />
                 ))}
               </div>
             )}
@@ -266,10 +266,12 @@ export function TodayPage(): React.JSX.Element {
 }
 
 function TaskPanel({
+  dashboardDate,
   loading,
   onStart,
   task
 }: {
+  readonly dashboardDate: string;
   readonly loading: boolean;
   readonly onStart: (taskId: string) => void;
   readonly task: DailyTask;
@@ -277,6 +279,7 @@ function TaskPanel({
   const isGerman = task.lesson.trackTitle === "German";
   const isProfessional =
     task.lesson.trackTitle === "Software Engineering" || task.lesson.trackTitle === "Project Management";
+  const isUpcoming = task.scheduledOn > dashboardDate;
 
   return (
     <article className="today-task-card">
@@ -302,13 +305,14 @@ function TaskPanel({
           {isGerman ? "about " : ""}
           {task.plannedDurationMinutes} min - {task.status.toLowerCase().replace("_", " ")}
         </p>
+        {isUpcoming ? <p>Next session: {formatDate(task.scheduledOn)}</p> : null}
       </div>
       <div className="auth-panel__actions">
         <Link className="button-link" to={`/lessons/${task.id}`}>
           {isGerman ? "Start German session" : isProfessional ? "Start session" : "Start lesson"}
         </Link>
-        <button type="button" disabled={loading || task.status !== "PLANNED"} onClick={() => onStart(task.id)}>
-          {task.status === "IN_PROGRESS" ? "In progress" : "Start"}
+        <button type="button" disabled={loading || !["PLANNED", "MISSED"].includes(task.status)} onClick={() => onStart(task.id)}>
+          {task.status === "IN_PROGRESS" ? "In progress" : task.status === "MISSED" ? "Resume" : "Start"}
         </button>
       </div>
     </article>

@@ -278,7 +278,10 @@ export class PrismaPlanningRepository implements PlanningRepository {
     const todaysTasks = await this.prisma.dailyTask.findMany({
       where: {
         ...activeOwnerTaskWhere(userId),
-        scheduledOn: date,
+        OR: [
+          { scheduledOn: date },
+          { status: PrismaTaskStatus.IN_PROGRESS }
+        ],
         status: {
           notIn: [
             PrismaTaskStatus.CANCELLED,
@@ -292,6 +295,32 @@ export class PrismaPlanningRepository implements PlanningRepository {
         plannedDurationMinutes: "desc"
       }
     });
+    const representedEnrollmentIds = new Set(
+      todaysTasks.map((task) => task.studyWeek.studyPlan.enrollment.id)
+    );
+    const remainingTasks = await this.prisma.dailyTask.findMany({
+      where: {
+        ...activeOwnerTaskWhere(userId),
+        status: {
+          in: [PrismaTaskStatus.MISSED, PrismaTaskStatus.PLANNED]
+        }
+      },
+      include: dailyTaskInclude,
+      orderBy: {
+        scheduledOn: "asc"
+      }
+    });
+    const nextTasksForUnrepresentedEnrollments = remainingTasks.filter((task) => {
+      const enrollmentId = task.studyWeek.studyPlan.enrollment.id;
+
+      if (representedEnrollmentIds.has(enrollmentId)) {
+        return false;
+      }
+
+      representedEnrollmentIds.add(enrollmentId);
+      return true;
+    });
+    const resumedTaskIds = new Set(nextTasksForUnrepresentedEnrollments.map((task) => task.id));
     const missedTasks = await this.prisma.dailyTask.findMany({
       where: {
         ...activeOwnerTaskWhere(userId),
@@ -322,7 +351,9 @@ export class PrismaPlanningRepository implements PlanningRepository {
         }
       }
     });
-    const mappedToday = todaysTasks.map(mapDailyTask).sort(compareDailyTasksForLearner);
+    const mappedToday = [...todaysTasks, ...nextTasksForUnrepresentedEnrollments]
+      .map(mapDailyTask)
+      .sort(compareDailyTasksForLearner);
     const mainTask = mappedToday.find((task) => task.lesson.trackType !== "GERMAN") ?? null;
     const germanTask = mappedToday.find((task) => task.lesson.trackType === "GERMAN") ?? null;
     const plannedCount = weeklyTasks.length;
@@ -333,7 +364,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
       tasks: mappedToday,
       mainTask,
       germanTask,
-      estimatedStudyMinutes: mappedToday.reduce(
+      estimatedStudyMinutes: todaysTasks.reduce(
         (sum, task) => sum + task.plannedDurationMinutes,
         0
       ),
@@ -343,7 +374,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
         weeklyCompletionPercentage:
           plannedCount === 0 ? 0 : Math.round((completedCount / plannedCount) * 100)
       },
-      missedTasks: missedTasks.map(mapDailyTask)
+      missedTasks: missedTasks.filter((task) => !resumedTaskIds.has(task.id)).map(mapDailyTask)
     };
   }
 
@@ -392,7 +423,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
       return mapDailyTask(task);
     }
 
-    if (task.status !== PrismaTaskStatus.PLANNED) {
+    if (task.status !== PrismaTaskStatus.PLANNED && task.status !== PrismaTaskStatus.MISSED) {
       throw invalidStatusError();
     }
 
@@ -867,7 +898,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
           lt: today
         },
         status: {
-          in: [PrismaTaskStatus.PLANNED, PrismaTaskStatus.IN_PROGRESS]
+          in: [PrismaTaskStatus.PLANNED]
         }
       },
       select: {

@@ -18,7 +18,7 @@ export function readLessonDraft(dailyTaskId: string | undefined): LessonDraft {
   if (dailyTaskId === undefined || typeof window === "undefined") return emptyLessonDraft;
 
   try {
-    const saved = window.sessionStorage.getItem(draftKey(dailyTaskId));
+    const saved = window.localStorage.getItem(draftKey(dailyTaskId));
     if (saved === null) return emptyLessonDraft;
     const value: unknown = JSON.parse(saved);
     return isLessonDraft(value) ? value : emptyLessonDraft;
@@ -29,12 +29,12 @@ export function readLessonDraft(dailyTaskId: string | undefined): LessonDraft {
 
 export function writeLessonDraft(dailyTaskId: string, draft: LessonDraft): void {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(draftKey(dailyTaskId), JSON.stringify(draft));
+  window.localStorage.setItem(draftKey(dailyTaskId), JSON.stringify(draft));
 }
 
 export function clearLessonDraft(dailyTaskId: string): void {
   if (typeof window === "undefined") return;
-  window.sessionStorage.removeItem(draftKey(dailyTaskId));
+  window.localStorage.removeItem(draftKey(dailyTaskId));
 }
 
 function draftKey(dailyTaskId: string): string {

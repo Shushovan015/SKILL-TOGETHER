@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { clearLessonDraft, emptyLessonDraft, readLessonDraft, writeLessonDraft } from "./lesson-draft.js";
 
 describe("lesson drafts", () => {
-  afterEach(() => window.sessionStorage.clear());
+  afterEach(() => window.localStorage.clear());
 
   it("restores unfinished evidence for the same daily task", () => {
     writeLessonDraft("software-task", { ...emptyLessonDraft, guidedEvidence: "typed mapper" });
@@ -23,7 +23,7 @@ describe("lesson drafts", () => {
   });
 
   it("ignores malformed stored content", () => {
-    window.sessionStorage.setItem("skilltogether:lesson-draft:task", "{not-json");
+    window.localStorage.setItem("skilltogether:lesson-draft:task", "{not-json");
 
     expect(readLessonDraft("task")).toEqual(emptyLessonDraft);
   });

@@ -234,8 +234,8 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
             <LessonSections task={task} />
           </article>
           <aside className="lesson-action" aria-label="Lesson actions">
-            <button type="button" disabled={startState.loading || task.status !== "PLANNED"} onClick={() => void startTask()}>
-              {task.status === "PLANNED" ? "Start lesson" : "Lesson started"}
+            <button type="button" disabled={startState.loading || !["PLANNED", "MISSED"].includes(task.status)} onClick={() => void startTask()}>
+              {task.status === "PLANNED" ? "Start lesson" : task.status === "MISSED" ? "Resume lesson" : "Lesson started"}
             </button>
             <button type="button" onClick={() => navigate(`/lessons/${taskId}/exercise`)}>
               Finish lesson

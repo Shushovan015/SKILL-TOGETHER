@@ -52,10 +52,12 @@ function createStudyPlan(enrollment, lessons, preferences):
 A task becomes MISSED when:
 
 - scheduled date is before today's local date;
-- status is PLANNED or IN_PROGRESS;
+- status is PLANNED;
 - no completed Task Attempt exists.
 
-Completed, SKIPPED, CANCELLED, and RESCHEDULED tasks are not marked MISSED.
+IN_PROGRESS tasks remain active and appear on the Today dashboard until the learner completes them, including on a later day. Completed, SKIPPED, CANCELLED, and RESCHEDULED tasks are not marked MISSED.
+
+When an active track has no task scheduled today and no future planned task, its earliest MISSED task appears as the track's resumable session on Today. Resuming changes that task to IN_PROGRESS without rewriting completed work.
 
 ## Recovery Options
 
