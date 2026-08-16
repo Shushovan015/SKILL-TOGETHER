@@ -32,6 +32,8 @@ The scheduling engine creates and adjusts Daily Tasks for a learner's Study Plan
 
 ## Initial Planning Algorithm
 
+Study Weeks and Daily Tasks are persisted in bulk inside a single transaction. The transaction uses an explicit extended timeout so larger level ranges can be created reliably against a production database without leaving a partially generated plan.
+
 ```text
 function createStudyPlan(enrollment, lessons, preferences):
   approvedLessons = lessons.filter(status == APPROVED)

@@ -100,6 +100,11 @@ interface LoadedRecoveryContext {
   readonly required: boolean;
 }
 
+const transactionOptions = {
+  maxWait: 10_000,
+  timeout: 30_000
+} as const;
+
 export class PrismaPlanningRepository implements PlanningRepository {
   public constructor(
     private readonly prisma: PrismaService,
@@ -174,7 +179,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
         );
 
         return savedEnrollment;
-      });
+      }, transactionOptions);
 
       return mapEnrollment(enrollment);
     } catch (error) {
@@ -260,7 +265,7 @@ export class PrismaPlanningRepository implements PlanningRepository {
         );
 
         return savedEnrollment;
-      });
+      }, transactionOptions);
 
       return mapEnrollment(enrollment);
     } catch (error) {
@@ -746,36 +751,41 @@ export class PrismaPlanningRepository implements PlanningRepository {
         }
       }
     });
-    const weekIdsByNumber = new Map<number, string>();
-
-    for (const week of schedule.weeks) {
-      const savedWeek = await transaction.studyWeek.create({
-        data: {
+    const savedWeeks = await transaction.studyWeek.createManyAndReturn({
+      data: schedule.weeks.map((week) => ({
           studyPlanId: studyPlan.id,
           weekNumber: week.weekNumber,
           startsOn: week.startsOn,
           endsOn: week.endsOn
-        }
-      });
-      weekIdsByNumber.set(week.weekNumber, savedWeek.id);
-    }
-
-    for (const task of schedule.tasks) {
+      })),
+      select: {
+        id: true,
+        weekNumber: true
+      }
+    });
+    const weekIdsByNumber = new Map(
+      savedWeeks.map((week) => [week.weekNumber, week.id] as const)
+    );
+    const taskData = schedule.tasks.map((task) => {
       const studyWeekId = weekIdsByNumber.get(task.weekNumber);
 
       if (studyWeekId === undefined) {
         throw new Error("Study week was not created for scheduled task.");
       }
 
-      await transaction.dailyTask.create({
-        data: {
+      return {
           studyWeekId,
           lessonVersionId: task.lessonVersionId,
           scheduledOn: task.scheduledOn,
           status: PrismaTaskStatus.PLANNED,
           plannedDurationMinutes: task.plannedDurationMinutes,
           isRequired: task.required
-        }
+      };
+    });
+
+    if (taskData.length > 0) {
+      await transaction.dailyTask.createMany({
+        data: taskData
       });
     }
   }
