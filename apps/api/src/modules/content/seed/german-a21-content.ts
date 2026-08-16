@@ -102,9 +102,9 @@ export function germanA21ContentForLesson(lesson: GermanSeedLesson): GermanA21Co
 
 function renderSession(session: GermanSession): string {
   return [
-    "How to use this session with your available time:\n30 minutes: complete quick review, the first input activity, controlled practice, and the knowledge check.\n45 minutes: add pronunciation plus one speaking or writing task.\n60 minutes: complete the full main path through guided production. This should take about 55-65 active minutes.\n90 minutes: complete everything, including the extension production, mediation, and real-world task.",
+    "### Choose your session length\n\n- **30 minutes:** quick review, first input activity, controlled practice, and knowledge check.\n- **45 minutes:** add pronunciation and one speaking or writing task.\n- **60 minutes:** complete the guided main path (about 55-65 active minutes).\n- **90 minutes:** add the optional extension, mediation, and real-world task.",
     ...session.activities.map(
-      (activity) => `${activity.title} (${activity.minutes} min)\n${activity.body}`
+      (activity) => `### ${activity.title} · ${activity.minutes} min\n\n${activity.body}`
     )
   ].join("\n\n");
 }

@@ -326,6 +326,34 @@ describe("phase 3 German seed data", () => {
     expect(content.resources.map((resource) => resource.provider)).toEqual(["Goethe-Institut"]);
   });
 
+  it("keeps the A2.1 travel examples simple and free of generated template fragments", () => {
+    const travelLesson = findLesson("DE-A21-M01-S01");
+    const content = buildApprovedSeedVersionInput(travelLesson);
+    const examples = content.examples.join("\n");
+
+    expect(content.examples).toEqual([
+      "A: Wann faehrt der Zug nach Leipzig?\nB: Der Zug faehrt um 9:18 Uhr von Gleis 7.",
+      "Ich moechte eine Fahrkarte hin und zurueck.",
+      "Ich suche eine Unterkunft fuer zwei Naechte in der Naehe vom Bahnhof."
+    ]);
+    expect(examples).not.toContain("Reading text and task");
+    expect(examples).not.toContain("compare two travel options and book one");
+    expect(examples).not.toContain("Welche Information fehlt noch?");
+  });
+
+  it("keeps generated worked examples grammatical from A1.1 through C2.2", () => {
+    for (const [level, code] of implementedGermanLevels) {
+      const lesson = findLesson(`DE-${code}-M03-S01`);
+      const examples = buildApprovedSeedVersionInput(lesson).examples.join("\n");
+
+      expect(examples, level).not.toContain("Core phrase:");
+      expect(examples, level).not.toContain("Welche Information fehlt noch?");
+      expect(examples, level).not.toContain(lesson.title);
+      expect(examples, level).not.toContain("compare two travel options and book one");
+      expect(examples, level).toContain("`");
+    }
+  });
+
   it("keeps every implemented German session compatible with 30/45/60/90 minute scheduling", () => {
     for (const lesson of implementedLessons) {
       const content = buildApprovedSeedVersionInput(lesson);

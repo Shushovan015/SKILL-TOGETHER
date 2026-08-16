@@ -124,6 +124,10 @@ The dashboard must not be a five-month calendar.
 - Use semantic code blocks and horizontally scrollable data tables at narrow widths.
 - Give every session explicit links to Today, the weekly plan, Roadmap, and My Tracks.
 - Keep the primary reading column near 48rem so long technical explanations remain readable.
+- On wide desktop screens, let the lesson workspace and completion panel use the available viewport while keeping individual prose blocks near 75 characters per line.
+- Present independent practice as one core task with short steps, useful language, explicit evidence, and clearly optional extension work; do not combine every duration route into one paragraph.
+- Divide substantial lesson explanations into visually distinct, named activity sections with duration, lists, and styled language examples instead of uninterrupted prose.
+- Let lesson headings, explanations, lists, and activity blocks use the full content panel on wide screens, with larger body type and section spacing to preserve readability.
 
 ## Missed-Session Experience
 

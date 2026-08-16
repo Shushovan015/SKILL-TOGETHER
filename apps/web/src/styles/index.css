@@ -581,8 +581,8 @@ select[aria-invalid="true"] {
   align-items: start;
   display: grid;
   gap: var(--space-6);
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-  width: min(100%, 72rem);
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
+  width: min(100%, 100rem);
 }
 
 .lesson-content,
@@ -594,7 +594,7 @@ select[aria-invalid="true"] {
 }
 
 .lesson-header {
-  width: min(100%, 72rem);
+  width: min(100%, 100rem);
 }
 
 .back-link {
@@ -608,8 +608,39 @@ select[aria-invalid="true"] {
 }
 
 .lesson-content--learning {
+  font-size: 1.075rem;
   line-height: 1.7;
-  max-width: 48rem;
+}
+
+.lesson-content .learning-copy > p,
+.lesson-content .learning-copy > ul,
+.lesson-content .learning-copy > ol {
+  width: 100%;
+}
+
+.lesson-content > section > h2,
+.lesson-content > section > p,
+.lesson-content > section > ul,
+.lesson-content > section > ol,
+.lesson-content > section > details,
+.lesson-content > section > .learning-copy {
+  width: 100%;
+}
+
+.lesson-content > section > .learning-section-label {
+  width: 100%;
+}
+
+.learning-callout--independent .learning-copy {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.learning-callout--independent .learning-copy > :first-child,
+.learning-callout--independent .learning-copy > :nth-child(2),
+.learning-callout--independent .learning-copy > :last-child {
+  grid-column: 1 / -1;
 }
 
 .lesson-content section {
@@ -660,7 +691,7 @@ select[aria-invalid="true"] {
 
 .learning-copy {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 .learning-copy > * {
@@ -668,8 +699,22 @@ select[aria-invalid="true"] {
 }
 
 .learning-copy h3 {
+  background: #f2f8f7;
+  border: 1px solid #d7e8e6;
+  border-radius: var(--radius-card);
+  color: var(--color-text-primary);
   font-size: 1rem;
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.learning-copy code {
+  background: #eef3f7;
+  border-radius: 0.25rem;
+  color: #17324d;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.92em;
+  padding: 0.12em 0.32em;
 }
 
 .learning-callout {
@@ -789,6 +834,14 @@ select[aria-invalid="true"] {
 
   .lesson-layout {
     grid-template-columns: 1fr;
+  }
+
+  .learning-callout--independent .learning-copy {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-callout--independent .learning-copy > * {
+    grid-column: 1;
   }
 
   .lesson-action {

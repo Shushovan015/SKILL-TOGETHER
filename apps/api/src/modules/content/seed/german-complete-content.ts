@@ -52,7 +52,7 @@ export function germanCompleteContentForLesson(lesson: SeedLessonDefinition): Ge
     outcomes: outcomesFor(definition, profile, unit),
     explanationMarkdown: explanationFor(definition, profile, unit, primaryPhrase, secondaryPhrase),
     relevanceMarkdown: relevanceFor(definition, profile),
-    examples: examplesFor(definition, profile, primaryPhrase, secondaryPhrase),
+    examples: examplesFor(profile),
     commonMistakes: commonMistakesFor(definition, profile),
     resources: [
       {
@@ -100,14 +100,14 @@ function explanationFor(
     : "";
 
   return [
-    "How to use this session with your available time:\n30 minutes: retrieval, core input, one controlled answer set, and the knowledge check.\n45 minutes: add pronunciation plus a short spoken or written response.\n60 minutes: complete the guided path. This should take about 55-65 active minutes.\n90 minutes: add partner or self-study recording, mediation, revision, and reflection.",
-    `Learning focus: ${definition.title}. Work at ${profile.label}; the session focus is ${unit.label.toLowerCase()}.`,
-    `Core language: start from \`${primaryPhrase}\`, add vocabulary for ${definition.module.vocabularyFocus}, and show ${definition.module.grammarFocus}. Expansion: \`${secondaryPhrase}\`.`,
-    audioScriptFor(definition, profile, unit),
-    readingTaskFor(definition, profile),
-    `Grammar/vocabulary: mark ${definition.module.grammarFocus}; circle words for ${definition.module.vocabularyFocus}. Then write one fact, one question, and one reason or contrast.`,
-    `Pronunciation: focus on ${definition.module.pronunciationFocus}. Say the core phrase slowly, then naturally, and mark one clarity improvement.`,
-    `Production path: ${unit.outputTask}. Partner route: exchange roles and ask one follow-up. Self-study route: record both sides, listen again, and rewrite the weakest sentence.${finalAssessment}`
+    "### Choose your session length\n\n- **30 minutes:** retrieval, core input, controlled practice, and knowledge check.\n- **45 minutes:** add pronunciation and a short response.\n- **60 minutes:** complete the guided path (about 55-65 active minutes).\n- **90 minutes:** add optional recording, mediation, revision, and reflection.",
+    `### Learning focus\n\n${definition.title}. Work at ${profile.label}. Today you will practise ${unit.label.toLowerCase()}.`,
+    `### Core language\n\nStart with \`${primaryPhrase} ...\`. Use vocabulary for ${definition.module.vocabularyFocus}. Practise ${definition.module.grammarFocus}. Another useful starter is \`${secondaryPhrase} ...\`.`,
+    `### Listening\n\n${audioScriptFor(definition, profile, unit)}`,
+    `### Reading\n\n${readingTaskFor(definition, profile)}`,
+    `### Grammar and vocabulary\n\nFind one example of ${definition.module.grammarFocus}. Select useful words for ${definition.module.vocabularyFocus}. Write one fact, one question, and one reason or contrast.`,
+    `### Pronunciation\n\nFocus on ${definition.module.pronunciationFocus}. Say the core phrase slowly, then naturally. Note one improvement.`,
+    `### Put it into practice\n\n${unit.outputTask}. With a partner, exchange roles and ask one follow-up question. By yourself, record both roles and improve your weakest sentence.${finalAssessment}`
   ].join("\n\n");
 }
 
@@ -246,13 +246,21 @@ function independentPromptFor(
     : "";
 
   return [
-    `${prefix}Real-world goal: ${definition.module.moduleEvidence}.`,
-    `Speaking task (8-10 minutes): Situation: you must ${definition.module.communicativePurpose}. Your role is the learner or customer; a partner, or your own recorded second voice, is the other person. Prepare the essential facts, open politely, complete at least six turns, ask two follow-up questions, repair one misunderstanding, and close with an agreed next step. Useful language: ${profile.phrases.join("; ")}.`,
-    `Writing task (8-10 minutes): Write a recipient-ready text that supports the same goal. State the audience and purpose, include the situation, two relevant details, a reason, and the requested next action. Use ${definition.module.grammarFocus}. At ${definition.module.level}, aim for the length and complexity appropriate to ${profile.productionStyle}; clarity matters more than padding.`,
-    `Mediation task (5 minutes, 60/90-minute route): Explain the important information to a person who did not see the source. ${profile.mediationStyle}. Preserve names, numbers, deadlines, conditions, and uncertainty. Do not translate sentence by sentence.`,
-    `90-minute extension: add a second response with a different register, compare both versions, and explain three changes in tone, vocabulary, or sentence structure.`,
-    `Evidence: record or rehearse the speaking response, save the written response, underline vocabulary for ${definition.module.vocabularyFocus}, and mark where you used ${definition.module.grammarFocus}.`
-  ].join("\n");
+    `${prefix}Your task`,
+    `Complete one practical response that helps you ${definition.module.moduleEvidence}.`,
+    "Steps",
+    "1. Write the situation and two important details.",
+    `2. Write a short response using vocabulary for ${definition.module.vocabularyFocus}.`,
+    `3. Include one clear example of ${definition.module.grammarFocus}.`,
+    "4. Add one question or requested next step.",
+    "5. Read the response aloud once and correct anything unclear.",
+    "Useful German",
+    ...profile.phrases.slice(0, 3).map((phrase) => `- ${phrase} ...`),
+    "What to save",
+    `Save your final response. It should be ${profile.productionStyle}.`,
+    "Optional extra practice",
+    "If you have more time, record the response or write a second version. This is optional."
+  ].join("\n\n");
 }
 
 function independentRubricFor(
@@ -289,19 +297,63 @@ function relevanceFor(definition: GermanCurriculumLessonDefinition, profile: Lev
 }
 
 function examplesFor(
-  definition: GermanCurriculumLessonDefinition,
-  profile: LevelProfile,
-  primaryPhrase: string,
-  secondaryPhrase: string
+  profile: LevelProfile
 ): readonly string[] {
-  return [
-    `Core phrase: ${primaryPhrase} ${definition.module.moduleEvidence}.`,
-    `Follow-up: ${secondaryPhrase} Welche Information fehlt noch?`,
-    `Mini response: Ich habe die wichtigsten Punkte zu ${definition.module.title} notiert und kann den naechsten Schritt erklaeren.`,
-    `Reason model: ${primaryPhrase} einen klaren naechsten Schritt, weil die andere Person danach handeln muss.`,
-    `Repair model: Entschuldigung, das habe ich nicht ganz verstanden. Koennen Sie den letzten Punkt bitte anders formulieren?`,
-    `Register model: informal answers may be shorter; formal answers need a greeting, clear request, reason, and polite closing. Aim for ${profile.productionStyle}.`
+  const sharedExamples = [
+    "Follow-up question: `Koennen Sie das bitte genauer erklaeren?` (Could you explain that more precisely?)",
+    "Repair phrase: `Entschuldigung, das habe ich nicht ganz verstanden. Koennen Sie das bitte anders formulieren?` (Sorry, I did not quite understand. Could you say that differently?)"
   ];
+
+  switch (profile.cefrBand) {
+    case "A1":
+      return [
+        "Request: `Ich moechte eine Fahrkarte, bitte.` (I would like a ticket, please.)",
+        "Question: `Wann beginnt der Kurs?` (When does the course start?)",
+        "Information: `Der Termin ist am Montag um zehn Uhr.` (The appointment is Monday at ten.)",
+        "Closing: `Vielen Dank. Auf Wiedersehen.` (Thank you. Goodbye.)",
+        ...sharedExamples
+      ];
+    case "A2":
+      return [
+        "Request: `Ich moechte wissen, ob noch ein Termin frei ist.` (I would like to know whether an appointment is still available.)",
+        "Question: `Koennen Sie mir bitte sagen, wann der Zug abfaehrt?` (Could you tell me when the train leaves?)",
+        "Reason: `Ich nehme den Bus, weil er guenstiger ist.` (I am taking the bus because it is cheaper.)",
+        "Decision: `Meine Entscheidung ist der fruehere Termin.` (My choice is the earlier appointment.)",
+        ...sharedExamples
+      ];
+    case "B1":
+      return [
+        "Opinion: `Meiner Meinung nach ist die zweite Moeglichkeit besser.` (In my opinion, the second option is better.)",
+        "Reason: `Ein wichtiger Grund ist, dass wir dadurch Zeit sparen.` (An important reason is that this saves us time.)",
+        "Sequence: `Zuerst vergleichen wir die Angebote, danach treffen wir eine Entscheidung.` (First we compare the offers, then we make a decision.)",
+        "Recommendation: `Ich wuerde empfehlen, dass wir frueh anfangen.` (I would recommend that we start early.)",
+        ...sharedExamples
+      ];
+    case "B2":
+      return [
+        "Contrast: `Einerseits ist das Angebot guenstig, andererseits ist es wenig flexibel.` (On the one hand the offer is inexpensive; on the other, it is not very flexible.)",
+        "Conclusion: `Aus den Informationen geht hervor, dass eine Aenderung notwendig ist.` (The information indicates that a change is necessary.)",
+        "Recommendation: `Daher waere es sinnvoll, eine Alternative zu pruefen.` (It would therefore be sensible to examine an alternative.)",
+        "Evaluation: `Ich halte diese Loesung fuer ueberzeugend, weil sie beide Ziele beruecksichtigt.` (I find this solution convincing because it considers both goals.)",
+        ...sharedExamples
+      ];
+    case "C1":
+      return [
+        "Position: `Es laesst sich argumentieren, dass die Vorteile langfristig ueberwiegen.` (It can be argued that the advantages prevail in the long term.)",
+        "Context: `Vor diesem Hintergrund erscheint eine schrittweise Einfuehrung angemessen.` (Against this background, a gradual introduction seems appropriate.)",
+        "Qualification: `Eine differenzierte Betrachtung zeigt jedoch, dass nicht alle Gruppen gleichermassen profitieren.` (A nuanced view shows, however, that not all groups benefit equally.)",
+        "Limitation: `Die zentrale Einschraenkung besteht darin, dass verlaessliche Daten fehlen.` (The main limitation is the lack of reliable data.)",
+        ...sharedExamples
+      ];
+    case "C2":
+      return [
+        "Nuance: `Bei genauer Betrachtung ist die Aussage weniger eindeutig, als sie zunaechst erscheint.` (On closer examination, the statement is less clear than it first appears.)",
+        "Ambiguity: `Die Formulierung ist bewusst ambivalent, weil sie zwei Lesarten zulaesst.` (The wording is deliberately ambiguous because it permits two interpretations.)",
+        "Refinement: `Ich wuerde die Position insofern nuancieren, als ihre Gueltigkeit vom jeweiligen Kontext abhaengt.` (I would qualify the position insofar as its validity depends on the context.)",
+        "Emphasis: `Entscheidend ist weniger die einzelne Aussage als vielmehr ihre Funktion im Gesamtargument.` (What matters is less the individual statement than its function in the overall argument.)",
+        ...sharedExamples
+      ];
+  }
 }
 
 function commonMistakesFor(

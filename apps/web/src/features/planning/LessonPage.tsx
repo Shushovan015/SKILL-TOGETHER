@@ -17,6 +17,7 @@ import {
 } from "./graphql.js";
 import { toSafePlanningMessage } from "./planning-ui.js";
 import { LearningContent } from "./LearningContent.js";
+import { formatIndependentPracticeContent } from "./independent-practice.js";
 import { clearLessonDraft, readLessonDraft, writeLessonDraft } from "./lesson-draft.js";
 
 interface LessonPageProps {
@@ -35,7 +36,6 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
   const [completionNotes, setCompletionNotes] = useState(initialDraft.notes);
   const [reflection, setReflection] = useState(initialDraft.reflection);
   const [actionError, setActionError] = useState<string | undefined>();
-  const [successMessage, setSuccessMessage] = useState<string | undefined>();
   const query = useQuery<DailyTaskQueryData, DailyTaskQueryVariables>(DAILY_TASK_QUERY, {
     variables: {
       id: dailyTaskId ?? ""
@@ -102,7 +102,6 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
 
   async function runWithCsrf(action: (csrfToken: string) => Promise<void>): Promise<void> {
     setActionError(undefined);
-    setSuccessMessage(undefined);
 
     try {
       await action(await fetchCsrfToken(client));
@@ -159,7 +158,7 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
         }
       });
       clearLessonDraft(taskId);
-      setSuccessMessage("Lesson completed. Your practice and reflection were saved.");
+      navigate("/tracks", { replace: true });
     });
   }
 
@@ -197,16 +196,6 @@ export function LessonPage({ exerciseOnly = false }: LessonPageProps): React.JSX
           {actionError}
         </p>
       )}
-      {successMessage === undefined ? null : (
-        <section className="form-success" role="status">
-          <p>{successMessage}</p>
-          <div className="auth-panel__actions">
-            <Link className="button-link" to="/today">Continue on Today</Link>
-            <Link className="button-link button-link--secondary" to={roadmapUrl}>View roadmap</Link>
-          </div>
-        </section>
-      )}
-
       {exerciseOnly ? (
         <LessonCompletionForm
           completeLoading={completeState.loading}
@@ -360,11 +349,14 @@ function ExerciseSection({
   readonly solutionNotes: string | null;
   readonly title: string;
 }): React.JSX.Element {
+  const displayedPrompt =
+    title === "Practice By Yourself" ? formatIndependentPracticeContent(prompt) : prompt;
+
   return (
     <section className={title === "Try It With Me" ? "learning-callout learning-callout--guided" : "learning-callout learning-callout--independent"}>
       <p className="learning-section-label">{title === "Try It With Me" ? "Guided Practice" : "Try It Yourself"}</p>
       <h2>{title}</h2>
-      <LearningContent content={prompt} />
+      <LearningContent content={displayedPrompt} />
       <p>
         <strong>What to write down:</strong> {evidence}
       </p>

@@ -240,25 +240,14 @@ function enrichBenchmarkGermanContent(
 ): LearnerSeedContent {
   return {
     ...benchmark,
-    examples: [
-      ...benchmark.examples,
-      `Reading text and task:\n${fullSession.examples[2] ?? fullSession.examples[0]}`,
-      `Listening transcript follow-up:\n${fullSession.examples[4] ?? fullSession.examples[1]}`,
-      ...fullSession.examples.slice(0, 3)
-    ].slice(0, 10),
-    exercises: benchmark.exercises.map((exercise, index) => {
-      const fullExercise = fullSession.exercises[index];
-
-      if (fullExercise === undefined) {
-        return exercise;
-      }
-
-      return {
-        ...exercise,
-        promptMarkdown: [exercise.promptMarkdown, fullExercise.promptMarkdown].join("\n\n"),
-        solutionNotesMarkdown: exercise.solutionNotesMarkdown ?? fullExercise.solutionNotesMarkdown
-      };
-    }),
+    // These benchmark sessions already contain reviewed, situation-specific examples.
+    // Generic examples interpolate English curriculum metadata into German phrases,
+    // which makes learner-facing copy confusing and sometimes ungrammatical.
+    examples: benchmark.examples,
+    // The reviewed exercises are complete on their own. Appending the generic
+    // speaking, writing, mediation, and extension routes creates one oversized
+    // assignment that obscures the actual task.
+    exercises: benchmark.exercises,
     knowledgeChecks: [...benchmark.knowledgeChecks, ...fullSession.knowledgeChecks].slice(0, 10)
   };
 }

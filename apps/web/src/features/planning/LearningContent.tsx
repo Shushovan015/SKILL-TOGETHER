@@ -55,7 +55,7 @@ function renderBlocks(content: string): readonly ReactNode[] {
         items.push((lines[index] ?? "").trim().slice(2));
         index += 1;
       }
-      blocks.push(<ul key={`list-${index}`}>{items.map((item) => <li key={item}>{item}</li>)}</ul>);
+      blocks.push(<ul key={`list-${index}`}>{items.map((item) => <li key={item}>{renderInline(item)}</li>)}</ul>);
       continue;
     }
 
@@ -65,11 +65,17 @@ function renderBlocks(content: string): readonly ReactNode[] {
         items.push((lines[index] ?? "").trim().replace(/^\d+\. /u, ""));
         index += 1;
       }
-      blocks.push(<ol key={`steps-${index}`}>{items.map((item) => <li key={item}>{item}</li>)}</ol>);
+      blocks.push(<ol key={`steps-${index}`}>{items.map((item) => <li key={item}>{renderInline(item)}</li>)}</ol>);
       continue;
     }
 
-    if (/^(Mental model|Problem|Why|Worked example|Checkpoint|Success criteria|What you should remember|Professional transfer|Interview transfer|Duration architecture|Activity plan|Core model):?$/iu.test(line)) {
+    if (/^#{2,4}\s+/u.test(line)) {
+      blocks.push(<h3 key={`heading-${index}`}>{renderInline(line.replace(/^#{2,4}\s+/u, ""))}</h3>);
+      index += 1;
+      continue;
+    }
+
+    if (/^(Mental model|Problem|Why|Worked example|Checkpoint|Success criteria|What you should remember|Professional transfer|Interview transfer|Duration architecture|Activity plan|Core model|Your task|Steps|Useful German|What to save|Optional extra practice):?$/iu.test(line)) {
       blocks.push(<h3 key={`heading-${index}`}>{line.replace(/:$/u, "")}</h3>);
       index += 1;
       continue;
@@ -83,10 +89,24 @@ function renderBlocks(content: string): readonly ReactNode[] {
       paragraph.push(next);
       index += 1;
     }
-    blocks.push(<p key={`paragraph-${index}`}>{paragraph.join(" ")}</p>);
+    blocks.push(<p key={`paragraph-${index}`}>{renderInline(paragraph.join(" "))}</p>);
   }
 
   return blocks;
+}
+
+function renderInline(text: string): readonly ReactNode[] {
+  return text.split(/(`[^`]+`|\*\*[^*]+\*\*)/u).filter(Boolean).map((part, index) => {
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={`${index}-${part}`}>{part.slice(1, -1)}</code>;
+    }
+
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={`${index}-${part}`}>{part.slice(2, -2)}</strong>;
+    }
+
+    return part;
+  });
 }
 
 function renderTable(lines: readonly string[], key: number): ReactNode {
